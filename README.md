@@ -1,0 +1,2 @@
+# codespin-plugin
+VSCode Plugin
