@@ -14,10 +14,47 @@
   "contributes": {
     "commands": [
       {
-        "command": "codespin-ai.helloWorld",
-        "title": "Hello World"
+        "command": "codespin-ai.generate",
+        "title": "CodeSpin.AI: Generate"
+      },
+      {
+        "command": "codespin-ai.generateFromCommit",
+        "title": "CodeSpin.AI: Generate from Commit"
+      },
+      {
+        "command": "codespin-ai.generateWithPromptDiff",
+        "title": "CodeSpin.AI: Generate with Prompt Diff"
       }
-    ]
+    ],
+    "menus": {
+      "explorer/context": [
+        {
+          "command": "codespin-ai.generate",
+          "when": "resourceFilename =~ /\\.prompt\\.md$/i",
+          "group": "codespin-ai"
+        },
+        {
+          "command": "codespin-ai.generateFromCommit",
+          "when": "resourceFilename =~ /\\.prompt\\.md$/i",
+          "group": "codespin-ai"
+        },
+
+        {
+          "command": "codespin-ai.generateWithPromptDiff",
+          "when": "resourceFilename =~ /\\.prompt\\.md$/i",
+          "group": "codespin-ai"
+        }
+      ]
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "codespin-ai",
+          "title": "CodeSpin.AI",
+          "icon": "resources/codespin-ai-icon.svg"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
