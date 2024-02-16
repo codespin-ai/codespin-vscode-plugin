@@ -5,12 +5,11 @@ import * as vscode from "vscode";
 import { generate } from "./commands/generate.js";
 import { generateFromCommit } from "./commands/generateFromCommit.js";
 import { generateWithPromptDiff } from "./commands/generateWithPromptDiff.js";
+import { createPromptFile } from "./commands/createPromptFile.js";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  console.log('Congratulations, your extension "codespin-ai" is now active!');
-
   const generateCommand = vscode.commands.registerCommand(
     "codespin-ai.generate",
     generate
@@ -31,6 +30,13 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(generateWithPromptDiffCommand);
+
+  const createPromptFileCommand = vscode.commands.registerCommand(
+    "codespin-ai.createPromptFile",
+    createPromptFile
+  );
+
+  context.subscriptions.push(createPromptFileCommand);
 }
 
 // This method is called when your extension is deactivated

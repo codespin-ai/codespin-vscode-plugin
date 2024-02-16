@@ -24,6 +24,10 @@
       {
         "command": "codespin-ai.generateWithPromptDiff",
         "title": "CodeSpin.AI: Generate with Prompt Diff"
+      },
+      {
+        "command": "codespin-ai.createPromptFile",
+        "title": "CodeSpin.AI: Add a Prompt File"
       }
     ],
     "menus": {
@@ -38,10 +42,14 @@
           "when": "resourceFilename =~ /\\.prompt\\.md$/i",
           "group": "codespin-ai"
         },
-
         {
           "command": "codespin-ai.generateWithPromptDiff",
           "when": "resourceFilename =~ /\\.prompt\\.md$/i",
+          "group": "codespin-ai"
+        },
+        {
+          "command": "codespin-ai.createPromptFile",
+          "when": "resourceFilename != .prompt.md",
           "group": "codespin-ai"
         }
       ]
