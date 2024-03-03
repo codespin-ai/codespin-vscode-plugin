@@ -18,9 +18,7 @@ export class QuickPromptPanel {
     );
   }
 
-  public static render(
-    context: vscode.ExtensionContext
-  ) {
+  public static render(context: vscode.ExtensionContext) {
     if (QuickPromptPanel.currentPanel) {
       QuickPromptPanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
     } else {
@@ -29,7 +27,12 @@ export class QuickPromptPanel {
         "Hello World",
         vscode.ViewColumn.One,
         {
-          // Empty for now
+          // Enable javascript in the webview
+          enableScripts: true,
+          // Restrict the webview to only load resources from the `out` directory
+          localResourceRoots: [
+            vscode.Uri.joinPath(context.extensionUri, "out"),
+          ],
         }
       );
 
@@ -66,9 +69,10 @@ export class QuickPromptPanel {
           <title>Hello World!34</title>
         </head>
         <body>
-          <h1>Hello World!!</h1>
+          <h1>Hello World33!!</h1>
           <vscode-button id="howdy">Howdy!!!</vscode-button>
-          <vscode-checkbox id="howdy">Howdy!</vscode-button>
+          <vscode-checkbox id="howdy">Howdy!e4</vscode-button>
+          <script type="module" src="${webviewUri}"></script>
         </body>
       </html>
     `;
