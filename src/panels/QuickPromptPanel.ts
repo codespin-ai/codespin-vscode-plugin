@@ -66,12 +66,26 @@ export class QuickPromptPanel {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Hello World!34</title>
+          <title>Quick Prompt</title>
         </head>
         <body>
-          <h1>Hello World33!!</h1>
-          <vscode-button id="howdy">Howdy!!!</vscode-button>
-          <vscode-checkbox id="howdy">Howdy!e4</vscode-button>
+          <h1>Quick Prompt</h1>
+          <div class="model-selection-container" style="margin-top: 1em">
+            <label for="model-selection-dropdown">Model:</label><br />
+            <vscode-dropdown id="model-selection-dropdown">
+              <vscode-option>GPT 3.5</vscode-option>
+              <vscode-option>GPT 4</vscode-option>
+              <vscode-option>GPT 4 32k</vscode-option>
+              <vscode-option>GPT 4 Turbo</vscode-option>              
+            </vscode-dropdown>
+          </div>
+          <div class="prompt-container" style="margin-top: 1em">
+            <label for="prompt-text-area">Prompt:</label><br />
+            <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area"></vscode-textarea>
+          </div>
+          <p style="style="margin-top: 1em">
+            <vscode-button>Execute</vscode-button>
+          </p>
           <script type="module" src="${webviewUri}"></script>
         </body>
       </html>
