@@ -18,7 +18,11 @@
         "title": "CodeSpin.AI: Generate"
       },
       {
-        "command": "codespin-ai.generateFromCommit",
+        "command": "codespin-ai.quickPrompt",
+        "title": "CodeSpin.AI: Quick Prompt"
+      },
+      {
+        "command": "codespin-ai.generateFromLastCommit",
         "title": "CodeSpin.AI: Generate from Commit"
       },
       {
@@ -27,7 +31,11 @@
       },
       {
         "command": "codespin-ai.createPromptFile",
-        "title": "CodeSpin.AI: Add a Prompt File"
+        "title": "CodeSpin.AI: Create Prompt File"
+      },
+      {
+        "command": "codespin-ai.initialize",
+        "title": "CodeSpin.AI: Initialize Project"
       }
     ],
     "menus": {
@@ -38,7 +46,22 @@
           "group": "codespin-ai"
         },
         {
-          "command": "codespin-ai.generateFromCommit",
+          "command": "codespin-ai.quickPrompt",
+          "group": "codespin-ai"
+        },
+        {
+          "submenu": "codespin-ai.more",
+          "group": "codespin-ai"
+        }
+      ],
+      "codespin-ai.more": [
+        {
+          "command": "codespin-ai.generate",
+          "when": "resourceFilename =~ /\\.prompt\\.md$/i",
+          "group": "codespin-ai"
+        },
+        {
+          "command": "codespin-ai.generateFromLastCommit",
           "when": "resourceFilename =~ /\\.prompt\\.md$/i",
           "group": "codespin-ai"
         },
@@ -49,11 +72,20 @@
         },
         {
           "command": "codespin-ai.createPromptFile",
-          "when": "resourceFilename != .prompt.md",
-          "group": "codespin-ai"
+          "group": "codespin-ai.more"
+        },
+        {
+          "command": "codespin-ai.initialize",
+          "group": "codespin-ai.more"
         }
       ]
     },
+    "submenus": [
+      {
+        "id": "codespin-ai.more",
+        "label": "CodeSpin AI: More"
+      }
+    ],
     "viewsContainers": {
       "activitybar": [
         {
@@ -65,23 +97,29 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "vscode:prepublish": "npm run package",
+    "compile": "node ./esbuild.js",
+    "watch": "node ./esbuild.js --watch",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "package": "NODE_ENV=production node ./esbuild.js"
   },
   "devDependencies": {
-    "@types/vscode": "^1.82.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "16.x",
+    "@types/vscode": "^1.82.0",
+    "@types/vscode-webview": "^1.57.5",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
+    "@vscode/test-electron": "^2.3.4",
+    "esbuild": "^0.16.17",
     "eslint": "^8.47.0",
     "glob": "^10.3.3",
     "mocha": "^10.2.0",
-    "typescript": "^5.1.6",
-    "@vscode/test-electron": "^2.3.4"
+    "typescript": "^5.1.6"
+  },
+  "dependencies": {
+    "@vscode/webview-ui-toolkit": "^1.4.0"
   }
 }
