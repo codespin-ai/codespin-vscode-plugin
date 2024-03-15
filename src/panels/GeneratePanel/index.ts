@@ -87,7 +87,6 @@ export class GeneratePanel {
           <script>
             (async () => {
                 const module = await import('${webviewUri}');
-                console.log({module, x: module.initGeneratePanel});
                 module.initGeneratePanel(); 
             })();
         </script>

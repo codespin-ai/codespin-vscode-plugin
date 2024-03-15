@@ -9,8 +9,6 @@ export function init() {
 
         options.forEach((option, index: number) => {
           const typedOption = option as HTMLOptionElement;
-          console.log(typedOption.textContent);
-          console.log(typedOption.value);
           if (
             typedOption.textContent &&
             typedOption.textContent.trim() === "GPT 4"
