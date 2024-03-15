@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { getUri } from "../utilities/getUri";
+import { getUri } from "../../utilities/getUri";
 
-export class QuickPromptPanel {
-  public static currentPanel: QuickPromptPanel | undefined;
+export class GeneratePanel {
+  public static currentPanel: GeneratePanel | undefined;
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
 
@@ -19,12 +19,12 @@ export class QuickPromptPanel {
   }
 
   public static render(context: vscode.ExtensionContext) {
-    if (QuickPromptPanel.currentPanel) {
-      QuickPromptPanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
+    if (GeneratePanel.currentPanel) {
+      GeneratePanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
     } else {
       const panel = vscode.window.createWebviewPanel(
-        "hello-world",
-        "Hello World",
+        "generate-panel",
+        "Generate Panel",
         vscode.ViewColumn.One,
         {
           // Enable javascript in the webview
@@ -36,12 +36,12 @@ export class QuickPromptPanel {
         }
       );
 
-      QuickPromptPanel.currentPanel = new QuickPromptPanel(panel, context);
+      GeneratePanel.currentPanel = new GeneratePanel(panel, context);
     }
   }
 
   public dispose() {
-    QuickPromptPanel.currentPanel = undefined;
+    GeneratePanel.currentPanel = undefined;
 
     this._panel.dispose();
 
@@ -52,8 +52,6 @@ export class QuickPromptPanel {
       }
     }
   }
-
-  // ... other code ...
 
   private _getWebviewContent(
     webview: vscode.Webview,
@@ -73,20 +71,26 @@ export class QuickPromptPanel {
           <div class="model-selection-container" style="margin-top: 1em">
             <label for="model-selection-dropdown">Model:</label><br />
             <vscode-dropdown id="model-selection-dropdown">
-              <vscode-option>GPT 3.5</vscode-option>
-              <vscode-option>GPT 4</vscode-option>
-              <vscode-option>GPT 4 32k</vscode-option>
-              <vscode-option>GPT 4 Turbo</vscode-option>              
+              <vscode-option value="GPT-3.5">GPT 3.5</vscode-option>
+              <vscode-option value="GPT-4">GPT 4</vscode-option>
+              <vscode-option value="GPT-4-32k">GPT 4 32k</vscode-option>
+              <vscode-option value="GPT-4-Turbo">GPT 4 Turbo</vscode-option>              
             </vscode-dropdown>
           </div>
           <div class="prompt-container" style="margin-top: 1em">
             <label for="prompt-text-area">Prompt:</label><br />
-            <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area"></vscode-textarea>
+            <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area"></vscode-text-area>
           </div>
           <p style="style="margin-top: 1em">
             <vscode-button>Execute</vscode-button>
           </p>
-          <script type="module" src="${webviewUri}"></script>
+          <script>
+            (async () => {
+                const module = await import('${webviewUri}');
+                console.log({module, x: module.initGeneratePanel});
+                module.initGeneratePanel(); 
+            })();
+        </script>
         </body>
       </html>
     `;

@@ -16,37 +16,12 @@
       {
         "command": "codespin-ai.generate",
         "title": "CodeSpin.AI: Generate"
-      },
-      {
-        "command": "codespin-ai.quickPrompt",
-        "title": "CodeSpin.AI: Quick Prompt"
-      },
-      {
-        "command": "codespin-ai.generateFromLastCommit",
-        "title": "CodeSpin.AI: Generate from Commit"
-      },
-      {
-        "command": "codespin-ai.generateWithPromptDiff",
-        "title": "CodeSpin.AI: Generate with Prompt Diff"
-      },
-      {
-        "command": "codespin-ai.createPromptFile",
-        "title": "CodeSpin.AI: Create Prompt File"
-      },
-      {
-        "command": "codespin-ai.initialize",
-        "title": "CodeSpin.AI: Initialize Project"
       }
     ],
     "menus": {
       "explorer/context": [
         {
           "command": "codespin-ai.generate",
-          "when": "resourceFilename =~ /\\.prompt\\.md$/i",
-          "group": "codespin-ai"
-        },
-        {
-          "command": "codespin-ai.quickPrompt",
           "group": "codespin-ai"
         },
         {
@@ -57,26 +32,7 @@
       "codespin-ai.more": [
         {
           "command": "codespin-ai.generate",
-          "when": "resourceFilename =~ /\\.prompt\\.md$/i",
           "group": "codespin-ai"
-        },
-        {
-          "command": "codespin-ai.generateFromLastCommit",
-          "when": "resourceFilename =~ /\\.prompt\\.md$/i",
-          "group": "codespin-ai"
-        },
-        {
-          "command": "codespin-ai.generateWithPromptDiff",
-          "when": "resourceFilename =~ /\\.prompt\\.md$/i",
-          "group": "codespin-ai"
-        },
-        {
-          "command": "codespin-ai.createPromptFile",
-          "group": "codespin-ai.more"
-        },
-        {
-          "command": "codespin-ai.initialize",
-          "group": "codespin-ai.more"
         }
       ]
     },
