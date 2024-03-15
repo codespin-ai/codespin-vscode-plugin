@@ -1,31 +1,37 @@
 export function init() {
   function setupDropdownAndFocus() {
     setTimeout(() => {
-      const dropdown: any = document.getElementById("model-selection-dropdown");
+      const dropdown = document.getElementById(
+        "model-selection-dropdown"
+      ) as HTMLSelectElement;
       if (dropdown) {
         const options = dropdown.querySelectorAll("vscode-option");
 
-        options.forEach((option: any, index: number) => {
-          console.log(option.textContent); // Log the text content of each option
-          console.log(option.value); // Log the value of each option
-          // Example of checking for a specific option and selecting it
-          if (option.textContent.trim() === "GPT 4") {
-            dropdown.selectedIndex = index; // Set the selected index
-            // Alternatively, set the value directly if the options have value attributes
-            dropdown.value = option.value;
+        options.forEach((option, index: number) => {
+          const typedOption = option as HTMLOptionElement;
+          console.log(typedOption.textContent);
+          console.log(typedOption.value);
+          if (
+            typedOption.textContent &&
+            typedOption.textContent.trim() === "GPT 4"
+          ) {
+            dropdown.selectedIndex = index;
+            dropdown.value = typedOption.value;
           }
         });
       }
-      const textArea: HTMLElement | null = document.getElementById("prompt-text-area");
-      if (textArea) textArea.focus();
-    }, 100); // Adjust the delay as needed
+      const textArea = document.getElementById(
+        "prompt-text-area"
+      ) as HTMLTextAreaElement;
+      if (textArea) {
+        textArea.focus();
+      }
+    }, 100);
   }
 
-  if (document.readyState === 'complete') {
-    // The DOM has already loaded, so run the setup function directly.
+  if (document.readyState === "complete") {
     setupDropdownAndFocus();
   } else {
-    // The DOM has not yet loaded, add the event listener.
-    window.addEventListener('DOMContentLoaded', setupDropdownAndFocus);
+    window.addEventListener("DOMContentLoaded", setupDropdownAndFocus);
   }
 }
