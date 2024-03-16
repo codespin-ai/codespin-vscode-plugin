@@ -1,10 +1,17 @@
 import * as vscode from "vscode";
 import { getUri } from "../../utilities/getUri";
 
+type GenerateArgs = {
+  files: string[];
+};
+
 export class GeneratePanel {
   public static currentPanel: GeneratePanel | undefined;
   private readonly _panel: vscode.WebviewPanel;
   private _disposables: vscode.Disposable[] = [];
+
+  private _isWebviewReady = false;
+  private _messageQueue: any[] = [];
 
   private constructor(
     panel: vscode.WebviewPanel,
@@ -12,13 +19,39 @@ export class GeneratePanel {
   ) {
     this._panel = panel;
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+
+    this._panel.webview.onDidReceiveMessage(
+      (message) => this._handleMessageFromWebview(message),
+      null,
+      this._disposables
+    );
+
     this._panel.webview.html = this._getWebviewContent(
       this._panel.webview,
       context.extensionUri
     );
   }
 
-  public static render(context: vscode.ExtensionContext) {
+  public postMessageToWebview(message: any) {
+    if (this._isWebviewReady) {
+      this._panel.webview.postMessage(message);
+    } else {
+      // Queue the message if the webview is not ready
+      this._messageQueue.push(message);
+    }
+  }
+
+  private _handleMessageFromWebview(message: any) {
+    // Handle messages from the webview. For example, a readiness notification
+    if (message.command === "webviewReady") {
+      this._isWebviewReady = true;
+      // Send all queued messages
+      this._messageQueue.forEach((msg) => this._panel.webview.postMessage(msg));
+      this._messageQueue = [];
+    }
+  }
+
+  public static render(args: GenerateArgs, context: vscode.ExtensionContext) {
     if (GeneratePanel.currentPanel) {
       GeneratePanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
     } else {
@@ -37,6 +70,11 @@ export class GeneratePanel {
       );
 
       GeneratePanel.currentPanel = new GeneratePanel(panel, context);
+
+      GeneratePanel.currentPanel.postMessageToWebview({
+        command: "loadFiles",
+        files: args.files,
+      });
     }
   }
 
@@ -70,24 +108,33 @@ export class GeneratePanel {
           <h1>Quick Prompt</h1>
           <div class="model-selection-container" style="margin-top: 1em">
             <label for="model-selection-dropdown">Model:</label><br />
-            <vscode-dropdown id="model-selection-dropdown">
+            <vscode-dropdown style="width:180px" id="model-selection-dropdown">
               <vscode-option value="GPT-3.5">GPT 3.5</vscode-option>
               <vscode-option value="GPT-4">GPT 4</vscode-option>
               <vscode-option value="GPT-4-32k">GPT 4 32k</vscode-option>
               <vscode-option value="GPT-4-Turbo">GPT 4 Turbo</vscode-option>              
+              <vscode-option value="Claude-3 Haiku">Claude 3 Haiku</vscode-option>              
+              <vscode-option value="Claude-3-Sonnet">Claude 3 Sonnet</vscode-option>              
+              <vscode-option value="Claude-3-Opus">Claude 3 Opus</vscode-option>              
             </vscode-dropdown>
           </div>
           <div class="prompt-container" style="margin-top: 1em">
             <label for="prompt-text-area">Prompt:</label><br />
             <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area"></vscode-text-area>
           </div>
-          <p style="style="margin-top: 1em">
+          <div style="margin-top: 1em">
             <vscode-button>Execute</vscode-button>
-          </p>
+          </div>
+          <div id="include-files-container" style="margin-top: 1em">
+            <label>Selected files:</label><br />
+            <ul id="include-files" style="list-style-type: none; padding: 0;">
+              <!-- File checkboxes will be inserted here by JavaScript -->
+            </div>            
+          </div>
           <script>
             (async () => {
                 const module = await import('${webviewUri}');
-                module.initGeneratePanel(); 
+                module.initGeneratePanel();
             })();
         </script>
         </body>

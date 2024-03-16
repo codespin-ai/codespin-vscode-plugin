@@ -7,34 +7,24 @@ export function getGenerate(context: vscode.ExtensionContext) {
     _: unknown,
     uris: vscode.Uri[]
   ): Promise<void> {
-    GeneratePanel.render(context);
-    // try {
-    //   // Create and show a new webview
-    //   const panel = vscode.window.createWebviewPanel(
-    //     "quickPrompt", // Identifies the type of the webview. Used internally
-    //     "Quick Prompt", // Title of the panel displayed to the user
-    //     vscode.ViewColumn.One, // Editor column to show the new webview panel in.
-    //     {} // Webview options. We don't need any for this example.
-    //   );
-    //   // Generate the file paths string
-    //   const filePaths = uris.map((uri) => path.normalize(uri.fsPath)).join(", ");
-    //   // HTML content for the webview
-    //   panel.webview.html = getWebviewContent(filePaths);
-    //   // Handle messages from the webview
-    //   panel.webview.onDidReceiveMessage(
-    //     (message) => {
-    //       switch (message.command) {
-    //         case "ok":
-    //           vscode.window.showInformationMessage(`Files: ${filePaths}`);
-    //           return;
-    //       }
-    //     },
-    //     undefined,
-    //     []
-    //   );
-    // } catch (error) {
-    //   vscode.window.showErrorMessage((error as any).message);
-    //   vscode.window.showErrorMessage("Failed to process files.");
-    // }
+    // Check if there is at least one workspace folder opened.
+    if (
+      vscode.workspace.workspaceFolders &&
+      vscode.workspace.workspaceFolders.length > 0
+    ) {
+      // Assuming you're working with files from the first workspace folder.
+      const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
+
+      // Map each URI to a path relative to the workspace root.
+      const relativePaths = uris.map((uri) => {
+        const fullPath = uri.fsPath;
+        return path.relative(workspaceRoot, fullPath);
+      });
+
+      GeneratePanel.render({ files: relativePaths }, context);
+    } else {
+      // Handle the case where no workspace is opened.
+      vscode.window.showErrorMessage("No workspace is opened.");
+    }
   };
 }
