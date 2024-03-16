@@ -8,7 +8,7 @@ import {
   vsCodeOption,
 } from "@vscode/webview-ui-toolkit";
 
-export { initGeneratePanel as initGeneratePanel } from "../panels/GeneratePanel/init.js";
+export { initWebView as generateWebViewInit } from "../commands/generate/panel/initWebView.js";
 
 provideVSCodeDesignSystem().register(
   vsCodeButton(),

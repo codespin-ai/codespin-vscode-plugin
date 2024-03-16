@@ -2,27 +2,18 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
-import { getGenerate } from "./commands/generate.js";
-import { getCreatePromptFile } from "./commands/createPromptFile.js";
+import { getGenerateCommand } from "./commands/generate/command.js";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
   const generateCommand = vscode.commands.registerCommand(
     "codespin-ai.generate",
-    getGenerate(context)
+    getGenerateCommand(context)
   );
 
   context.subscriptions.push(generateCommand);
-
-  const createPromptFileCommand = vscode.commands.registerCommand(
-    "codespin-ai.createPromptFile",
-    getCreatePromptFile(context)
-  );
-
-  context.subscriptions.push(createPromptFileCommand);
 }
 
 // This method is called when your extension is deactivated
 export function deactivate() {}
-

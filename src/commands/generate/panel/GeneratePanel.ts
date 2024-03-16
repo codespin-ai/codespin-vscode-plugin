@@ -1,100 +1,59 @@
 import * as vscode from "vscode";
-import { getUri } from "../../utilities/getUri";
-
-type GenerateArgs = {
-  files: string[];
-};
+import { getUri } from "../../../utilities/getUri";
 
 export class GeneratePanel {
   public static currentPanel: GeneratePanel | undefined;
-  private readonly _panel: vscode.WebviewPanel;
-  private _disposables: vscode.Disposable[] = [];
+  readonly panel: vscode.WebviewPanel;
+  disposables: vscode.Disposable[] = [];
+  args: GenerateArgs;
 
-  private _isWebviewReady = false;
-  private _messageQueue: any[] = [];
-
-  private constructor(
+  constructor(
+    args: GenerateArgs,
     panel: vscode.WebviewPanel,
     context: vscode.ExtensionContext
   ) {
-    this._panel = panel;
-    this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
+    this.args = args;
+    this.panel = panel;
+    this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
-    this._panel.webview.onDidReceiveMessage(
-      (message) => this._handleMessageFromWebview(message),
+    this.panel.webview.onDidReceiveMessage(
+      (message) => this.handleMessageFromWebview(message),
       null,
-      this._disposables
+      this.disposables
     );
 
-    this._panel.webview.html = this._getWebviewContent(
-      this._panel.webview,
+    this.panel.webview.html = this.getWebviewContent(
+      this.panel.webview,
       context.extensionUri
     );
   }
 
-  public postMessageToWebview(message: any) {
-    if (this._isWebviewReady) {
-      this._panel.webview.postMessage(message);
-    } else {
-      // Queue the message if the webview is not ready
-      this._messageQueue.push(message);
-    }
-  }
-
-  private _handleMessageFromWebview(message: any) {
-    // Handle messages from the webview. For example, a readiness notification
+  private handleMessageFromWebview(message: any) {
+    console.log({ message });
     if (message.command === "webviewReady") {
-      this._isWebviewReady = true;
-      // Send all queued messages
-      this._messageQueue.forEach((msg) => this._panel.webview.postMessage(msg));
-      this._messageQueue = [];
-    }
-  }
-
-  public static render(args: GenerateArgs, context: vscode.ExtensionContext) {
-    if (GeneratePanel.currentPanel) {
-      GeneratePanel.currentPanel._panel.reveal(vscode.ViewColumn.One);
-    } else {
-      const panel = vscode.window.createWebviewPanel(
-        "generate-panel",
-        "Generate Panel",
-        vscode.ViewColumn.One,
-        {
-          // Enable javascript in the webview
-          enableScripts: true,
-          // Restrict the webview to only load resources from the `out` directory
-          localResourceRoots: [
-            vscode.Uri.joinPath(context.extensionUri, "out"),
-          ],
-        }
-      );
-
-      GeneratePanel.currentPanel = new GeneratePanel(panel, context);
-
-      GeneratePanel.currentPanel.postMessageToWebview({
-        command: "loadFiles",
-        files: args.files,
+      this.panel.webview.postMessage({
+        command: "load",
+        files: this.args.files,
       });
+    } else if (message.command === "execute") {
+      console.log({ message });
     }
   }
 
   public dispose() {
     GeneratePanel.currentPanel = undefined;
 
-    this._panel.dispose();
+    this.panel.dispose();
 
-    while (this._disposables.length) {
-      const disposable = this._disposables.pop();
+    while (this.disposables.length) {
+      const disposable = this.disposables.pop();
       if (disposable) {
         disposable.dispose();
       }
     }
   }
 
-  private _getWebviewContent(
-    webview: vscode.Webview,
-    extensionUri: vscode.Uri
-  ) {
+  private getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
     const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
     return `
       <!DOCTYPE html>
@@ -134,7 +93,7 @@ export class GeneratePanel {
           <script>
             (async () => {
                 const module = await import('${webviewUri}');
-                module.initGeneratePanel();
+                module.generateWebViewInit();
             })();
         </script>
         </body>

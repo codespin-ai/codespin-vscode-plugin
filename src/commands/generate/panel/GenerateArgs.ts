@@ -1,0 +1,3 @@
+type GenerateArgs = {
+  files: string[];
+};

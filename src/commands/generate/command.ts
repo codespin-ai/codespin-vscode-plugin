@@ -1,9 +1,9 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { GeneratePanel } from "../panels/GeneratePanel/index.js";
+import { render } from "./panel/render.js";
 
-export function getGenerate(context: vscode.ExtensionContext) {
-  return async function generatePrompt(
+export function getGenerateCommand(context: vscode.ExtensionContext) {
+  return async function generateCommand(
     _: unknown,
     uris: vscode.Uri[]
   ): Promise<void> {
@@ -21,7 +21,7 @@ export function getGenerate(context: vscode.ExtensionContext) {
         return path.relative(workspaceRoot, fullPath);
       });
 
-      GeneratePanel.render({ files: relativePaths }, context);
+      render({ files: relativePaths }, context);
     } else {
       // Handle the case where no workspace is opened.
       vscode.window.showErrorMessage("No workspace is opened.");

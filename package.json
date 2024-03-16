@@ -76,6 +76,7 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@vscode/webview-ui-toolkit": "^1.4.0"
+    "@vscode/webview-ui-toolkit": "^1.4.0",
+    "codespin": "^0.0.91"
   }
 }
