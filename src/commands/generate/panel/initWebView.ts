@@ -1,9 +1,9 @@
-import { Checkbox, Radio, RadioGroup } from "@vscode/webview-ui-toolkit";
+import { Dropdown, Option, Radio } from "@vscode/webview-ui-toolkit";
 import { WebviewApi } from "vscode-webview";
 
 let vsCodeApi: WebviewApi<unknown>;
 
-export function initWebView(files: string[]) {
+export function initWebView() {
   function onReady() {
     window.addEventListener("message", (event) => {
       const message = event.data;
@@ -25,69 +25,22 @@ export function initWebView(files: string[]) {
   }
 }
 
-function load(message: { files: string[] }) {
-  const dropdown = document.getElementById(
-    "model-selection-dropdown"
-  ) as HTMLSelectElement;
+function load(message: any) {
+  updateGenerationTargetDropdown(message.files);
+  updateModelSelectionDropdown(message.models);
+  updateRulesDropdown(message.rules);
+  updateIncludedFiles(message.files);
 
-  if (dropdown) {
-    const options = dropdown.querySelectorAll("vscode-option");
-
-    options.forEach((option, index: number) => {
-      const typedOption = option as HTMLOptionElement;
-      if (
-        typedOption.textContent &&
-        typedOption.textContent.trim() === "GPT 4"
-      ) {
-        dropdown.selectedIndex = index;
-        dropdown.value = typedOption.value;
-      }
-    });
-  }
-
-  const textArea = document.getElementById(
-    "prompt-text-area"
-  ) as HTMLTextAreaElement;
-  if (textArea) {
-    textArea.focus();
-  }
-
-  loadFiles(message.files);
-
+  // Add here the code for setting the default value for the dropdowns if needed
   const executeButton = document.querySelector("vscode-button");
   if (executeButton) {
     executeButton.addEventListener("click", () => {
-      const dropdown = document.getElementById(
-        "model-selection-dropdown"
-      ) as HTMLSelectElement;
-      const textArea = document.getElementById(
-        "prompt-text-area"
-      ) as HTMLTextAreaElement;
-
-      const model = dropdown.value;
-      const prompt = textArea.value;
-
-      const filesInfo = Array.from(
-        document.querySelectorAll(".file-options")
-      ).map((div: Element) => {
-        const path = div.getAttribute("data-file-path");
-        const selectedType =
-          (div.querySelector("vscode-radio-group:checked") as HTMLInputElement)
-            ?.value || "source";
-        return { path, type: selectedType };
-      });
-
-      vsCodeApi.postMessage({
-        command: "execute",
-        model: model,
-        prompt: prompt,
-        files: filesInfo,
-      });
+      // Handle the execute button click event
     });
   }
 }
 
-function loadFiles(files: string[]) {
+function updateIncludedFiles(files: string[]) {
   if (files.length > 1) {
     const includedFilesDiv = document.getElementById(
       "included-files"
@@ -118,6 +71,7 @@ function loadFiles(files: string[]) {
       const declarationRadio = document.createElement("vscode-radio") as Radio;
       declarationRadio.value = "declaration";
       declarationRadio.innerText = "Declarations";
+      declarationRadio.checked = false;
 
       radioGroup.appendChild(sourceRadio);
       radioGroup.appendChild(declarationRadio);
@@ -133,20 +87,38 @@ function loadFiles(files: string[]) {
   }
 }
 
-function handlePrimarySelection(selectedFile: string, files: string[]) {
-  // files.forEach((file) => {
-  //   if (file !== selectedFile) {
-  //     const fileDiv = document.querySelector(`div[data-file-path="${file}"]`);
-  //     const primaryRadio = fileDiv.querySelector(
-  //       `vscode-radio[value="primary"]`
-  //     ) as HTMLInputElement;
-  //     const sourceRadio = fileDiv.querySelector(
-  //       `vscode-radio[value="source"]`
-  //     ) as HTMLInputElement;
-  //     if (primaryRadio && primaryRadio.checked) {
-  //       primaryRadio.checked = false;
-  //       sourceRadio.checked = true;
-  //     }
-  //   }
-  // });
+function updateGenerationTargetDropdown(files: string[]) {
+  const generationTargetDropdown = document.getElementById(
+    "generation-target-dropdown"
+  ) as HTMLDivElement;
+  files.forEach((file) => {
+    const option = document.createElement("vscode-option") as Option;
+    option.value = file;
+    option.textContent = file;
+    generationTargetDropdown.appendChild(option);
+  });
+}
+
+function updateModelSelectionDropdown(models: string[]) {
+  const modelSelectionDropdown = document.getElementById(
+    "model-selection-dropdown"
+  ) as HTMLDivElement;
+  models.forEach((model) => {
+    const option = document.createElement("vscode-option") as Option;
+    option.value = model;
+    option.textContent = model;
+    modelSelectionDropdown.appendChild(option);
+  });
+}
+
+function updateRulesDropdown(rules: string[]) {
+  const rulesDropdown = document.getElementById(
+    "select-rules-dropdown"
+  ) as Dropdown;
+  rules.forEach((rule) => {
+    const option = document.createElement("vscode-option") as Option;
+    option.value = rule;
+    option.textContent = rule;
+    rulesDropdown.appendChild(option);
+  });
 }

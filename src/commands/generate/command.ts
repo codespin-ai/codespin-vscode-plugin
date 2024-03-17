@@ -18,6 +18,13 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       })
       .sort();
 
-    render({ files: relativePaths }, context);
+    render(
+      {
+        files: relativePaths,
+        rules: ["Typescript", "Python"],
+        models: ["GPT4", "Claude 3", "Claude 4"],
+      },
+      context
+    );
   };
 }

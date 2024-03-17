@@ -24,7 +24,8 @@ export class GeneratePanel {
 
     this.panel.webview.html = this.getWebviewContent(
       this.panel.webview,
-      context.extensionUri
+      context.extensionUri,
+      this.args
     );
   }
 
@@ -34,6 +35,8 @@ export class GeneratePanel {
       this.panel.webview.postMessage({
         command: "load",
         files: this.args.files,
+        models: this.args.models, // Assuming 'models' is part of GenerateArgs
+        rules: this.args.rules, // Assuming 'rules' is part of GenerateArgs
       });
     } else if (message.command === "execute") {
       console.log({ message });
@@ -53,7 +56,11 @@ export class GeneratePanel {
     }
   }
 
-  private getWebviewContent(webview: vscode.Webview, extensionUri: vscode.Uri) {
+  private getWebviewContent(
+    webview: vscode.Webview,
+    extensionUri: vscode.Uri,
+    args: GenerateArgs
+  ) {
     const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
     return `
       <!DOCTYPE html>
@@ -61,43 +68,41 @@ export class GeneratePanel {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>CodeSpin Generate</title>
+          <title>CodeSpin</title>
+          <style>
+            body { font-family: var(--font-family); }
+          </style>
         </head>
         <body>
-          <h1>CodeSpin Generate</h1>
+          <h1>Generate</h1>
           <div class="model-selection-container" style="margin-top: 1em">
             <label for="model-selection-dropdown">Model:</label><br />
-            <vscode-dropdown style="width:180px; margin-top: 4px;" id="model-selection-dropdown">
-              <vscode-option value="GPT-3.5">GPT 3.5</vscode-option>
-              <vscode-option value="GPT-4">GPT 4</vscode-option>
-              <vscode-option value="GPT-4-32k">GPT 4 32k</vscode-option>
-              <vscode-option value="GPT-4-Turbo">GPT 4 Turbo</vscode-option>              
-              <vscode-option value="Claude-3 Haiku">Claude 3 Haiku</vscode-option>              
-              <vscode-option value="Claude-3-Sonnet">Claude 3 Sonnet</vscode-option>              
-              <vscode-option value="Claude-3-Opus">Claude 3 Opus</vscode-option>              
-            </vscode-dropdown>
+            <vscode-dropdown style="width:180px; margin-top: 4px;" id="model-selection-dropdown"></vscode-dropdown>
           </div>
           <div class="prompt-container" style="margin-top: 1em">
             <label for="prompt-text-area">Prompt:</label><br />
             <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area" style="margin-top: 4px;"></vscode-text-area>
-          </div>          
+          </div>
           <div style="margin-top: 1em">
-            <vscode-button>Execute</vscode-button>
+            <vscode-button>Generate Code</vscode-button>
           </div>
           <h3>Additional Options</h3>
-          <div class="select-rules-container" style="margin-top: 1em">
-            <label for="select-rules-dropdown">Select Coding Conventions:</label><br />
-            <vscode-dropdown style="width:180px; margin-top: 4px;" id="select-rules-dropdown">
-            <vscode-option value="abcd">Auto</vscode-option>            
-              <vscode-option value="abcd">TypeScript</vscode-option>
-              <vscode-option value="abcd">TypeScript-Frontend</vscode-option>
+          <div class="generation-target-container" style="margin-top: 1em">
+            <label for="generation-target-dropdown">Files to generate:</label><br />
+            <vscode-dropdown style="width:180px; margin-top: 4px;" id="generation-target-dropdown">
+              <vscode-option value="prompt">As in Prompt</vscode-option>
+              <!-- File options will be inserted dynamically -->
             </vscode-dropdown>
+          </div>
+          <div class="select-rules-container" style="margin-top: 1em">
+            <label for="select-rules-dropdown">Coding Conventions:</label><br />
+            <vscode-dropdown style="width:180px; margin-top: 4px;" id="select-rules-dropdown"></vscode-dropdown>
           </div>
           <div class="file-version-container" style="margin-top: 1em">
             <label for="file-version-dropdown">File Version:</label><br />
             <vscode-dropdown style="width:180px; margin-top: 4px;" id="file-version-dropdown">
-              <vscode-option value="abcd">Working Copy</vscode-option>
-              <vscode-option value="abcd">Git HEAD</vscode-option>            
+              <vscode-option value="working">Working Copy</vscode-option>
+              <vscode-option value="head">Git HEAD</vscode-option>            
             </vscode-dropdown>
           </div>
           <div id="included-files-container" style="margin-top: 2em">            
@@ -107,10 +112,10 @@ export class GeneratePanel {
           </div>
           <script>
             (async () => {
-                const module = await import('${webviewUri}');
-                module.generateWebViewInit();
+              const module = await import('${webviewUri}');
+              module.generateWebViewInit();
             })();
-        </script>
+          </script>
         </body>
       </html>
     `;
