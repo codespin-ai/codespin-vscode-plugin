@@ -84,9 +84,9 @@ export class GeneratePanel {
           <div style="margin-top: 1em">
             <vscode-button>Execute</vscode-button>
           </div>
-          <div id="include-files-container" style="margin-top: 1em">
-            <label>Selected files:</label><br />
-            <ul id="include-files" style="list-style-type: none; padding: 0;">
+          <div id="primary-file-container" style="margin-top: 1em">
+            <label>Primary File (Optional):</label><br />
+            <div id="primary-file" style="display: flex; flex-direction: column; margin-top: 4px">
               <!-- File checkboxes will be inserted here by JavaScript -->
             </div>            
           </div>

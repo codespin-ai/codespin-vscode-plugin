@@ -1,3 +1,4 @@
+import { Checkbox } from "@vscode/webview-ui-toolkit";
 import { WebviewApi } from "vscode-webview";
 
 let vsCodeApi: WebviewApi<unknown>;
@@ -62,63 +63,54 @@ function load(message: { files: string[] }) {
         "prompt-text-area"
       ) as HTMLTextAreaElement;
 
-      // Gather values for posting
-      const model = dropdown.value; // Get the selected model's value from the dropdown
-      const prompt = textArea.value; // Get the prompt from the textarea
+      const model = dropdown.value;
+      const prompt = textArea.value;
 
-      // Gather checked files
-      const checkedFiles: string[] = [];
-      const checkboxes = document.querySelectorAll(
-        "#include-files input[type='checkbox']"
-      );
-      checkboxes.forEach((checkbox) => {
-        const cb = checkbox as HTMLInputElement;
-        if (cb.checked) {
-          checkedFiles.push(cb.value);
-        }
-      });
+      const primaryFile: string | undefined = Array.from(
+        document.querySelectorAll(
+          "#primary-file vscode-checkbox"
+        ) as NodeListOf<Checkbox>
+      ).find((x) => x.checked)?.value;
 
-      // Post message with gathered values
       vsCodeApi.postMessage({
         command: "execute",
         model: model,
         prompt: prompt,
-        files: checkedFiles,
+        primaryFile,
       });
     });
   }
 }
 
 function loadFiles(files: string[]) {
-  const includeFilesContainer = document.getElementById(
-    "include-files"
-  ) as HTMLUListElement;
+  const primaryFileDiv = document.getElementById(
+    "primary-file"
+  ) as HTMLDivElement;
 
-  includeFilesContainer.innerHTML = ""; // Clear existing content
+  // Create a function to uncheck all checkboxes except the one that's currently being checked
+  const handleCheckboxChange = (currentCheckbox: Checkbox) => {
+    const allCheckboxes = primaryFileDiv.querySelectorAll(
+      "vscode-checkbox"
+    ) as NodeListOf<Checkbox>;
+    allCheckboxes.forEach((checkbox) => {
+      if (checkbox !== currentCheckbox) {
+        checkbox.checked = false; // Uncheck all other checkboxes
+      }
+    });
+  };
+
+  primaryFileDiv.innerHTML = ""; // Clear existing content
 
   files.forEach((file) => {
-    const li = document.createElement("li"); // Create a new list item
-    li.style.margin = "0.2em"; // Apply margin to the list item
-
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
+    const checkbox = document.createElement("vscode-checkbox") as Checkbox;
     checkbox.id = `include_${file}`;
     checkbox.value = file;
-    checkbox.style.verticalAlign = "middle";
-    checkbox.checked = true;
-    checkbox.style.marginRight = "0.5em";
-
-    const label = document.createElement("label");
-    label.htmlFor = `include_${file}`; // Ensure the htmlFor matches the checkbox id
-    label.textContent = file;
-    label.style.verticalAlign = "middle"; // Align label text vertically
-    label.style.display = "inline-block"; // Ensure label is in line
-
-    // Append the checkbox and label to the list item, not directly to the container
-    li.appendChild(checkbox);
-    li.appendChild(label);
+    checkbox.innerText = file;
+    checkbox.checked = files.length === 1;
 
     // Append the list item to the container
-    includeFilesContainer.appendChild(li);
+    primaryFileDiv.appendChild(checkbox);
+
+    checkbox.addEventListener("click", () => handleCheckboxChange(checkbox));
   });
 }
