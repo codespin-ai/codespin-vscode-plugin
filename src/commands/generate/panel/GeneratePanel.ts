@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { getUri } from "../../../utilities/getUri";
+import { getUri } from "../../../vscode/getUri";
 
 export class GeneratePanel {
   public static currentPanel: GeneratePanel | undefined;
@@ -64,7 +64,7 @@ export class GeneratePanel {
           <title>CodeSpin Generate</title>
         </head>
         <body>
-          <h1 style="font-size: smaller">CodeSpin Generate</h1>
+          <h1>CodeSpin Generate</h1>
           <div class="model-selection-container" style="margin-top: 1em">
             <label for="model-selection-dropdown">Model:</label><br />
             <vscode-dropdown style="width:180px; margin-top: 4px;" id="model-selection-dropdown">
@@ -84,15 +84,23 @@ export class GeneratePanel {
           <div style="margin-top: 1em">
             <vscode-button>Execute</vscode-button>
           </div>
+          <h3>Additional Options</h3>
+          <div class="select-rules-container" style="margin-top: 1em">
+            <label for="select-rules-dropdown">Select Coding Conventions:</label><br />
+            <vscode-dropdown style="width:180px; margin-top: 4px;" id="select-rules-dropdown">
+            <vscode-option value="abcd">Auto</vscode-option>            
+              <vscode-option value="abcd">TypeScript</vscode-option>
+              <vscode-option value="abcd">TypeScript-Frontend</vscode-option>
+            </vscode-dropdown>
+          </div>
           <div class="file-version-container" style="margin-top: 1em">
             <label for="file-version-dropdown">File Version:</label><br />
             <vscode-dropdown style="width:180px; margin-top: 4px;" id="file-version-dropdown">
-              <vscode-option value="Current">Working Copy</vscode-option>
-              <vscode-option value="GPT-4">HEAD</vscode-option>            
+              <vscode-option value="abcd">Working Copy</vscode-option>
+              <vscode-option value="abcd">Git HEAD</vscode-option>            
             </vscode-dropdown>
           </div>
-          <div id="included-files-container" style="margin-top: 2em">
-            <label>Included Files:</label><br />
+          <div id="included-files-container" style="margin-top: 2em">            
             <div id="included-files" style="display: flex; flex-direction: column;">
               <!-- File checkboxes will be inserted here by JavaScript -->
             </div>            

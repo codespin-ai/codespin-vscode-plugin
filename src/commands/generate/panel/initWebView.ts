@@ -88,51 +88,49 @@ function load(message: { files: string[] }) {
 }
 
 function loadFiles(files: string[]) {
-  const includedFilesDiv = document.getElementById(
-    "included-files"
-  ) as HTMLDivElement;
-  includedFilesDiv.innerHTML = ""; // Clear existing content
+  if (files.length > 1) {
+    const includedFilesDiv = document.getElementById(
+      "included-files"
+    ) as HTMLDivElement;
+    includedFilesDiv.innerHTML = ""; // Clear existing content
 
-  files.forEach((file, index) => {
-    const fileOptionContainer = document.createElement("div");
+    const label = document.createElement("div");
+    label.innerText = "Included Files:";
+    includedFilesDiv.appendChild(label);
 
-    fileOptionContainer.className = "file-options";
-    fileOptionContainer.setAttribute("data-file-path", file);
-    fileOptionContainer.style.display = "flex";
-    fileOptionContainer.style.flexDirection = "row";
-    fileOptionContainer.style.alignItems = "center";
+    files.forEach((file, index) => {
+      const fileOptionContainer = document.createElement("div");
 
-    const radioGroup = document.createElement("vscode-radio-group");
-    radioGroup.setAttribute("name", `file-type-${index}`);
+      fileOptionContainer.className = "file-options";
+      fileOptionContainer.setAttribute("data-file-path", file);
+      fileOptionContainer.style.display = "flex";
+      fileOptionContainer.style.flexDirection = "row";
+      fileOptionContainer.style.alignItems = "center";
 
-    const primaryRadio = document.createElement("vscode-radio") as Radio;
-    primaryRadio.value = "primary";
-    primaryRadio.innerText = "Primary";
-    primaryRadio.addEventListener("click", () =>
-      handlePrimarySelection(file, files)
-    );
+      const radioGroup = document.createElement("vscode-radio-group");
+      radioGroup.setAttribute("name", `file-type-${index}`);
 
-    const sourceRadio = document.createElement("vscode-radio") as Radio;
-    sourceRadio.value = "source";
-    sourceRadio.innerText = "Full Source";
-    sourceRadio.checked = true;
+      const sourceRadio = document.createElement("vscode-radio") as Radio;
+      sourceRadio.value = "source";
+      sourceRadio.innerText = "Full Source";
+      sourceRadio.checked = true;
 
-    const declarationRadio = document.createElement("vscode-radio") as Radio;
-    declarationRadio.value = "declaration";
-    declarationRadio.innerText = "Declarations";
+      const declarationRadio = document.createElement("vscode-radio") as Radio;
+      declarationRadio.value = "declaration";
+      declarationRadio.innerText = "Declarations";
 
-    radioGroup.appendChild(primaryRadio);
-    radioGroup.appendChild(sourceRadio);
-    radioGroup.appendChild(declarationRadio);
+      radioGroup.appendChild(sourceRadio);
+      radioGroup.appendChild(declarationRadio);
 
-    fileOptionContainer.appendChild(radioGroup);
+      fileOptionContainer.appendChild(radioGroup);
 
-    const label = document.createElement("label");
-    label.innerText = file;
-    fileOptionContainer.appendChild(label);
+      const filenameLabel = document.createElement("label");
+      filenameLabel.innerText = file;
+      fileOptionContainer.appendChild(filenameLabel);
 
-    includedFilesDiv.appendChild(fileOptionContainer);
-  });
+      includedFilesDiv.appendChild(fileOptionContainer);
+    });
+  }
 }
 
 function handlePrimarySelection(selectedFile: string, files: string[]) {

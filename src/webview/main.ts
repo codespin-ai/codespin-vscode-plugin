@@ -21,5 +21,6 @@ provideVSCodeDesignSystem().register(
   vsCodeOption(),
   vsCodeCheckbox(),
   vsCodeRadioGroup(),
-  vsCodeRadio()
+  vsCodeRadio(),
+  vsCodeOption()
 );

@@ -16,6 +16,10 @@
       {
         "command": "codespin-ai.generate",
         "title": "CodeSpin.AI: Generate"
+      },
+      {
+        "command": "codespin-ai.init",
+        "title": "CodeSpin.AI: Initialize Project"
       }
     ],
     "menus": {
@@ -31,7 +35,7 @@
       ],
       "codespin-ai.more": [
         {
-          "command": "codespin-ai.generate",
+          "command": "codespin-ai.init",
           "group": "codespin-ai"
         }
       ]
@@ -77,6 +81,6 @@
   },
   "dependencies": {
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.91"
+    "codespin": "^0.0.97"
   }
 }
