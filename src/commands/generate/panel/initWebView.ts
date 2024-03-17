@@ -1,4 +1,4 @@
-import { Dropdown, Option, Radio } from "@vscode/webview-ui-toolkit";
+import { Dropdown, Option } from "@vscode/webview-ui-toolkit";
 import { WebviewApi } from "vscode-webview";
 
 let vsCodeApi: WebviewApi<unknown>;
@@ -41,50 +41,34 @@ function load(message: any) {
 }
 
 function updateIncludedFiles(files: string[]) {
-  if (files.length > 1) {
-    const includedFilesDiv = document.getElementById(
-      "included-files"
-    ) as HTMLDivElement;
-    includedFilesDiv.innerHTML = ""; // Clear existing content
+  const includedFilesDiv = document.getElementById(
+    "included-files"
+  ) as HTMLDivElement;
+  includedFilesDiv.innerHTML = ""; // Clear existing content
 
-    const label = document.createElement("div");
-    label.innerText = "Included Files:";
-    includedFilesDiv.appendChild(label);
+  files.forEach((file) => {
+    const fileOptionContainer = document.createElement("div");
+    fileOptionContainer.className = "file-options";
+    fileOptionContainer.setAttribute("data-file-path", file);
+    fileOptionContainer.style.display = "flex";
+    fileOptionContainer.style.flexDirection = "row";
+    fileOptionContainer.style.alignItems = "center";
+    fileOptionContainer.style.paddingTop = "4px";
+    fileOptionContainer.style.paddingBottom = "4px";
 
-    files.forEach((file, index) => {
-      const fileOptionContainer = document.createElement("div");
+    const dropdown = document.createElement("vscode-dropdown") as Dropdown;
+    dropdown.innerHTML = `<vscode-option value="source">Full Source</vscode-option><vscode-option value="declaration">Declarations</vscode-option>`;
+    dropdown.value = "source";
+    dropdown.style.marginRight = "1em";
+    dropdown.style.width = "120px";
+    fileOptionContainer.appendChild(dropdown);
 
-      fileOptionContainer.className = "file-options";
-      fileOptionContainer.setAttribute("data-file-path", file);
-      fileOptionContainer.style.display = "flex";
-      fileOptionContainer.style.flexDirection = "row";
-      fileOptionContainer.style.alignItems = "center";
+    const filenameLabel = document.createElement("label");
+    filenameLabel.innerText = file;
+    fileOptionContainer.appendChild(filenameLabel);
 
-      const radioGroup = document.createElement("vscode-radio-group");
-      radioGroup.setAttribute("name", `file-type-${index}`);
-
-      const sourceRadio = document.createElement("vscode-radio") as Radio;
-      sourceRadio.value = "source";
-      sourceRadio.innerText = "Full Source";
-      sourceRadio.checked = true;
-
-      const declarationRadio = document.createElement("vscode-radio") as Radio;
-      declarationRadio.value = "declaration";
-      declarationRadio.innerText = "Declarations";
-      declarationRadio.checked = false;
-
-      radioGroup.appendChild(sourceRadio);
-      radioGroup.appendChild(declarationRadio);
-
-      fileOptionContainer.appendChild(radioGroup);
-
-      const filenameLabel = document.createElement("label");
-      filenameLabel.innerText = file;
-      fileOptionContainer.appendChild(filenameLabel);
-
-      includedFilesDiv.appendChild(fileOptionContainer);
-    });
-  }
+    includedFilesDiv.appendChild(fileOptionContainer);
+  });
 }
 
 function updateGenerationTargetDropdown(files: string[]) {

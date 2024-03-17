@@ -70,7 +70,7 @@ export class GeneratePanel {
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <title>CodeSpin</title>
           <style>
-            body { font-family: var(--font-family); }
+            body { font-family: var(--font-family); }            
           </style>
         </head>
         <body>
@@ -81,11 +81,12 @@ export class GeneratePanel {
           </div>
           <div class="prompt-container" style="margin-top: 1em">
             <label for="prompt-text-area">Prompt:</label><br />
-            <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area" style="margin-top: 4px;"></vscode-text-area>
+            <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area" style="margin-top: 4px; font-family: var(--vscode-editor-font-family);"></vscode-text-area>
           </div>
-          <div style="margin-top: 1em">
+          <div style="margin-top: 1em; margin-bottom: 1em;">
             <vscode-button>Generate Code</vscode-button>
           </div>
+          <vscode-divider role="presentation"></vscode-divider>
           <h3>Additional Options</h3>
           <div class="generation-target-container" style="margin-top: 1em">
             <label for="generation-target-dropdown">Files to generate:</label><br />
@@ -105,7 +106,8 @@ export class GeneratePanel {
               <vscode-option value="head">Git HEAD</vscode-option>            
             </vscode-dropdown>
           </div>
-          <div id="included-files-container" style="margin-top: 2em">            
+          <div id="included-files-container" style="margin-top: 2em">     
+            <label for="file-version-dropdown">Included Files:</label><br />
             <div id="included-files" style="display: flex; flex-direction: column;">
               <!-- File checkboxes will be inserted here by JavaScript -->
             </div>            

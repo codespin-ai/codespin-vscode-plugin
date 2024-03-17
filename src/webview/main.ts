@@ -8,6 +8,7 @@ import {
   vsCodeOption,
   vsCodeRadioGroup,
   vsCodeRadio,
+  vsCodeDivider,
 } from "@vscode/webview-ui-toolkit";
 
 export { initWebView as generateWebViewInit } from "../commands/generate/panel/initWebView.js";
@@ -22,5 +23,6 @@ provideVSCodeDesignSystem().register(
   vsCodeCheckbox(),
   vsCodeRadioGroup(),
   vsCodeRadio(),
-  vsCodeOption()
+  vsCodeOption(),
+  vsCodeDivider()
 );
