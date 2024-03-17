@@ -61,13 +61,13 @@ export class GeneratePanel {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Quick Prompt</title>
+          <title>CodeSpin Generate</title>
         </head>
         <body>
-          <h1>Quick Prompt</h1>
+          <h1 style="font-size: smaller">CodeSpin Generate</h1>
           <div class="model-selection-container" style="margin-top: 1em">
             <label for="model-selection-dropdown">Model:</label><br />
-            <vscode-dropdown style="width:180px" id="model-selection-dropdown">
+            <vscode-dropdown style="width:180px; margin-top: 4px;" id="model-selection-dropdown">
               <vscode-option value="GPT-3.5">GPT 3.5</vscode-option>
               <vscode-option value="GPT-4">GPT 4</vscode-option>
               <vscode-option value="GPT-4-32k">GPT 4 32k</vscode-option>
@@ -79,14 +79,21 @@ export class GeneratePanel {
           </div>
           <div class="prompt-container" style="margin-top: 1em">
             <label for="prompt-text-area">Prompt:</label><br />
-            <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area"></vscode-text-area>
-          </div>
+            <vscode-text-area cols="50" rows="10" resize="both" autofocus id="prompt-text-area" style="margin-top: 4px;"></vscode-text-area>
+          </div>          
           <div style="margin-top: 1em">
             <vscode-button>Execute</vscode-button>
           </div>
-          <div id="primary-file-container" style="margin-top: 1em">
-            <label>Primary File (Optional):</label><br />
-            <div id="primary-file" style="display: flex; flex-direction: column; margin-top: 4px">
+          <div class="file-version-container" style="margin-top: 1em">
+            <label for="file-version-dropdown">File Version:</label><br />
+            <vscode-dropdown style="width:180px; margin-top: 4px;" id="file-version-dropdown">
+              <vscode-option value="Current">Working Copy</vscode-option>
+              <vscode-option value="GPT-4">HEAD</vscode-option>            
+            </vscode-dropdown>
+          </div>
+          <div id="included-files-container" style="margin-top: 2em">
+            <label>Included Files:</label><br />
+            <div id="included-files" style="display: flex; flex-direction: column;">
               <!-- File checkboxes will be inserted here by JavaScript -->
             </div>            
           </div>

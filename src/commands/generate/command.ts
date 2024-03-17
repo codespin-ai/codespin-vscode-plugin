@@ -16,10 +16,12 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       const workspaceRoot = vscode.workspace.workspaceFolders[0].uri.fsPath;
 
       // Map each URI to a path relative to the workspace root.
-      const relativePaths = uris.map((uri) => {
-        const fullPath = uri.fsPath;
-        return path.relative(workspaceRoot, fullPath);
-      });
+      const relativePaths = uris
+        .map((uri) => {
+          const fullPath = uri.fsPath;
+          return path.relative(workspaceRoot, fullPath);
+        })
+        .sort();
 
       render({ files: relativePaths }, context);
     } else {

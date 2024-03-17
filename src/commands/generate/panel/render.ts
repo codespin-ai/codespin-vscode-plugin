@@ -10,7 +10,7 @@ export function render(args: GenerateArgs, context: vscode.ExtensionContext) {
     const panel = vscode.window.createWebviewPanel(
       "generate-panel",
       "CodeSpin Generate",
-      vscode.ViewColumn.One,
+      vscode.ViewColumn.Active,
       {
         // Enable javascript in the webview
         enableScripts: true,
@@ -30,7 +30,5 @@ export function render(args: GenerateArgs, context: vscode.ExtensionContext) {
       null,
       generatePanel.disposables
     );
-
-    
   }
 }

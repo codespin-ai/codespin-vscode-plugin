@@ -1,4 +1,4 @@
-import { Checkbox } from "@vscode/webview-ui-toolkit";
+import { Checkbox, Radio, RadioGroup } from "@vscode/webview-ui-toolkit";
 import { WebviewApi } from "vscode-webview";
 
 let vsCodeApi: WebviewApi<unknown>;
@@ -44,6 +44,7 @@ function load(message: { files: string[] }) {
       }
     });
   }
+
   const textArea = document.getElementById(
     "prompt-text-area"
   ) as HTMLTextAreaElement;
@@ -66,51 +67,88 @@ function load(message: { files: string[] }) {
       const model = dropdown.value;
       const prompt = textArea.value;
 
-      const primaryFile: string | undefined = Array.from(
-        document.querySelectorAll(
-          "#primary-file vscode-checkbox"
-        ) as NodeListOf<Checkbox>
-      ).find((x) => x.checked)?.value;
+      const filesInfo = Array.from(
+        document.querySelectorAll(".file-options")
+      ).map((div: Element) => {
+        const path = div.getAttribute("data-file-path");
+        const selectedType =
+          (div.querySelector("vscode-radio-group:checked") as HTMLInputElement)
+            ?.value || "source";
+        return { path, type: selectedType };
+      });
 
       vsCodeApi.postMessage({
         command: "execute",
         model: model,
         prompt: prompt,
-        primaryFile,
+        files: filesInfo,
       });
     });
   }
 }
 
 function loadFiles(files: string[]) {
-  const primaryFileDiv = document.getElementById(
-    "primary-file"
+  const includedFilesDiv = document.getElementById(
+    "included-files"
   ) as HTMLDivElement;
+  includedFilesDiv.innerHTML = ""; // Clear existing content
 
-  // Create a function to uncheck all checkboxes except the one that's currently being checked
-  const handleCheckboxChange = (currentCheckbox: Checkbox) => {
-    const allCheckboxes = primaryFileDiv.querySelectorAll(
-      "vscode-checkbox"
-    ) as NodeListOf<Checkbox>;
-    allCheckboxes.forEach((checkbox) => {
-      if (checkbox !== currentCheckbox) {
-        checkbox.checked = false; // Uncheck all other checkboxes
-      }
-    });
-  };
+  files.forEach((file, index) => {
+    const fileOptionContainer = document.createElement("div");
 
-  primaryFileDiv.innerHTML = ""; // Clear existing content
+    fileOptionContainer.className = "file-options";
+    fileOptionContainer.setAttribute("data-file-path", file);
+    fileOptionContainer.style.display = "flex";
+    fileOptionContainer.style.flexDirection = "row";
+    fileOptionContainer.style.alignItems = "center";
 
-  files.forEach((file) => {
-    const checkbox = document.createElement("vscode-checkbox") as Checkbox;
-    checkbox.id = `include_${file}`;
-    checkbox.value = file;
-    checkbox.innerText = file;
-    checkbox.checked = files.length === 1;
+    const radioGroup = document.createElement("vscode-radio-group");
+    radioGroup.setAttribute("name", `file-type-${index}`);
 
-    // Append the list item to the container
-    primaryFileDiv.appendChild(checkbox);
+    const primaryRadio = document.createElement("vscode-radio") as Radio;
+    primaryRadio.value = "primary";
+    primaryRadio.innerText = "Primary";
+    primaryRadio.addEventListener("click", () =>
+      handlePrimarySelection(file, files)
+    );
 
-    checkbox.addEventListener("click", () => handleCheckboxChange(checkbox));
+    const sourceRadio = document.createElement("vscode-radio") as Radio;
+    sourceRadio.value = "source";
+    sourceRadio.innerText = "Full Source";
+    sourceRadio.checked = true;
+
+    const declarationRadio = document.createElement("vscode-radio") as Radio;
+    declarationRadio.value = "declaration";
+    declarationRadio.innerText = "Declarations";
+
+    radioGroup.appendChild(primaryRadio);
+    radioGroup.appendChild(sourceRadio);
+    radioGroup.appendChild(declarationRadio);
+
+    fileOptionContainer.appendChild(radioGroup);
+
+    const label = document.createElement("label");
+    label.innerText = file;
+    fileOptionContainer.appendChild(label);
+
+    includedFilesDiv.appendChild(fileOptionContainer);
   });
+}
+
+function handlePrimarySelection(selectedFile: string, files: string[]) {
+  // files.forEach((file) => {
+  //   if (file !== selectedFile) {
+  //     const fileDiv = document.querySelector(`div[data-file-path="${file}"]`);
+  //     const primaryRadio = fileDiv.querySelector(
+  //       `vscode-radio[value="primary"]`
+  //     ) as HTMLInputElement;
+  //     const sourceRadio = fileDiv.querySelector(
+  //       `vscode-radio[value="source"]`
+  //     ) as HTMLInputElement;
+  //     if (primaryRadio && primaryRadio.checked) {
+  //       primaryRadio.checked = false;
+  //       sourceRadio.checked = true;
+  //     }
+  //   }
+  // });
 }
