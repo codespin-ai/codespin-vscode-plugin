@@ -20,9 +20,16 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     render(
       {
-        files: relativePaths,
+        files: relativePaths.map((x) => ({ path: x, size: 100434 })),
         rules: ["Typescript", "Python"],
-        models: ["GPT4", "Claude 3", "Claude 4"],
+        models: [
+          { name: "GPT-3.5", value: "gpt-3.5-turbo" },
+          { name: "GPT-4", value: "gpt-4" },
+          { name: "GPT-4 Turbo", value: "gpt-4-turbo" },
+          { name: "Claude-3 Haiku", value: "claude-3-haiku" },
+          { name: "Claude-3 Sonnet", value: "claude-3-sonnet" },
+          { name: "Claude-3 Opus", value: "claude-3-opus" },
+        ],
       },
       context
     );

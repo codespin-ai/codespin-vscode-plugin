@@ -74,6 +74,20 @@ export class GeneratePanel {
           </style>
         </head>
         <body>
+          <div id="root"></div>
+          <script>
+            (async () => {
+              const module = await import('${webviewUri}');
+              module.generateWebViewInit();
+            })();
+          </script>
+        </body>
+      </html>
+    `;
+  }
+}
+
+/*
           <h1>Generate</h1>
           <div class="model-selection-container" style="margin-top: 1em">
             <label for="model-selection-dropdown">Model:</label><br />
@@ -112,14 +126,4 @@ export class GeneratePanel {
               <!-- File checkboxes will be inserted here by JavaScript -->
             </div>            
           </div>
-          <script>
-            (async () => {
-              const module = await import('${webviewUri}');
-              module.generateWebViewInit();
-            })();
-          </script>
-        </body>
-      </html>
-    `;
-  }
-}
+*/

@@ -1,5 +1,5 @@
 type GenerateArgs = {
-  files: string[];
-  models: string[];
+  files: { path: string; size: number | undefined }[];
+  models: { name: string; value: string }[];
   rules: string[];
 };
