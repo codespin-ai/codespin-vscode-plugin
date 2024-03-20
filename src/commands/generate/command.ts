@@ -1,7 +1,9 @@
 import * as vscode from "vscode";
 import * as path from "path";
-import { render } from "./panel/render.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
+import { getModels } from "../../models/getModels.js";
+import { getDefaultModel } from "../../models/getDefaultModel.js";
+import { GeneratePanel } from "./panel/GeneratePanel.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -18,19 +20,27 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       })
       .sort();
 
-    render(
+    const webviewPanel = vscode.window.createWebviewPanel(
+      "generate-panel",
+      "CodeSpin Generate",
+      vscode.ViewColumn.Active,
+      {
+        // Enable javascript in the webview
+        enableScripts: true,
+        // Restrict the webview to only load resources from the `out` directory
+        localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, "out")],
+        retainContextWhenHidden: true,
+      }
+    );
+
+    const generatePanel = new GeneratePanel(
       {
         files: relativePaths.map((x) => ({ path: x, size: 100434 })),
         rules: ["Typescript", "Python"],
-        models: [
-          { name: "GPT-3.5", value: "gpt-3.5-turbo" },
-          { name: "GPT-4", value: "gpt-4" },
-          { name: "GPT-4 Turbo", value: "gpt-4-turbo" },
-          { name: "Claude-3 Haiku", value: "claude-3-haiku" },
-          { name: "Claude-3 Sonnet", value: "claude-3-sonnet" },
-          { name: "Claude-3 Opus", value: "claude-3-opus" },
-        ],
+        models: getModels(),
+        selectedModel: getDefaultModel(),
       },
+      webviewPanel,
       context
     );
   };

@@ -7,6 +7,7 @@ export type CSTextAreaProps = {
   cols: number;
   defaultValue?: string;
   textareaStyle?: React.CSSProperties;
+  resize?: "none" | "vertical" | "horizontal" | "both";
 };
 
 export function CSTextArea(props: CSTextAreaProps) {
@@ -16,6 +17,7 @@ export function CSTextArea(props: CSTextAreaProps) {
       cols={props.cols}
       defaultValue={props.defaultValue}
       style={props.textareaStyle}
+      resize={props.resize}
     ></VSCodeTextArea>
   );
 }

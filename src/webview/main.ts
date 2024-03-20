@@ -11,7 +11,7 @@ import {
   vsCodeDivider,
 } from "@vscode/webview-ui-toolkit";
 
-export { initWebView as generateWebViewInit } from "../commands/generate/panel/initWebView.js";
+export { initWebView as generateWebViewInit } from "../ui/index.js";
 
 provideVSCodeDesignSystem().register(
   vsCodeButton(),
