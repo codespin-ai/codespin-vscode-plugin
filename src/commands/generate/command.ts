@@ -20,27 +20,15 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       })
       .sort();
 
-    const webviewPanel = vscode.window.createWebviewPanel(
-      "generate-panel",
-      "CodeSpin Generate",
-      vscode.ViewColumn.Active,
+    new GeneratePanel(
       {
-        // Enable javascript in the webview
-        enableScripts: true,
-        // Restrict the webview to only load resources from the `out` directory
-        localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, "out")],
-        retainContextWhenHidden: true,
-      }
-    );
-
-    const generatePanel = new GeneratePanel(
-      {
+        panelName: "generate-panel",
+        panelTitle: "CodeSpin Generate",
         files: relativePaths.map((x) => ({ path: x, size: 100434 })),
         rules: ["Typescript", "Python"],
         models: getModels(),
         selectedModel: getDefaultModel(),
       },
-      webviewPanel,
       context
     );
   };

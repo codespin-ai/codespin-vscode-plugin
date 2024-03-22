@@ -10,6 +10,7 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import { formatFileSize } from "../../text/formatFileSize.js";
 import { getVSCodeApi } from "../../vscode/getVSCodeApi.js";
+import { GenerateArgs } from "../../commands/generate/panel/GenerateArgs.js";
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -32,10 +33,10 @@ export function Generate() {
             rules: message.rules,
             selectedModel: message.selectedModel,
           });
-          setSelectedModel(message.selectedModel);
+          setModel(message.selectedModel);
           setCodegenTargets(":prompt");
-          setSelectedCodingConvention(message.rules[0]);
-          setSelectedFileVersion("working-copy");
+          setCodingConvention(message.rules[0]);
+          setFileVersion("working-copy");
           setIncludedFiles(
             args.files.map((file) => ({
               path: file.path,
@@ -49,11 +50,11 @@ export function Generate() {
     vsCodeApi.postMessage({ command: "webviewReady" });
   }, []);
 
-  const [selectedModel, setSelectedModel] = useState(args.selectedModel);
+  const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>("");
   const [codegenTargets, setCodegenTargets] = useState("");
-  const [selectedCodingConvention, setSelectedCodingConvention] = useState("");
-  const [selectedFileVersion, setSelectedFileVersion] = useState<string>();
+  const [codingConvention, setCodingConvention] = useState("");
+  const [fileVersion, setFileVersion] = useState<string>();
   const [includedFiles, setIncludedFiles] = useState<
     { path: string; includeOption: string }[]
   >([]);
@@ -62,11 +63,11 @@ export function Generate() {
     vsCodeApi.postMessage({
       command: "generate",
       args: {
-        selectedModel,
+        selectedModel: model,
         prompt,
         codegenTargets,
-        selectedCodingConvention,
-        selectedFileVersion,
+        codingConvention: codingConvention,
+        fileVersion: fileVersion,
       },
     });
   }
@@ -80,9 +81,9 @@ export function Generate() {
             text: x.name,
             value: x.value,
           }))}
-          selectedItem={args.selectedModel}
+          currentValue={model}
           style={{ width: "180px" }}
-          onChange={(e: any) => setSelectedModel(e.target.value)}
+          onChange={(e: any) => setModel(e.target.value)}
         >
           {args.models.map((item) => (
             <VSCodeOption key={item.value} value={item.value}>
@@ -107,7 +108,7 @@ export function Generate() {
       <h3>Additional Options</h3>
       <CSFormField label={{ text: "Files to generate:" }}>
         <VSCodeDropdown
-          selectedItem="prompt"
+          currentValue={codegenTargets}
           style={{ width: "180px" }}
           onChange={(e: any) => setCodegenTargets(e.target.value)}
         >
@@ -128,7 +129,8 @@ export function Generate() {
       <CSFormField label={{ text: "Coding Conventions:" }}>
         <VSCodeDropdown
           style={{ width: "180px" }}
-          onChange={(e: any) => setSelectedCodingConvention(e.target.value)}
+          onChange={(e: any) => setCodingConvention(e.target.value)}
+          currentValue={codingConvention}
         >
           {args.rules
             .map((x) => ({ text: x, value: x }))
@@ -141,9 +143,9 @@ export function Generate() {
       </CSFormField>
       <CSFormField label={{ text: "File Version:" }}>
         <VSCodeDropdown
-          selectedItem="working-copy"
+          currentValue="working-copy"
           style={{ width: "180px" }}
-          onChange={(e: any) => setSelectedFileVersion(e.target.value)}
+          onChange={(e: any) => setFileVersion(e.target.value)}
         >
           {[
             { text: "Working Copy", value: "working-copy" },
@@ -167,7 +169,7 @@ export function Generate() {
             }}
           >
             <VSCodeDropdown
-              selectedItem={
+              currentValue={
                 includedFiles.find((f) => f.path === file.path)
                   ?.includeOption || "source"
               }

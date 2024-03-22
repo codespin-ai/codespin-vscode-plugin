@@ -1,13 +1,13 @@
 import * as vscode from "vscode";
-import { BasePanel } from "../../../vscode/BasePanel.js";
+import { BasePanel, BasePanelArgs } from "../../../vscode/BasePanel.js";
+import { GenerateArgs } from "./GenerateArgs.js";
 
-export class GeneratePanel extends BasePanel<GenerateArgs> {
+export class GeneratePanel extends BasePanel<GenerateArgs & BasePanelArgs> {
   constructor(
-    args: GenerateArgs,
-    panel: vscode.WebviewPanel,
+    args: GenerateArgs & BasePanelArgs,
     context: vscode.ExtensionContext
   ) {
-    super(args, panel, context);
+    super(args, context);
   }
 
   override getDefaultUrl(): string {
@@ -25,7 +25,6 @@ export class GeneratePanel extends BasePanel<GenerateArgs> {
         selectedModel: this.args.selectedModel,
       });
     } else if (message.command === "generate") {
-      
     }
   }
 }

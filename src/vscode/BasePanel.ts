@@ -1,18 +1,29 @@
 import * as vscode from "vscode";
 import { getWebviewContent } from "../ui/getWebView.js";
 
-export abstract class BasePanel<TArgs> {
-  readonly panel: vscode.WebviewPanel;
+export type BasePanelArgs = { panelName: string; panelTitle: string };
+
+export abstract class BasePanel<TArgs extends BasePanelArgs> {
   disposables: vscode.Disposable[] = [];
   args: TArgs;
+  panel: vscode.WebviewPanel;
 
-  constructor(
-    args: TArgs,
-    panel: vscode.WebviewPanel,
-    context: vscode.ExtensionContext
-  ) {
+  constructor(args: TArgs, context: vscode.ExtensionContext) {
     this.args = args;
-    this.panel = panel;
+
+    this.panel = vscode.window.createWebviewPanel(
+      args.panelName,
+      args.panelTitle,
+      vscode.ViewColumn.Active,
+      {
+        // Enable javascript in the webview
+        enableScripts: true,
+        // Restrict the webview to only load resources from the `out` directory
+        localResourceRoots: [vscode.Uri.joinPath(context.extensionUri, "out")],
+        retainContextWhenHidden: true,
+      }
+    );
+
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
     this.panel.webview.onDidReceiveMessage(
