@@ -9,13 +9,13 @@ import {
   VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import { formatFileSize } from "../../text/formatFileSize.js";
-import { getVSCodeApi } from "../../vscode/getVSCodeApi.js";
-import { GenerateArgs } from "../../commands/generate/panel/GenerateArgs.js";
+import { getVsCodeApi } from "../../vscode/getVsCodeApi.js";
+import { OnGenerateEventArgs } from "../eventHandlers/onGenerate.js";
 
 export function Generate() {
-  const vsCodeApi = getVSCodeApi();
+  const vsCodeApi = getVsCodeApi();
 
-  const [args, setArgs] = useState<GenerateArgs>({
+  const [args, setArgs] = useState<OnGenerateEventArgs>({
     models: [],
     files: [],
     rules: [],
@@ -25,8 +25,8 @@ export function Generate() {
   useEffect(() => {
     window.addEventListener("message", (event) => {
       const message = event.data;
-      switch (message.command) {
-        case "load":
+      switch (message.type) {
+        case "onGenerate":
           setArgs({
             models: message.models,
             files: message.files,
@@ -46,8 +46,6 @@ export function Generate() {
           break;
       }
     });
-
-    vsCodeApi.postMessage({ command: "webviewReady" });
   }, []);
 
   const [model, setModel] = useState(args.selectedModel);
@@ -61,14 +59,12 @@ export function Generate() {
 
   function handleGenerateClick() {
     vsCodeApi.postMessage({
-      command: "generate",
-      args: {
-        selectedModel: model,
-        prompt,
-        codegenTargets,
-        codingConvention: codingConvention,
-        fileVersion: fileVersion,
-      },
+      type: "generate",
+      model,
+      prompt,
+      codegenTargets,
+      codingConvention,
+      fileVersion,
     });
   }
 

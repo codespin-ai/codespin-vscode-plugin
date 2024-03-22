@@ -3,8 +3,8 @@
 import * as vscode from "vscode";
 
 import { setWorkingDir } from "codespin/dist/fs/workingDir.js";
-import { getGenerateCommand } from "./commands/generate/command.js";
-import { getInitCommand } from "./commands/init/command.js";
+import { getGenerateCommand } from "./commands/generate.js";
+import { getInitCommand } from "./commands/init.js";
 import { getWorkspaceRoot } from "./vscode/getWorkspaceRoot.js";
 
 // This method is called when your extension is activated

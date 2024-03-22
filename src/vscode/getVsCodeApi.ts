@@ -2,7 +2,7 @@ import { WebviewApi } from "vscode-webview";
 
 let vsCodeApi: WebviewApi<unknown>;
 
-export function getVSCodeApi() {
+export function getVsCodeApi() {
   if (!vsCodeApi) {
     vsCodeApi = acquireVsCodeApi();
   }

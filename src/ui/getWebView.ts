@@ -2,7 +2,6 @@ import * as vscode from "vscode";
 import { getUri } from "../vscode/getUri.js";
 
 export function getWebviewContent(
-  url: string,
   webview: vscode.Webview,
   extensionUri: vscode.Uri
 ) {
@@ -23,11 +22,10 @@ export function getWebviewContent(
         <script>
           (async () => {
             const module = await import('${webviewUri}');
-            module.generateWebViewInit("${url}");
+            module.initWebView();
           })();
         </script>
       </body>
     </html>
   `;
 }
-  

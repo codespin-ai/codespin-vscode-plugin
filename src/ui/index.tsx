@@ -1,36 +1,44 @@
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch } from "wouter";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Generate } from "./pages/Generate.js";
+import { NavigateEventArgs } from "./eventHandlers/navigate.js";
+import { navigate } from "wouter/use-browser-location";
+import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
 
-export type AppProps = {
-  url: string;
-};
-
-function App(props: AppProps) {
-  const [location, navigate] = useLocation();
-
+function App() {
   React.useEffect(() => {
-    if (props.url) {
-      navigate(props.url);
-    }
+    window.addEventListener("message", (event) => {
+      const incomingMessage = event.data;
+      switch (incomingMessage.type) {
+        case "navigate":
+          const eventArgs = incomingMessage as NavigateEventArgs;
+          navigate(eventArgs.url);
+          getVsCodeApi().postMessage({
+            type: "navigated",
+            url: eventArgs.url,
+          });
+      }
+    });
+
+    getVsCodeApi().postMessage({ type: "webviewReady" });
   }, []);
 
   return (
     <>
       <Switch>
         <Route path="/generate" component={Generate} />
-        <Route>Loading.........</Route>
+        <Route></Route>
       </Switch>
     </>
   );
 }
 
-export function initWebView(defaultUrl: string) {
+export function initWebView() {
   function onReady() {
     const domRootNode = document.getElementById("root")!;
     const root = createRoot(domRootNode);
-    root.render(<App url={defaultUrl} />);
+    root.render(<App />);
   }
 
   if (document.readyState === "complete") {
