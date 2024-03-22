@@ -24,8 +24,8 @@ export class GeneratePanel extends BasePanel<GenerateArgs> {
         rules: this.args.rules,
         selectedModel: this.args.selectedModel,
       });
-    } else if (message.command === "execute") {
-      console.log({ message });
+    } else if (message.command === "generate") {
+      
     }
   }
 }

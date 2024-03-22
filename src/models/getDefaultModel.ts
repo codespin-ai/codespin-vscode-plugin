@@ -1,3 +1,3 @@
 export function getDefaultModel() {
-  return "claude-3-sonnet";
+  return "anthropic:claude-3-sonnet";
 }

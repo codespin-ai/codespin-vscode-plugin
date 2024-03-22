@@ -1,19 +1,20 @@
-import { WebviewApi } from "vscode-webview";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { CSDropDown } from "../components/CSDropDown.js";
-import { CSTextArea } from "../components/CSTextAreaRow.js";
 import { CSFormField } from "../components/CSFormField.js";
 import {
   VSCodeButton,
   VSCodeDivider,
+  VSCodeDropdown,
+  VSCodeOption,
+  VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import { formatFileSize } from "../../text/formatFileSize.js";
-
-let vsCodeApi: WebviewApi<unknown>;
+import { getVSCodeApi } from "../../vscode/getVSCodeApi.js";
 
 export function Generate() {
-  const [state, setState] = useState<GenerateArgs>({
+  const vsCodeApi = getVSCodeApi();
+
+  const [args, setArgs] = useState<GenerateArgs>({
     models: [],
     files: [],
     rules: [],
@@ -25,73 +26,137 @@ export function Generate() {
       const message = event.data;
       switch (message.command) {
         case "load":
-          setState({
+          setArgs({
             models: message.models,
             files: message.files,
             rules: message.rules,
             selectedModel: message.selectedModel,
           });
-          console.log(message);
+          setSelectedModel(message.selectedModel);
+          setCodegenTargets(":prompt");
+          setSelectedCodingConvention(message.rules[0]);
+          setSelectedFileVersion("working-copy");
+          setIncludedFiles(
+            args.files.map((file) => ({
+              path: file.path,
+              includeOption: "source",
+            }))
+          );
           break;
       }
     });
-    vsCodeApi = acquireVsCodeApi();
+
     vsCodeApi.postMessage({ command: "webviewReady" });
   }, []);
+
+  const [selectedModel, setSelectedModel] = useState(args.selectedModel);
+  const [prompt, setPrompt] = useState<string>("");
+  const [codegenTargets, setCodegenTargets] = useState("");
+  const [selectedCodingConvention, setSelectedCodingConvention] = useState("");
+  const [selectedFileVersion, setSelectedFileVersion] = useState<string>();
+  const [includedFiles, setIncludedFiles] = useState<
+    { path: string; includeOption: string }[]
+  >([]);
+
+  function handleGenerateClick() {
+    vsCodeApi.postMessage({
+      command: "generate",
+      args: {
+        selectedModel,
+        prompt,
+        codegenTargets,
+        selectedCodingConvention,
+        selectedFileVersion,
+      },
+    });
+  }
 
   return (
     <div>
       <h1>Generate</h1>
       <CSFormField label={{ text: "Model" }}>
-        <CSDropDown
-          items={state.models.map((x) => ({ text: x.name, value: x.value }))}
-          selectedItem={state.selectedModel}
-          dropdownStyle={{ width: "180px" }}
-        />
+        <VSCodeDropdown
+          items={args.models.map((x) => ({
+            text: x.name,
+            value: x.value,
+          }))}
+          selectedItem={args.selectedModel}
+          style={{ width: "180px" }}
+          onChange={(e: any) => setSelectedModel(e.target.value)}
+        >
+          {args.models.map((item) => (
+            <VSCodeOption key={item.value} value={item.value}>
+              {item.name}
+            </VSCodeOption>
+          ))}
+        </VSCodeDropdown>
       </CSFormField>
       <CSFormField label={{ text: "Prompt:" }}>
-        <CSTextArea
+        <VSCodeTextArea
           rows={10}
           cols={50}
           textareaStyle={{ fontFamily: "var(--vscode-editor-font-family)" }}
           resize="both"
+          onChange={(e: any) => setPrompt(e.target.value)}
         />{" "}
       </CSFormField>
       <CSFormField>
-        <VSCodeButton>Generate Code</VSCodeButton>
+        <VSCodeButton onClick={handleGenerateClick}>Generate Code</VSCodeButton>
       </CSFormField>
       <VSCodeDivider />
       <h3>Additional Options</h3>
       <CSFormField label={{ text: "Files to generate:" }}>
-        <CSDropDown
-          items={[{ text: "As in Prompt", value: ":prompt" }].concat(
-            state.files.map((x) => ({
-              text: x.path,
-              value: `${x.path}`,
-            }))
-          )}
+        <VSCodeDropdown
           selectedItem="prompt"
-          dropdownStyle={{ width: "180px" }}
-        />{" "}
+          style={{ width: "180px" }}
+          onChange={(e: any) => setCodegenTargets(e.target.value)}
+        >
+          {[{ text: "As in Prompt", value: ":prompt" }]
+            .concat(
+              args.files.map((x) => ({
+                text: x.path,
+                value: `${x.path}`,
+              }))
+            )
+            .map((item) => (
+              <VSCodeOption key={item.value} value={item.value}>
+                {item.text}
+              </VSCodeOption>
+            ))}
+        </VSCodeDropdown>
       </CSFormField>
       <CSFormField label={{ text: "Coding Conventions:" }}>
-        <CSDropDown
-          items={state.rules.map((x) => ({ text: x, value: x }))}
-          dropdownStyle={{ width: "180px" }}
-        />{" "}
+        <VSCodeDropdown
+          style={{ width: "180px" }}
+          onChange={(e: any) => setSelectedCodingConvention(e.target.value)}
+        >
+          {args.rules
+            .map((x) => ({ text: x, value: x }))
+            .map((item) => (
+              <VSCodeOption key={item.value} value={item.value}>
+                {item.text}
+              </VSCodeOption>
+            ))}
+        </VSCodeDropdown>
       </CSFormField>
       <CSFormField label={{ text: "File Version:" }}>
-        <CSDropDown
-          items={[
+        <VSCodeDropdown
+          selectedItem="working-copy"
+          style={{ width: "180px" }}
+          onChange={(e: any) => setSelectedFileVersion(e.target.value)}
+        >
+          {[
             { text: "Working Copy", value: "working-copy" },
             { text: "Git HEAD", value: "head" },
-          ]}
-          selectedItem="working-copy"
-          dropdownStyle={{ width: "180px" }}
-        />{" "}
+          ].map((item) => (
+            <VSCodeOption key={item.value} value={item.value}>
+              {item.text}
+            </VSCodeOption>
+          ))}
+        </VSCodeDropdown>
       </CSFormField>
       <CSFormField label={{ text: "Included Files:" }}>
-        {state.files.map((file) => (
+        {args.files.map((file) => (
           <div
             key={file.path}
             style={{
@@ -101,19 +166,43 @@ export function Generate() {
               alignItems: "center",
             }}
           >
-            <CSDropDown
-              items={[
+            <VSCodeDropdown
+              selectedItem={
+                includedFiles.find((f) => f.path === file.path)
+                  ?.includeOption || "source"
+              }
+              style={{ width: "120px", marginRight: "8px" }}
+              onChange={(e: any) => {
+                const newIncludedFiles = [...includedFiles];
+                const fileIndex = newIncludedFiles.findIndex(
+                  (f) => f.path === file.path
+                );
+                if (fileIndex !== -1) {
+                  newIncludedFiles[fileIndex].includeOption = e.target.value;
+                } else {
+                  newIncludedFiles.push({
+                    path: file.path,
+                    includeOption: e.target.value,
+                  });
+                }
+                setIncludedFiles(newIncludedFiles);
+              }}
+            >
+              {[
                 { text: "Full Source", value: "source" },
                 { text: "Declarations", value: "declarations" },
-              ]}
-              dropdownStyle={{ width: "120px", marginRight: "8px" }}
-            />
+              ].map((item) => (
+                <VSCodeOption key={item.value} value={item.value}>
+                  {item.text}
+                </VSCodeOption>
+              ))}
+            </VSCodeDropdown>
             <span>
               {file.path} {file.size ? `(${formatFileSize(file.size)})` : ""}
             </span>
             <br />
           </div>
-        ))}{" "}
+        ))}
       </CSFormField>
     </div>
   );
