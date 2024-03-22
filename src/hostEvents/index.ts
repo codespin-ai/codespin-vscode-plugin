@@ -1,4 +1,4 @@
-import { UIPanel } from "../../vscode/UIPanel.js";
+import { UIPanel } from "../vscode/UIPanel.js";
 import { generate } from "./generate.js";
 
 export async function processEvent(

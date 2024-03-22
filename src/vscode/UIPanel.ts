@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getWebviewContent } from "../ui/getWebView.js";
-import { processEvent } from "../ui/eventHandlers/index.js";
+import { processEvent } from "../hostEvents/index.js";
 
 export class UIPanel {
   context: vscode.ExtensionContext;

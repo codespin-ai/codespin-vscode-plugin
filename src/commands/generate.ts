@@ -4,6 +4,8 @@ import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
 import { getModels } from "../models/getModels.js";
 import { getDefaultModel } from "../models/getDefaultModel.js";
 import { UIPanel } from "../vscode/UIPanel.js";
+import { LoadGeneratePanelEventArgs } from "../ui/webviewEvents/LoadGeneratePanelEventArgs.js";
+import { EventTemplate } from "../EventTemplate.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -26,12 +28,14 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     await uiPanel.navigateTo("/generate");
 
-    uiPanel.postMessageToWebview({
-      type: "onGenerate",
+    const generatePanelArgs: EventTemplate<LoadGeneratePanelEventArgs> = {
+      type: "onGeneratePanel",
       files: relativePaths.map((x) => ({ path: x, size: 100434 })),
       rules: ["Typescript", "Python"],
       models: getModels(),
       selectedModel: getDefaultModel(),
-    });
+    };
+
+    uiPanel.postMessageToWebview(generatePanelArgs);
   };
 }

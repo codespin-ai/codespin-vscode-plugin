@@ -2,7 +2,7 @@ import { Route, Switch } from "wouter";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Generate } from "./pages/Generate.js";
-import { NavigateEventArgs } from "./eventHandlers/navigate.js";
+import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
 import { navigate } from "wouter/use-browser-location";
 import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
 

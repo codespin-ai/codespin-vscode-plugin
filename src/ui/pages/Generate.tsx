@@ -10,12 +10,14 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import { formatFileSize } from "../../text/formatFileSize.js";
 import { getVsCodeApi } from "../../vscode/getVsCodeApi.js";
-import { OnGenerateEventArgs } from "../eventHandlers/onGenerate.js";
+import { LoadGeneratePanelEventArgs } from "../webviewEvents/LoadGeneratePanelEventArgs.js";
+import { GenerateEventArgs } from "../../hostEvents/GenerateEventArgs.js";
+import { EventTemplate } from "../../EventTemplate.js";
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();
 
-  const [args, setArgs] = useState<OnGenerateEventArgs>({
+  const [args, setArgs] = useState<LoadGeneratePanelEventArgs>({
     models: [],
     files: [],
     rules: [],
@@ -26,7 +28,7 @@ export function Generate() {
     window.addEventListener("message", (event) => {
       const message = event.data;
       switch (message.type) {
-        case "onGenerate":
+        case "onGeneratePanel":
           setArgs({
             models: message.models,
             files: message.files,
@@ -52,20 +54,22 @@ export function Generate() {
   const [prompt, setPrompt] = useState<string>("");
   const [codegenTargets, setCodegenTargets] = useState("");
   const [codingConvention, setCodingConvention] = useState("");
-  const [fileVersion, setFileVersion] = useState<string>();
+  const [fileVersion, setFileVersion] = useState<string>("");
   const [includedFiles, setIncludedFiles] = useState<
-    { path: string; includeOption: string }[]
+    { path: string; includeOption: "source" | "declaration" }[]
   >([]);
 
   function handleGenerateClick() {
-    vsCodeApi.postMessage({
+    const message: EventTemplate<GenerateEventArgs> = {
       type: "generate",
       model,
       prompt,
       codegenTargets,
       codingConvention,
       fileVersion,
-    });
+      includedFiles,
+    };
+    vsCodeApi.postMessage(message);
   }
 
   return (
