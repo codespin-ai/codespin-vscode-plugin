@@ -41,6 +41,8 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     await uiPanel.navigateTo("/generate", generatePanelArgs);
 
     function onMessage(message: { type: string }) {
+      console.log("MSG!", message);
+
       switch (message.type) {
         case "generate":
           return generate(message as any);
@@ -70,32 +72,48 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           provider: llmProvider,
         });
       } else {
-        console.log("GENERATING!");
+        console.log("Gonna GENERATE!!");
       }
     }
 
     async function editProviderConfig(message: EditProviderConfigArgs) {
-      const llmProvider = message.provider;
+      console.log("editeen....", message);
+
       const configFilePath = path.join(
         os.homedir(),
         ".codespin",
-        `${llmProvider}.json`
+        `${message.provider}.json`
       );
 
-      const { provider, ...config } = message;
-
       try {
-        // fs.writeFileSync(
-        //   configFilePath,
-        //   JSON.stringify(config, null, 2),
-        //   "utf8"
-        // );
-        console.log(`${llmProvider} configuration saved successfully.`);
+        const revisedConfig =
+          message.provider === "openai"
+            ? {
+                apiKey: message.apiKey,
+                authType: message.vendor === "azure" ? "API_KEY" : undefined,
+                completionsEndpoint: message.completionsEndpoint,
+              }
+            : message.provider === "anthropic"
+            ? {
+                apiKey: message.apiKey,
+              }
+            : {};
+
+        console.log("writing ", configFilePath);
+        
+        fs.writeFileSync(
+          configFilePath,
+          JSON.stringify(revisedConfig, null, 2),
+          "utf8"
+        );
 
         // Let's run generate again.
         await generate(generateArgs!);
       } catch (error) {
-        console.error(`Failed to save ${llmProvider} configuration:`, error);
+        console.error(
+          `Failed to save ${message.provider} configuration:`,
+          error
+        );
       }
     }
   };

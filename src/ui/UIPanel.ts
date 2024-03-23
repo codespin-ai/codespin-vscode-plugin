@@ -55,7 +55,8 @@ export class UIPanel {
   }
 
   handleMessageFromWebview(message: any) {
-    console.log("MSG!", message);
+    console.log("INCOMING", message);
+    
     switch (message.type) {
       case "webviewReady":
         this.resolveReady();

@@ -8,18 +8,18 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
+import { EventTemplate } from "../../../EventTemplate.js";
+import { EditProviderConfigArgs } from "../../../commands/EditProviderConfigArgs.js";
 
-// Define a TypeScript interface for the component's props
 interface EditOpenAIConfigProps {
   vendor: string;
   apiKey: string;
   completionsEndPoint: string;
 }
 
-// Update the component to accept props and use them to initialize state
 export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
   const vsCodeApi = getVsCodeApi();
-  // Initialize state with props
+
   const [vendor, setVendor] = useState<string>(props.vendor ?? "");
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
   const [completionsEndPoint, setCompletionsEndPoint] = useState<string>(
@@ -27,8 +27,9 @@ export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
   );
 
   function handleSave() {
-    const message = {
-      type: "saveConfig",
+    const message: EventTemplate<EditProviderConfigArgs> = {
+      type: "provider:editConfig",
+      provider: "openai",
       vendor,
       apiKey,
       completionsEndPoint: vendor === "azure" ? completionsEndPoint : undefined,

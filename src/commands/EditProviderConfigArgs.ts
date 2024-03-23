@@ -1,3 +1,4 @@
 export type EditProviderConfigArgs = {
-  [key: string]: string;
+  provider: "openai" | "anthropic" | "google";
+  [key: string]: string | undefined;
 };
