@@ -1,5 +1,5 @@
+import { init } from "codespin/dist/commands/init.js";
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { getDefaultModel } from "../models/getDefaultModel.js";
@@ -7,9 +7,8 @@ import { getModels } from "../models/getModels.js";
 import { UIPanel } from "../ui/UIPanel.js";
 import { GeneratePageArgs } from "../ui/pages/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
-import { GenerateArgs } from "./GenerateArgs.js";
 import { EditProviderConfigArgs } from "./EditProviderConfigArgs.js";
-import { init } from "codespin/dist/commands/init.js";
+import { GenerateArgs } from "./GenerateArgs.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   let generateArgs: GenerateArgs | undefined;
@@ -20,20 +19,21 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
   ): Promise<void> {
     const workspaceRoot = getWorkspaceRoot(context);
 
-    // Map each URI to a path relative to the workspace root.
-    const relativePaths = uris
+    const fileDetails = uris
       .map((uri) => {
         const fullPath = uri.fsPath;
-        return path.relative(workspaceRoot, fullPath);
+        const size = fs.statSync(fullPath).size;
+        const relativePath = path.relative(workspaceRoot, fullPath);
+        return { path: relativePath, size };
       })
-      .sort();
+      .sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
 
     const uiPanel = new UIPanel(context, onMessage);
 
     await uiPanel.onReady();
 
     const generatePanelArgs: GeneratePageArgs = {
-      files: relativePaths.map((x) => ({ path: x, size: 100434 })),
+      files: fileDetails,
       rules: ["Typescript", "Python"],
       models: getModels(),
       selectedModel: getDefaultModel(),
@@ -98,7 +98,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           provider: llmProvider,
         });
       } else {
-        console.log("Gonna GENERATE!!");
+        await uiPanel.navigateTo(`/generate/invoke`);
       }
     }
 
