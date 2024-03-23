@@ -47,7 +47,7 @@ export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
       {apiKey === "" ? (
         <p>
           You need to set up OpenAI API keys. This will be stored in
-          $HOME/.codespin/openai.json
+          .codespin/openai.json
         </p>
       ) : (
         <></>

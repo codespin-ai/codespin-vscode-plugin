@@ -9,7 +9,7 @@ export function getInitCommand(context: vscode.ExtensionContext) {
     // Check if there is at least one workspace folder opened.
     const workspaceRoot = getWorkspaceRoot(context);
 
-    const codespinConfigPath = path.join(workspaceRoot, "codespin.json");
+    const codespinConfigPath = path.join(workspaceRoot, ".codespin");
 
     // Check if codespin.json exists
     if (fs.existsSync(codespinConfigPath)) {

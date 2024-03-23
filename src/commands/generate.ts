@@ -9,6 +9,7 @@ import { GeneratePageArgs } from "../ui/pages/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
 import { GenerateArgs } from "./GenerateArgs.js";
 import { EditProviderConfigArgs } from "./EditProviderConfigArgs.js";
+import { init } from "codespin/dist/commands/init.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   let generateArgs: GenerateArgs | undefined;
@@ -54,16 +55,41 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     }
 
     async function generate(message: GenerateArgs) {
+      // First check if the .codespin dir exists.
+      // Check if there is at least one workspace folder opened.
+      const workspaceRoot = getWorkspaceRoot(context);
+
+      const configDir = path.join(workspaceRoot, ".codespin");
+
+      // Check if .codespin dir exists
+      if (!fs.existsSync(configDir)) {
+        // Ask the user if they want to force initialize
+        const userChoice = await vscode.window.showWarningMessage(
+          "Codespin settings not found for this project. Create?",
+          "Yes",
+          "No"
+        );
+
+        if (userChoice === "Yes") {
+          await init({
+            templatesDir: path.join(
+              __dirname,
+              "../node_modules/codespin/dist/templates"
+            ),
+          });
+        }
+        // If the user chooses No, we must exit.
+        else {
+          return;
+        }
+      }
+
       // Store it.
       generateArgs = message;
 
       const llmProvider = generateArgs.model.split(":")[0];
 
-      const configFilePath = path.join(
-        os.homedir(),
-        ".codespin",
-        `${llmProvider}.json`
-      );
+      const configFilePath = path.join(configDir, `${llmProvider}.json`);
 
       // Check if the config file exists
       if (!fs.existsSync(configFilePath)) {
@@ -77,13 +103,9 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     }
 
     async function editProviderConfig(message: EditProviderConfigArgs) {
-      console.log("editeen....", message);
-
-      const configFilePath = path.join(
-        os.homedir(),
-        ".codespin",
-        `${message.provider}.json`
-      );
+      const workspaceRoot = getWorkspaceRoot(context);
+      const configDir = path.join(workspaceRoot, ".codespin");
+      const configFilePath = path.join(configDir, `${message.provider}.json`);
 
       try {
         const revisedConfig =
@@ -100,7 +122,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
             : {};
 
         console.log("writing ", configFilePath);
-        
+
         fs.writeFileSync(
           configFilePath,
           JSON.stringify(revisedConfig, null, 2),

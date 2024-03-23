@@ -35,8 +35,8 @@ export function EditAnthropicConfig(props: EditAnthropicConfigProps) {
       )}
       {!props.apiKey ? (
         <p>
-          You need to set up Anthropic API keys. This will be stored in
-          $HOME/.codespin/anthropic.json
+          You need to set up OpenAI API keys. This will be stored in
+          .codespin/anthropic.json
         </p>
       ) : (
         <></>
