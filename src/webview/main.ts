@@ -2,13 +2,13 @@ import {
   provideVSCodeDesignSystem,
   vsCodeButton,
   vsCodeCheckbox,
-  vsCodeTextArea,
-  vsCodeTextField,
+  vsCodeDivider,
   vsCodeDropdown,
   vsCodeOption,
-  vsCodeRadioGroup,
   vsCodeRadio,
-  vsCodeDivider,
+  vsCodeRadioGroup,
+  vsCodeTextArea,
+  vsCodeTextField,
 } from "@vscode/webview-ui-toolkit";
 
 export { initWebView } from "../ui/index.js";

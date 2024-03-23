@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { getWebviewContent } from "./getWebView.js";
-import { processEvent } from "../hostEvents/index.js";
+
+export type MessageHandler = (message: any) => void;
 
 export class UIPanel {
   context: vscode.ExtensionContext;
@@ -9,10 +10,12 @@ export class UIPanel {
   readyPromise: Promise<void>;
   resolveReady: () => void = () => {};
   navigationPromiseResolvers: Map<string, () => void>;
+  onMessage: MessageHandler;
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(context: vscode.ExtensionContext, onMessage: MessageHandler) {
     this.navigationPromiseResolvers = new Map();
     this.context = context;
+    this.onMessage = onMessage;
 
     this.panel = vscode.window.createWebviewPanel(
       "codespin-panel",
@@ -63,14 +66,14 @@ export class UIPanel {
           this.navigationPromiseResolvers.delete(message.url);
         }
     }
-    processEvent(message, this);
+    this.onMessage(message);
   }
 
   postMessageToWebview(message: any) {
     this.panel.webview.postMessage(message);
   }
 
-  navigateTo(url: string, args: any) {
+  navigateTo(url: string, args?: any) {
     return new Promise<void>((resolve) => {
       this.navigationPromiseResolvers.set(url, resolve);
       this.postMessageToWebview({

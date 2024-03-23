@@ -1,6 +1,3 @@
-import * as React from "react";
-import { useEffect, useState } from "react";
-import { CSFormField } from "../components/CSFormField.js";
 import {
   VSCodeButton,
   VSCodeDivider,
@@ -8,16 +5,19 @@ import {
   VSCodeOption,
   VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
+import * as React from "react";
+import { useState } from "react";
+import { EventTemplate } from "../../EventTemplate.js";
+import { GenerateArgs } from "../../commands/GenerateArgs.js";
 import { formatFileSize } from "../../text/formatFileSize.js";
 import { getVsCodeApi } from "../../vscode/getVsCodeApi.js";
-import { GeneratePanelArgs } from "./GeneratePanelArgs.js";
-import { GenerateEventArgs } from "../../hostEvents/GenerateEventArgs.js";
-import { EventTemplate } from "../../EventTemplate.js";
+import { CSFormField } from "../components/CSFormField.js";
+import { GeneratePageArgs } from "./GeneratePageArgs.js";
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();
 
-  const args: GeneratePanelArgs = history.state;
+  const args: GeneratePageArgs = history.state;
 
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>("");
@@ -36,7 +36,7 @@ export function Generate() {
   );
 
   function handleGenerateClick() {
-    const message: EventTemplate<GenerateEventArgs> = {
+    const message: EventTemplate<GenerateArgs> = {
       type: "generate",
       model,
       prompt,

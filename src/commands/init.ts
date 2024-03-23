@@ -1,7 +1,7 @@
-import * as vscode from "vscode";
 import { init } from "codespin/dist/commands/init.js";
 import * as fs from "fs";
 import * as path from "path";
+import * as vscode from "vscode";
 import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
 
 export function getInitCommand(context: vscode.ExtensionContext) {

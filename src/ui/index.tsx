@@ -1,10 +1,11 @@
-import { Route, Switch } from "wouter";
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Generate } from "./pages/Generate.js";
-import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
+import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
 import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
+import { Generate } from "./pages/Generate.js";
+import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
+import { EditConfig as EditProviderConfig } from "./pages/providers/EditConfig.js";
 
 function App() {
   React.useEffect(() => {
@@ -28,7 +29,8 @@ function App() {
     <>
       <Switch>
         <Route path="/generate" component={Generate} />
-        <Route></Route>
+        <Route path="/providers/config/edit" component={EditProviderConfig} />
+        <Route>404... Missing feature</Route>
       </Switch>
     </>
   );
