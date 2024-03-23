@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
-import { UIPanel } from "../vscode/UIPanel.js";
+import { UIPanel } from "../ui/UIPanel.js";
 import { GenerateEventArgs } from "./GenerateEventArgs.js";
 
 export async function generate(message: GenerateEventArgs, panel: UIPanel) {

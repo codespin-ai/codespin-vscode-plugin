@@ -13,7 +13,7 @@ function App() {
       switch (incomingMessage.type) {
         case "navigate":
           const eventArgs = incomingMessage as NavigateEventArgs;
-          navigate(eventArgs.url);
+          navigate(eventArgs.url, { state: eventArgs.state });
           getVsCodeApi().postMessage({
             type: "navigated",
             url: eventArgs.url,

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { getWebviewContent } from "../ui/getWebView.js";
+import { getWebviewContent } from "./getWebView.js";
 import { processEvent } from "../hostEvents/index.js";
 
 export class UIPanel {
@@ -70,12 +70,13 @@ export class UIPanel {
     this.panel.webview.postMessage(message);
   }
 
-  navigateTo(url: string) {
+  navigateTo(url: string, args: any) {
     return new Promise<void>((resolve) => {
       this.navigationPromiseResolvers.set(url, resolve);
       this.postMessageToWebview({
         type: "navigate",
         url,
+        state: args,
       });
     });
   }

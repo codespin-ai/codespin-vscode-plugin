@@ -10,54 +10,30 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import { formatFileSize } from "../../text/formatFileSize.js";
 import { getVsCodeApi } from "../../vscode/getVsCodeApi.js";
-import { LoadGeneratePanelEventArgs } from "../webviewEvents/LoadGeneratePanelEventArgs.js";
+import { GeneratePanelArgs } from "./GeneratePanelArgs.js";
 import { GenerateEventArgs } from "../../hostEvents/GenerateEventArgs.js";
 import { EventTemplate } from "../../EventTemplate.js";
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();
 
-  const [args, setArgs] = useState<LoadGeneratePanelEventArgs>({
-    models: [],
-    files: [],
-    rules: [],
-    selectedModel: "",
-  });
-
-  useEffect(() => {
-    window.addEventListener("message", (event) => {
-      const message = event.data;
-      switch (message.type) {
-        case "onGeneratePanel":
-          setArgs({
-            models: message.models,
-            files: message.files,
-            rules: message.rules,
-            selectedModel: message.selectedModel,
-          });
-          setModel(message.selectedModel);
-          setCodegenTargets(":prompt");
-          setCodingConvention(message.rules[0]);
-          setFileVersion("working-copy");
-          setIncludedFiles(
-            args.files.map((file) => ({
-              path: file.path,
-              includeOption: "source",
-            }))
-          );
-          break;
-      }
-    });
-  }, []);
+  const args: GeneratePanelArgs = history.state;
 
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>("");
-  const [codegenTargets, setCodegenTargets] = useState("");
-  const [codingConvention, setCodingConvention] = useState("");
-  const [fileVersion, setFileVersion] = useState<string>("");
+  const [codegenTargets, setCodegenTargets] = useState(":prompt");
+  const [codingConvention, setCodingConvention] = useState(
+    args.rules[0]
+  );
+  const [fileVersion, setFileVersion] = useState<string>("working-copy");
   const [includedFiles, setIncludedFiles] = useState<
     { path: string; includeOption: "source" | "declaration" }[]
-  >([]);
+  >(
+    args.files.map((file) => ({
+      path: file.path,
+      includeOption: "source",
+    }))
+  );
 
   function handleGenerateClick() {
     const message: EventTemplate<GenerateEventArgs> = {
