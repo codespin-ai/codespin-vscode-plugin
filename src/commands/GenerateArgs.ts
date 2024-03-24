@@ -3,7 +3,7 @@ export type GenerateArgs = {
   prompt: string;
   codegenTargets: string;
   codingConvention: string;
-  fileVersion: string;
+  fileVersion: "current" | "HEAD";
   includedFiles: {
     path: string;
     includeOption: "source" | "declaration";

@@ -1,4 +1,5 @@
-import { init } from "codespin/dist/commands/init.js";
+import { init as codespinInit } from "codespin/dist/commands/init.js";
+import { generate as codespinGenerate } from "codespin/dist/commands/generate.js";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -9,6 +10,7 @@ import { GeneratePageArgs } from "../ui/pages/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
 import { EditProviderConfigArgs } from "./EditProviderConfigArgs.js";
 import { GenerateArgs } from "./GenerateArgs.js";
+import * as os from "os";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   let generateArgs: GenerateArgs | undefined;
@@ -42,8 +44,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     await uiPanel.navigateTo("/generate", generatePanelArgs);
 
     function onMessage(message: { type: string }) {
-      console.log("MSG!", message);
-
       switch (message.type) {
         case "generate":
           return generate(message as any);
@@ -71,12 +71,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
         );
 
         if (userChoice === "Yes") {
-          await init({
-            templatesDir: path.join(
-              __dirname,
-              "../node_modules/codespin/dist/templates"
-            ),
-          });
+          await codespinInit({});
         }
         // If the user chooses No, we must exit.
         else {
@@ -98,6 +93,50 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           provider: llmProvider,
         });
       } else {
+        const tmpFilePath = path.join(
+          os.tmpdir(),
+          `codespin-prompt-${Date.now()}.txt`
+        );
+        fs.writeFileSync(tmpFilePath, message.prompt, "utf8");
+
+        const [vendor, model] = message.model.split(":");
+
+        const codespinGenerateArgs = {
+          promptFile: tmpFilePath,
+          source:
+            message.codegenTargets !== ":prompt"
+              ? message.codegenTargets
+              : undefined,
+          version: message.fileVersion,
+          model,
+          write: true,
+          include: message.includedFiles
+            .filter((f) => f.includeOption === "source")
+            .map((f) => f.path),
+          exclude: undefined,
+          declare: message.includedFiles
+            .filter((f) => f.includeOption === "declaration")
+            .map((f) => f.path),
+          prompt: undefined,
+          api: vendor,
+          maxTokens: undefined,
+          printPrompt: undefined,
+          writePrompt: undefined,
+          template: undefined,
+          templateArgs: undefined,
+          debug: true,
+          exec: undefined,
+          config: undefined,
+          outDir: undefined,
+          parser: undefined,
+          parse: undefined,
+          go: undefined,
+          maxDeclare: undefined,
+          dataCallback: undefined,
+        };
+
+        await codespinGenerate(codespinGenerateArgs);
+
         await uiPanel.navigateTo(`/generate/invoke`);
       }
     }
@@ -120,8 +159,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
                 apiKey: message.apiKey,
               }
             : {};
-
-        console.log("writing ", configFilePath);
 
         fs.writeFileSync(
           configFilePath,
