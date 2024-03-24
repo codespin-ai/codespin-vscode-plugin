@@ -6,6 +6,7 @@ import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
 import { Generate } from "./pages/Generate.js";
 import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
 import { EditConfig } from "./pages/api/EditConfig.js";
+import { GenerateStream } from "./pages/GenerateStream.js";
 
 function App() {
   React.useEffect(() => {
@@ -29,6 +30,7 @@ function App() {
     <>
       <Switch>
         <Route path="/generate" component={Generate} />
+        <Route path="/generate/stream" component={GenerateStream} />
         <Route path="/api/config/edit" component={EditConfig} />
         <Route>404... Missing feature</Route>
       </Switch>

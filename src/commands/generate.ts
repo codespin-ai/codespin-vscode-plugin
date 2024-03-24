@@ -127,13 +127,16 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           parse: undefined,
           go: undefined,
           maxDeclare: undefined,
-          dataCallback: undefined,
           apiVersion: undefined,
+          dataCallback: (data: string) => {
+            console.log("DATA:", data);
+          },
         };
+        
+        await uiPanel.navigateTo(`/generate/invoke`);
 
         await codespinGenerate(codespinGenerateArgs);
 
-        await uiPanel.navigateTo(`/generate/invoke`);
       }
       // config file doesn't exist.
       else {
