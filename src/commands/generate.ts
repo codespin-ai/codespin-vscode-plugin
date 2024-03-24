@@ -1,18 +1,17 @@
-import { init as codespinInit } from "codespin/dist/commands/init.js";
 import { generate as codespinGenerate } from "codespin/dist/commands/generate.js";
+import { init as codespinInit } from "codespin/dist/commands/init.js";
+import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
 import { getDefaultModel } from "../models/getDefaultModel.js";
 import { getModels } from "../models/getModels.js";
+import { createAPIConfig } from "../settings/createAPIConfig.js";
+import { getAPIConfigPath } from "../settings/getAPIConfigPath.js";
 import { UIPanel } from "../ui/UIPanel.js";
 import { GeneratePageArgs } from "../ui/pages/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
-import { EditAPIConfigArgs } from "./EditAPIConfigArgs.js";
 import { GenerateArgs } from "./GenerateArgs.js";
-import * as os from "os";
-import * as fs from "fs";
-import { createDirIfMissing } from "../fs/createDirIfMissing.js";
-import { pathExists } from "../fs/pathExists.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   let generateArgs: GenerateArgs | undefined;
@@ -45,12 +44,13 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     await uiPanel.navigateTo("/generate", generatePanelArgs);
 
-    function onMessage(message: { type: string }) {
+    async function onMessage(message: { type: string }) {
       switch (message.type) {
         case "generate":
           return generate(message as any);
         case "api:editConfig":
-          return editAPIConfig(message as any);
+          await createAPIConfig(message as any);
+          await generate(generateArgs!);
         default:
           return;
       }
@@ -84,7 +84,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
       const api = generateArgs.model.split(":")[0];
 
-      const configFilePath = await getAPIConfigPath(api);
+      const configFilePath = await getAPIConfigPath(api, workspaceRoot);
 
       // Check if the config file exists
       if (configFilePath) {
@@ -114,7 +114,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
             .map((f) => f.path),
           prompt: undefined,
           api: vendor,
-          maxTokens: undefined,
+          maxTokens: 4000,
           printPrompt: undefined,
           writePrompt: undefined,
           template: undefined,
@@ -128,6 +128,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           go: undefined,
           maxDeclare: undefined,
           dataCallback: undefined,
+          apiVersion: undefined,
         };
 
         await codespinGenerate(codespinGenerateArgs);
@@ -139,57 +140,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
         await uiPanel.navigateTo(`/api/config/edit`, {
           api,
         });
-      }
-    }
-
-    async function getAPIConfigPath(api: string): Promise<string | undefined> {
-      const workspaceRoot = getWorkspaceRoot(context);
-
-      const projectConfigDir = path.join(workspaceRoot, ".codespin");
-      const configFilePath = path.join(projectConfigDir, `${api}.json`);
-      if (await pathExists(configFilePath)) {
-        return configFilePath;
-      }
-
-      const rootConfigDir = path.join(os.homedir(), ".codespin");
-      const rootConfigPath = path.join(rootConfigDir, `${api}.json`);
-      if (await pathExists(rootConfigPath)) {
-        return rootConfigPath;
-      }
-
-      return undefined;
-    }
-
-    async function editAPIConfig(message: EditAPIConfigArgs) {
-      const configDir = path.join(os.homedir(), ".codespin");
-      await createDirIfMissing(configDir);
-      const configFilePath = path.join(configDir, `${message.api}.json`);
-
-      try {
-        const revisedConfig =
-          message.api === "openai"
-            ? {
-                apiKey: message.apiKey,
-                authType: message.vendor === "azure" ? "API_KEY" : undefined,
-                completionsEndpoint: message.completionsEndpoint,
-              }
-            : message.api === "anthropic"
-            ? {
-                apiKey: message.apiKey,
-              }
-            : {};
-
-        fs.writeFileSync(
-          configFilePath,
-          JSON.stringify(revisedConfig, null, 2),
-          "utf8"
-        );
-        await generate(generateArgs!);
-      } catch (error) {
-        console.error(
-          `Failed to save ${message.api} configuration:`,
-          error
-        );
       }
     }
   };
