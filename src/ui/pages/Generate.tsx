@@ -22,10 +22,8 @@ export function Generate() {
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>("");
   const [codegenTargets, setCodegenTargets] = useState(":prompt");
-  const [codingConvention, setCodingConvention] = useState(
-    args.rules[0]
-  );
-  const [fileVersion, setFileVersion] = useState<string>("working-copy");
+  const [codingConvention, setCodingConvention] = useState(args.rules[0]);
+  const [fileVersion, setFileVersion] = useState<"current" | "HEAD">("current");
   const [includedFiles, setIncludedFiles] = useState<
     { path: string; includeOption: "source" | "declaration" }[]
   >(
@@ -72,7 +70,7 @@ export function Generate() {
         <VSCodeTextArea
           rows={10}
           cols={50}
-          textareaStyle={{ fontFamily: "var(--vscode-editor-font-family)" }}
+          style={{ fontFamily: "var(--vscode-editor-font-family)" }}
           resize="both"
           onChange={(e: any) => setPrompt(e.target.value)}
         />{" "}
