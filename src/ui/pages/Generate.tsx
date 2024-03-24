@@ -123,13 +123,13 @@ export function Generate() {
       </CSFormField>
       <CSFormField label={{ text: "File Version:" }}>
         <VSCodeDropdown
-          currentValue="working-copy"
+          currentValue="current"
           style={{ width: "180px" }}
           onChange={(e: any) => setFileVersion(e.target.value)}
         >
           {[
-            { text: "Working Copy", value: "working-copy" },
-            { text: "Git HEAD", value: "head" },
+            { text: "Working Copy", value: "current" },
+            { text: "Git HEAD", value: "HEAD" },
           ].map((item) => (
             <VSCodeOption key={item.value} value={item.value}>
               {item.text}
