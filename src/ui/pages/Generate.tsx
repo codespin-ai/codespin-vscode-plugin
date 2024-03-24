@@ -33,6 +33,12 @@ export function Generate() {
     }))
   );
 
+  React.useEffect(() => {
+    if (includedFiles.length === 1) {
+      setCodegenTargets(includedFiles[0].path);
+    }
+  }, [includedFiles]);
+
   function handleGenerateClick() {
     const message: EventTemplate<GenerateArgs> = {
       type: "generate",
