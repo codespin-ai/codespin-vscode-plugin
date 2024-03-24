@@ -5,7 +5,7 @@ import { navigate } from "wouter/use-browser-location";
 import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
 import { Generate } from "./pages/Generate.js";
 import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
-import { EditConfig as EditProviderConfig } from "./pages/providers/EditConfig.js";
+import { EditConfig } from "./pages/api/EditConfig.js";
 
 function App() {
   React.useEffect(() => {
@@ -29,7 +29,7 @@ function App() {
     <>
       <Switch>
         <Route path="/generate" component={Generate} />
-        <Route path="/providers/config/edit" component={EditProviderConfig} />
+        <Route path="/api/config/edit" component={EditConfig} />
         <Route>404... Missing feature</Route>
       </Switch>
     </>

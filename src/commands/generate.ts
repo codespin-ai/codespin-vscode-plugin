@@ -1,6 +1,5 @@
 import { init as codespinInit } from "codespin/dist/commands/init.js";
 import { generate as codespinGenerate } from "codespin/dist/commands/generate.js";
-import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { getDefaultModel } from "../models/getDefaultModel.js";
@@ -8,9 +7,12 @@ import { getModels } from "../models/getModels.js";
 import { UIPanel } from "../ui/UIPanel.js";
 import { GeneratePageArgs } from "../ui/pages/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
-import { EditProviderConfigArgs } from "./EditProviderConfigArgs.js";
+import { EditAPIConfigArgs } from "./EditAPIConfigArgs.js";
 import { GenerateArgs } from "./GenerateArgs.js";
 import * as os from "os";
+import * as fs from "fs";
+import { createDirIfMissing } from "../fs/createDirIfMissing.js";
+import { pathExists } from "../fs/pathExists.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   let generateArgs: GenerateArgs | undefined;
@@ -47,22 +49,20 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       switch (message.type) {
         case "generate":
           return generate(message as any);
-        case "provider:editConfig":
-          return editProviderConfig(message as any);
+        case "api:editConfig":
+          return editAPIConfig(message as any);
         default:
           return;
       }
     }
 
     async function generate(message: GenerateArgs) {
-      // First check if the .codespin dir exists.
-      // Check if there is at least one workspace folder opened.
       const workspaceRoot = getWorkspaceRoot(context);
 
-      const configDir = path.join(workspaceRoot, ".codespin");
+      const projectConfigDir = path.join(workspaceRoot, ".codespin");
 
       // Check if .codespin dir exists
-      if (!fs.existsSync(configDir)) {
+      if (!fs.existsSync(projectConfigDir)) {
         // Ask the user if they want to force initialize
         const userChoice = await vscode.window.showWarningMessage(
           "Codespin settings not found for this project. Create?",
@@ -82,17 +82,12 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       // Store it.
       generateArgs = message;
 
-      const llmProvider = generateArgs.model.split(":")[0];
+      const api = generateArgs.model.split(":")[0];
 
-      const configFilePath = path.join(configDir, `${llmProvider}.json`);
+      const configFilePath = await getAPIConfigPath(api);
 
       // Check if the config file exists
-      if (!fs.existsSync(configFilePath)) {
-        // If the file doesn't exist, navigate to the config page
-        await uiPanel.navigateTo(`/providers/config/edit`, {
-          provider: llmProvider,
-        });
-      } else {
+      if (configFilePath) {
         const tmpFilePath = path.join(
           os.tmpdir(),
           `codespin-prompt-${Date.now()}.txt`
@@ -139,22 +134,46 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
         await uiPanel.navigateTo(`/generate/invoke`);
       }
+      // config file doesn't exist.
+      else {
+        await uiPanel.navigateTo(`/api/config/edit`, {
+          api,
+        });
+      }
     }
 
-    async function editProviderConfig(message: EditProviderConfigArgs) {
+    async function getAPIConfigPath(api: string): Promise<string | undefined> {
       const workspaceRoot = getWorkspaceRoot(context);
-      const configDir = path.join(workspaceRoot, ".codespin");
-      const configFilePath = path.join(configDir, `${message.provider}.json`);
+
+      const projectConfigDir = path.join(workspaceRoot, ".codespin");
+      const configFilePath = path.join(projectConfigDir, `${api}.json`);
+      if (await pathExists(configFilePath)) {
+        return configFilePath;
+      }
+
+      const rootConfigDir = path.join(os.homedir(), ".codespin");
+      const rootConfigPath = path.join(rootConfigDir, `${api}.json`);
+      if (await pathExists(rootConfigPath)) {
+        return rootConfigPath;
+      }
+
+      return undefined;
+    }
+
+    async function editAPIConfig(message: EditAPIConfigArgs) {
+      const configDir = path.join(os.homedir(), ".codespin");
+      await createDirIfMissing(configDir);
+      const configFilePath = path.join(configDir, `${message.api}.json`);
 
       try {
         const revisedConfig =
-          message.provider === "openai"
+          message.api === "openai"
             ? {
                 apiKey: message.apiKey,
                 authType: message.vendor === "azure" ? "API_KEY" : undefined,
                 completionsEndpoint: message.completionsEndpoint,
               }
-            : message.provider === "anthropic"
+            : message.api === "anthropic"
             ? {
                 apiKey: message.apiKey,
               }
@@ -165,12 +184,10 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           JSON.stringify(revisedConfig, null, 2),
           "utf8"
         );
-
-        // Let's run generate again.
         await generate(generateArgs!);
       } catch (error) {
         console.error(
-          `Failed to save ${message.provider} configuration:`,
+          `Failed to save ${message.api} configuration:`,
           error
         );
       }

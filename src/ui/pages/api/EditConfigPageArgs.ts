@@ -1,4 +1,4 @@
 export type EditConfigPageArgs = {
-  provider: "openai" | "anthropic" | "google";
+  api: "openai" | "anthropic" | "google";
   [key: string]: string;
 };

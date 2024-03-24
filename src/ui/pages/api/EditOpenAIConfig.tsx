@@ -9,7 +9,7 @@ import {
 import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { EventTemplate } from "../../../EventTemplate.js";
-import { EditProviderConfigArgs } from "../../../commands/EditProviderConfigArgs.js";
+import { EditAPIConfigArgs } from "../../../commands/EditAPIConfigArgs.js";
 
 interface EditOpenAIConfigProps {
   vendor: string;
@@ -27,9 +27,9 @@ export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
   );
 
   function handleSave() {
-    const message: EventTemplate<EditProviderConfigArgs> = {
+    const message: EventTemplate<EditAPIConfigArgs> = {
       type: "provider:editConfig",
-      provider: "openai",
+      api: "openai",
       vendor,
       apiKey,
       completionsEndPoint: vendor === "azure" ? completionsEndPoint : undefined,

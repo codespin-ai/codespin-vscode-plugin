@@ -6,11 +6,11 @@ import { EditConfigPageArgs } from "./EditConfigPageArgs.js";
 export function EditConfig() {
   const args: EditConfigPageArgs = history.state;
   const Page: any =
-    args.provider === "anthropic"
+    args.api === "anthropic"
       ? EditAnthropicConfig
-      : args.provider === "openai"
+      : args.api === "openai"
       ? EditOpenAIConfig
       : undefined;
 
-  return Page ? <Page {...args} /> : <div>Unsupported Provider</div>;
+  return Page ? <Page {...args} /> : <div>Unsupported API</div>;
 }
