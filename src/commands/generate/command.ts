@@ -73,12 +73,13 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
                 });
               };
               await codespinGenerate(result.args);
-              return;
+              uiPanel.dispose();
+              break;
             case "missing_config":
               await uiPanel.navigateTo(`/api/config/edit`, {
                 api: result.api,
               });
-              return;
+              break;
           }
 
         case "api:editConfig":
@@ -86,8 +87,9 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           await onMessage(generateArgs!);
         case "close":
           uiPanel.dispose();
+          break;
         default:
-          return;
+          break;
       }
     }
   };
