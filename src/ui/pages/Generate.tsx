@@ -8,7 +8,7 @@ import {
 import * as React from "react";
 import { useState } from "react";
 import { EventTemplate } from "../../EventTemplate.js";
-import { GenerateArgs } from "../../commands/GenerateArgs.js";
+import { ArgsFromGeneratePanel } from "../../commands/generate/ArgsFromGeneratePanel.js";
 import { formatFileSize } from "../../text/formatFileSize.js";
 import { getVsCodeApi } from "../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../components/CSFormField.js";
@@ -40,7 +40,7 @@ export function Generate() {
   }, [includedFiles]);
 
   function handleGenerateClick() {
-    const message: EventTemplate<GenerateArgs> = {
+    const message: EventTemplate<ArgsFromGeneratePanel> = {
       type: "generate",
       model,
       prompt,

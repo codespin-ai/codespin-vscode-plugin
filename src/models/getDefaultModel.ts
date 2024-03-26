@@ -1,3 +1,3 @@
 export function getDefaultModel() {
-  return "anthropic:claude-3-sonnet-20240229";
+  return "anthropic:claude-3-haiku-20240307";
 }

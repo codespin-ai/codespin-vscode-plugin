@@ -10,7 +10,7 @@ import { GenerateStream } from "./pages/GenerateStream.js";
 
 function App() {
   React.useEffect(() => {
-    window.addEventListener("message", (event) => {
+    function listeners(event: any) {
       const incomingMessage = event.data;
       switch (incomingMessage.type) {
         case "navigate":
@@ -21,16 +21,17 @@ function App() {
             url: eventArgs.url,
           });
       }
-    });
-
+    }
+    window.addEventListener("message", listeners);
     getVsCodeApi().postMessage({ type: "webviewReady" });
+    return () => window.removeEventListener("click", listeners);
   }, []);
 
   return (
     <>
       <Switch>
         <Route path="/generate" component={Generate} />
-        <Route path="/generate/stream" component={GenerateStream} />
+        <Route path="/generate/invoke" component={GenerateStream} />
         <Route path="/api/config/edit" component={EditConfig} />
         <Route>404... Missing feature</Route>
       </Switch>

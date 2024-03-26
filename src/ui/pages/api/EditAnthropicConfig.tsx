@@ -6,7 +6,7 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
-import { EditAPIConfigArgs } from "../../../commands/EditAPIConfigArgs.js";
+import { EditAPIConfigArgs } from "../../../commands/generate/EditAPIConfigArgs.js";
 import { EventTemplate } from "../../../EventTemplate.js";
 
 type EditAnthropicConfigProps = {

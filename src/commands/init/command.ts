@@ -2,7 +2,7 @@ import { init } from "codespin/dist/commands/init.js";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
+import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 
 export function getInitCommand(context: vscode.ExtensionContext) {
   return async function initCommand(_: unknown): Promise<void> {
@@ -23,21 +23,12 @@ export function getInitCommand(context: vscode.ExtensionContext) {
       if (userChoice === "Yes") {
         await init({
           force: true,
-          templatesDir: path.join(
-            __dirname,
-            "../node_modules/codespin/dist/templates"
-          ),
         });
       }
       // If the user chooses "No", do nothing.
     } else {
       // If codespin.json doesn't exist, call init({}) without an alert.
-      await init({
-        templatesDir: path.join(
-          __dirname,
-          "../node_modules/codespin/dist/templates"
-        ),
-      });
+      await init({});
     }
   };
 }

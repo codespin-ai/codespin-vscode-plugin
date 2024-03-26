@@ -1,4 +1,4 @@
-export type GenerateArgs = {
+export type ArgsFromGeneratePanel = {
   model: string;
   prompt: string;
   codegenTargets: string;

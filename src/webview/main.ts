@@ -5,6 +5,7 @@ import {
   vsCodeDivider,
   vsCodeDropdown,
   vsCodeOption,
+  vsCodeProgressRing,
   vsCodeRadio,
   vsCodeRadioGroup,
   vsCodeTextArea,
@@ -24,5 +25,6 @@ provideVSCodeDesignSystem().register(
   vsCodeRadioGroup(),
   vsCodeRadio(),
   vsCodeOption(),
-  vsCodeDivider()
+  vsCodeDivider(),
+  vsCodeProgressRing()
 );

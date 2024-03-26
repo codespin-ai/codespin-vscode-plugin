@@ -9,7 +9,7 @@ import {
 import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { EventTemplate } from "../../../EventTemplate.js";
-import { EditAPIConfigArgs } from "../../../commands/EditAPIConfigArgs.js";
+import { EditAPIConfigArgs } from "../../../commands/generate/EditAPIConfigArgs.js";
 
 interface EditOpenAIConfigProps {
   vendor: string;
