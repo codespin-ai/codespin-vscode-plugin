@@ -46,9 +46,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     await uiPanel.navigateTo("/generate", generatePanelArgs);
 
     async function onMessage(message: EventTemplate<unknown>) {
-      console.log({
-        message,
-      });
       switch (message.type) {
         case "generate":
           generateArgs = message as EventTemplate<ArgsFromGeneratePanel>;

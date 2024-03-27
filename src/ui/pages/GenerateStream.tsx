@@ -21,7 +21,6 @@ export function GenerateStream() {
 
   React.useEffect(() => {
     function listeners(event: any) {
-      console.log({ event });
       const incomingMessage = event.data;
       switch (incomingMessage.type) {
         case "generate:stream:prompt":
