@@ -1,19 +1,44 @@
 import { init } from "codespin/dist/commands/init.js";
 import * as fs from "fs";
+import { mkdirSync } from "fs";
 import * as path from "path";
+import * as sqlite3 from "better-sqlite3"; // Using the 'better-sqlite3' package to avoid the 'open' error
 import * as vscode from "vscode";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 
+function createDatabase(codespinConfigPath: string) {
+  const dbPath = path.join(codespinConfigPath, "settings.db");
+  const createDatabasePromise = async () => {
+    const db = new sqlite3(dbPath); // Creating a new instance of the database
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS prompt (
+        model TEXT,
+        prompt TEXT,
+        codegenTargets TEXT,
+        codingConvention TEXT,
+        fileVersion TEXT,
+        includedFiles TEXT
+      );
+      CREATE TABLE IF NOT EXISTS file (
+        id INTEGER PRIMARY KEY,
+        prompt_id INTEGER,
+        original_contents TEXT,
+        updated_contents TEXT,
+        FOREIGN KEY (prompt_id) REFERENCES prompt(rowid)
+      );
+    `);
+    db.close(); // Closing the database connection
+  };
+  return createDatabasePromise;
+}
+
 export function getInitCommand(context: vscode.ExtensionContext) {
   return async function initCommand(_: unknown): Promise<void> {
-    // Check if there is at least one workspace folder opened.
     const workspaceRoot = getWorkspaceRoot(context);
-
     const codespinConfigPath = path.join(workspaceRoot, ".codespin");
+    const conventionsPath = path.join(codespinConfigPath, "conventions");
 
-    // Check if codespin.json exists
     if (fs.existsSync(codespinConfigPath)) {
-      // Ask the user if they want to force initialize
       const userChoice = await vscode.window.showWarningMessage(
         "The directory has already been initialized with codespin. Do you want to force initialize?",
         "Yes",
@@ -24,11 +49,15 @@ export function getInitCommand(context: vscode.ExtensionContext) {
         await init({
           force: true,
         });
+        mkdirSync(conventionsPath, { recursive: true });
+        const createDatabasePromise = createDatabase(codespinConfigPath);
+        await createDatabasePromise();
       }
-      // If the user chooses "No", do nothing.
     } else {
-      // If codespin.json doesn't exist, call init({}) without an alert.
       await init({});
+      mkdirSync(conventionsPath, { recursive: true });
+      const createDatabasePromise = createDatabase(codespinConfigPath);
+      await createDatabasePromise();
     }
   };
 }
