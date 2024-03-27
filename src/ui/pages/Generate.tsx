@@ -13,7 +13,7 @@ import { formatFileSize } from "../../text/formatFileSize.js";
 import { getVsCodeApi } from "../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../components/CSFormField.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
-import { TextArea } from "@vscode/webview-ui-toolkit";
+import { Dropdown, TextArea } from "@vscode/webview-ui-toolkit";
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();
@@ -24,7 +24,7 @@ export function Generate() {
   const [prompt, setPrompt] = useState<string>("");
   const [codegenTargets, setCodegenTargets] = useState(":prompt");
   const [codingConvention, setCodingConvention] = useState(
-    args.conventions.length ? args.conventions[0] : undefined
+    args.conventions.length ? args.conventions[0].extension : undefined
   );
   const [fileVersion, setFileVersion] = useState<"current" | "HEAD">("current");
   const [includedFiles, setIncludedFiles] = useState<
@@ -60,7 +60,7 @@ export function Generate() {
       model,
       prompt,
       codegenTargets,
-      codingConvention: codingConvention?.extension,
+      codingConvention,
       fileVersion,
       includedFiles,
     };
@@ -77,7 +77,7 @@ export function Generate() {
         model,
         prompt: (e.currentTarget as any).value,
         codegenTargets,
-        codingConvention: codingConvention?.extension,
+        codingConvention,
         fileVersion,
         includedFiles,
       };
@@ -148,12 +148,14 @@ export function Generate() {
         <CSFormField label={{ text: "Coding Conventions:" }}>
           <VSCodeDropdown
             style={{ width: "180px" }}
-            onChange={(e: any) => setCodingConvention(e.target.value)}
-            currentValue={codingConvention?.extension}
+            onChange={(e: React.FormEvent<Dropdown>) =>
+              setCodingConvention(e.currentTarget.value)
+            }
+            currentValue={codingConvention}
           >
             {args.conventions.map((item) => (
               <VSCodeOption key={item.extension} value={item.extension}>
-                {item.type}
+                {item.description}
               </VSCodeOption>
             ))}
           </VSCodeDropdown>
