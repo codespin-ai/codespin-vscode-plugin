@@ -12,6 +12,7 @@ import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import { EventTemplate } from "../../EventTemplate.js";
 import { getConventions } from "../../settings/getConventions.js";
+import { processConvention } from "../../settings/processConvention.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -51,7 +52,10 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     async function onMessage(message: EventTemplate<unknown>) {
       switch (message.type) {
         case "generate":
-          generateArgs = message as EventTemplate<ArgsFromGeneratePanel>;
+          generateArgs = await processArgs(
+            message as EventTemplate<ArgsFromGeneratePanel>,
+            context
+          );
           const result = await getGenerateArgs(generateArgs!, context);
           switch (result.status) {
             case "can_generate":
@@ -95,4 +99,18 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       }
     }
   };
+}
+
+async function processArgs(
+  args: EventTemplate<ArgsFromGeneratePanel>,
+  context: vscode.ExtensionContext
+): Promise<EventTemplate<ArgsFromGeneratePanel>> {
+  if (args.codingConvention !== undefined) {
+    args.prompt = await processConvention(
+      args.prompt,
+      args.codingConvention,
+      getWorkspaceRoot(context)
+    );
+  }
+  return args;
 }

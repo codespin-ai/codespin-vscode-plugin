@@ -3,11 +3,11 @@ import { join } from "path";
 
 export async function processConvention(
   prompt: string,
-  extension: string,
+  filename: string,
   workspaceRoot: string
 ): Promise<string> {
   const conventionsDir = join(workspaceRoot, ".codespin", "conventions");
-  const filePath = join(conventionsDir, `${extension}.md`);
+  const filePath = join(conventionsDir, filename);
 
   // Check if the specific convention file exists
   if (existsSync(filePath)) {
