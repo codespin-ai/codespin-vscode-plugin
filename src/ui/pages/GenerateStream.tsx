@@ -16,7 +16,7 @@ export function GenerateStream() {
   const args: GenerateStreamArgs = history.state;
 
   const [bytesReceived, setBytesReceived] = React.useState(0);
-  const [data, setData] = React.useState("");
+  let [data, setData] = React.useState("");
   const [prompt, setPrompt] = React.useState("");
 
   React.useEffect(() => {
@@ -30,9 +30,9 @@ export function GenerateStream() {
           return;
         case "generate:stream:response":
           const { data: chunk } = incomingMessage;
-          const newData = data + chunk;
-          setData(newData);
-          setBytesReceived(newData.length);
+          data = data + chunk;
+          setData(data);
+          setBytesReceived(data.length);
           return;
       }
     }
@@ -69,7 +69,7 @@ export function GenerateStream() {
           </div>
         </div>
       </CSFormField>
-      {data || "generating..."}
+      <pre>{data || "generating..."}</pre>
       <VSCodeDivider style={{ marginTop: "1em" }} />
       <h3>Prompt</h3>
       <pre>{prompt}</pre>

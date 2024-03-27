@@ -1,6 +1,4 @@
-import {
-  GenerateArgs as CodespinGenerateArgs
-} from "codespin/dist/commands/generate.js";
+import { GenerateArgs as CodespinGenerateArgs } from "codespin/dist/commands/generate.js";
 import { init as codespinInit } from "codespin/dist/commands/init.js";
 import * as fs from "fs";
 import * as os from "os";
@@ -45,7 +43,7 @@ export async function getGenerateArgs(
     }
     // If the user chooses No, we must exit.
     else {
-      return { status: "cancel" };
+      return { status: "close" };
     }
   }
 

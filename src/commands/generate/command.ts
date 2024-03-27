@@ -13,12 +13,12 @@ import { getGenerateArgs } from "./getGenerateArgs.js";
 import { EventTemplate } from "../../EventTemplate.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
-  let generateArgs: EventTemplate<ArgsFromGeneratePanel> | undefined;
-
   return async function generateCommand(
     _: unknown,
     uris: vscode.Uri[]
   ): Promise<void> {
+    let generateArgs: EventTemplate<ArgsFromGeneratePanel> | undefined;
+
     const workspaceRoot = getWorkspaceRoot(context);
 
     const fileDetails = (
@@ -66,14 +66,16 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
                   prompt,
                 });
               };
-              result.args.dataCallback = (data) => {
+              result.args.responseStreamCallback = (text) => {
                 uiPanel.postMessageToWebview({
                   type: "generate:stream:response",
-                  data,
+                  data: text,
                 });
               };
+              result.args.responseCallback = (text) => {
+                uiPanel.dispose();
+              };
               await codespinGenerate(result.args);
-              uiPanel.dispose();
               break;
             case "missing_config":
               await uiPanel.navigateTo(`/api/config/edit`, {
