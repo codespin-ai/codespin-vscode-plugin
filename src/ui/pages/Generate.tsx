@@ -23,7 +23,7 @@ export function Generate() {
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>("");
   const [codegenTargets, setCodegenTargets] = useState(":prompt");
-  const [codingConvention, setCodingConvention] = useState(args.rules[0]);
+  const [codingConvention, setCodingConvention] = useState(args.conventions[0]);
   const [fileVersion, setFileVersion] = useState<"current" | "HEAD">("current");
   const [includedFiles, setIncludedFiles] = useState<
     { path: string; includeOption: "source" | "declaration" }[]
@@ -149,7 +149,7 @@ export function Generate() {
             onChange={(e: any) => setCodingConvention(e.target.value)}
             currentValue={codingConvention}
           >
-            {args.rules
+            {args.conventions
               .map((x) => ({ text: x, value: x }))
               .map((item) => (
                 <VSCodeOption key={item.value} value={item.value}>

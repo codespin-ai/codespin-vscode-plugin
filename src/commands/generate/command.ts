@@ -38,7 +38,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     const generatePanelArgs: GeneratePageArgs = {
       files: fileDetails,
-      rules: ["Typescript", "Python"],
+      conventions: ["Typescript", "Python"],
       models: getModels(),
       selectedModel: getDefaultModel(),
     };
