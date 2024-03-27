@@ -24,7 +24,7 @@ export function Generate() {
   const [prompt, setPrompt] = useState<string>("");
   const [codegenTargets, setCodegenTargets] = useState(":prompt");
   const [codingConvention, setCodingConvention] = useState(
-    args.conventions.length ? args.conventions[0].extension : undefined
+    args.conventions.length ? args.conventions[0].filename : undefined
   );
   const [fileVersion, setFileVersion] = useState<"current" | "HEAD">("current");
   const [includedFiles, setIncludedFiles] = useState<
@@ -154,7 +154,7 @@ export function Generate() {
             currentValue={codingConvention}
           >
             {args.conventions.map((item) => (
-              <VSCodeOption key={item.extension} value={item.extension}>
+              <VSCodeOption key={item.filename} value={item.filename}>
                 {item.description}
               </VSCodeOption>
             ))}
