@@ -11,12 +11,13 @@ export class UIPanel {
   resolveReady: () => void = () => {};
   navigationPromiseResolvers: Map<string, () => void>;
   onMessage: MessageHandler;
+  isDisposed: boolean;
 
   constructor(context: vscode.ExtensionContext, onMessage: MessageHandler) {
     this.navigationPromiseResolvers = new Map();
     this.context = context;
     this.onMessage = onMessage;
-
+    this.isDisposed = false;
     this.panel = vscode.window.createWebviewPanel(
       "codespin-panel",
       "CodeSpin",
@@ -69,7 +70,9 @@ export class UIPanel {
   }
 
   postMessageToWebview(message: any) {
-    this.panel.webview.postMessage(message);
+    if (!this.isDisposed) {
+      this.panel.webview.postMessage(message);
+    }
   }
 
   navigateTo(url: string, args?: any) {
@@ -84,6 +87,7 @@ export class UIPanel {
   }
 
   public dispose() {
+    this.isDisposed = true;
     this.panel.dispose();
 
     while (this.disposables.length) {
