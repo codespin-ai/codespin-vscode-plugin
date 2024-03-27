@@ -1,5 +1,5 @@
 import { generate as codespinGenerate } from "codespin/dist/commands/generate.js";
-import { promises as fs } from "fs";
+import { existsSync, promises as fs, readdirSync } from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { getDefaultModel } from "../../models/getDefaultModel.js";
@@ -36,9 +36,11 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     await uiPanel.onReady();
 
+    const conventions = await getConventions(workspaceRoot);
+
     const generatePanelArgs: GeneratePageArgs = {
       files: fileDetails,
-      conventions: ["Typescript", "Python"],
+      conventions,
       models: getModels(),
       selectedModel: getDefaultModel(),
     };
@@ -92,4 +94,38 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       }
     }
   };
+}
+
+async function getConventions(workspaceRoot: string): Promise<Array<{ extension: string, type: string }>> {
+  const conventionsDir = path.join(workspaceRoot, ".codespin", "conventions");
+  if (!existsSync(conventionsDir)) {
+    return [];
+  }
+
+  const conventions: Array<{ extension: string, type: string }> = [];
+  const files = readdirSync(conventionsDir);
+  for (const file of files) {
+    const [extension, _] = file.split(".");
+    const type = getType(extension);
+    conventions.push({ extension, type });
+  }
+  return conventions;
+}
+
+function getType(extension: string): string {
+  const knownTypes = {
+    "ts": "TypeScript",
+    "py": "Python",
+    "js": "JavaScript",
+    "java": "Java",
+    "cpp": "C++",
+    "cs": "C#",
+    "rb": "Ruby",
+    "go": "Go",
+    "rs": "Rust",
+    "swift": "Swift",
+    "kt": "Kotlin",
+    "php": "PHP",
+  };
+  return (knownTypes as any)[extension ] || extension;
 }

@@ -23,7 +23,9 @@ export function Generate() {
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>("");
   const [codegenTargets, setCodegenTargets] = useState(":prompt");
-  const [codingConvention, setCodingConvention] = useState(args.conventions[0]);
+  const [codingConvention, setCodingConvention] = useState(
+    args.conventions.length ? args.conventions[0] : undefined
+  );
   const [fileVersion, setFileVersion] = useState<"current" | "HEAD">("current");
   const [includedFiles, setIncludedFiles] = useState<
     { path: string; includeOption: "source" | "declaration" }[]
@@ -58,7 +60,7 @@ export function Generate() {
       model,
       prompt,
       codegenTargets,
-      codingConvention,
+      codingConvention: codingConvention?.extension,
       fileVersion,
       includedFiles,
     };
@@ -75,7 +77,7 @@ export function Generate() {
         model,
         prompt: (e.currentTarget as any).value,
         codegenTargets,
-        codingConvention,
+        codingConvention: codingConvention?.extension,
         fileVersion,
         includedFiles,
       };
@@ -147,15 +149,13 @@ export function Generate() {
           <VSCodeDropdown
             style={{ width: "180px" }}
             onChange={(e: any) => setCodingConvention(e.target.value)}
-            currentValue={codingConvention}
+            currentValue={codingConvention?.extension}
           >
-            {args.conventions
-              .map((x) => ({ text: x, value: x }))
-              .map((item) => (
-                <VSCodeOption key={item.value} value={item.value}>
-                  {item.text}
-                </VSCodeOption>
-              ))}
+            {args.conventions.map((item) => (
+              <VSCodeOption key={item.extension} value={item.extension}>
+                {item.type}
+              </VSCodeOption>
+            ))}
           </VSCodeDropdown>
         </CSFormField>
         <CSFormField label={{ text: "File Version:" }}>
