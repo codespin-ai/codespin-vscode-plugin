@@ -9,7 +9,6 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
@@ -35,6 +34,10 @@
       ],
       "codespin-ai.more": [
         {
+          "command": "codespin-ai.generate",
+          "group": "codespin-ai"
+        },
+        {
           "command": "codespin-ai.init",
           "group": "codespin-ai"
         }
@@ -52,6 +55,20 @@
           "id": "codespin-ai",
           "title": "CodeSpin.AI",
           "icon": "resources/codespin-ai-icon.svg"
+        }
+      ]
+    },
+    "views": {
+      "codespin-ai": [
+        {
+          "type": "webview",
+          "id": "codespin-ai.history",
+          "name": "History"
+        },
+        {
+          "type": "webview",
+          "id": "codespin-ai.settings",
+          "name": "Settings"
         }
       ]
     }
@@ -80,12 +97,10 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@types/better-sqlite3": "^7.6.9",
     "@types/react": "^18.2.66",
     "@types/react-dom": "^18.2.22",
     "@types/react-router-dom": "^5.3.3",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "better-sqlite3": "^9.4.3",
     "codespin": "^0.0.120",
     "gray-matter": "^4.0.3",
     "react": "^18.2.0",

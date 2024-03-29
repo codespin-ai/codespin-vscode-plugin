@@ -13,15 +13,21 @@ import { getGenerateArgs } from "./getGenerateArgs.js";
 import { EventTemplate } from "../../EventTemplate.js";
 import { getConventions } from "../../settings/getConventions.js";
 import { processConvention } from "../../settings/processConvention.js";
+import { setWorkingDir } from "codespin/dist/fs/workingDir.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
     _: unknown,
     uris: vscode.Uri[]
   ): Promise<void> {
+    if (!uris) {
+      return;
+    }
+    
     let generateArgs: EventTemplate<ArgsFromGeneratePanel> | undefined;
 
     const workspaceRoot = getWorkspaceRoot(context);
+    setWorkingDir(workspaceRoot);
 
     const fileDetails = (
       await Promise.all(
