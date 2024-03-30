@@ -50,6 +50,12 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       selectedModel: getDefaultModel(),
     };
 
+    let cancelCodespinGenerate: (() => void) | undefined = undefined;
+
+    function setCancelGenerationFunc(fnOnCancel: () => void) {
+      cancelCodespinGenerate = fnOnCancel;
+    }
+
     await uiPanel.navigateTo("/generate", generatePanelArgs);
 
     async function onMessage(message: EventTemplate<unknown>) {
@@ -57,7 +63,11 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
         case "generate":
           generateArgs = message as EventTemplate<ArgsFromGeneratePanel>;
 
-          const result = await getGenerateArgs(generateArgs!, context);
+          const result = await getGenerateArgs(
+            generateArgs!,
+            setCancelGenerationFunc,
+            context
+          );
 
           switch (result.status) {
             case "can_generate":
@@ -95,7 +105,10 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
         case "api:editConfig":
           await createAPIConfig(message as any);
           await onMessage(generateArgs!);
-        case "close":
+        case "cancel":
+          if (cancelCodespinGenerate) {
+            cancelCodespinGenerate();
+          }
           uiPanel.dispose();
           break;
         default:

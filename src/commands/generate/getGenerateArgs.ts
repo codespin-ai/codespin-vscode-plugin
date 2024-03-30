@@ -2,11 +2,12 @@ import {
   GenerateArgs as CodespinGenerateArgs,
   GenerateArgs,
 } from "codespin/dist/commands/generate.js";
-import { init as codespinInit } from "codespin/dist/commands/init.js";
 import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { EventTemplate } from "../../EventTemplate.js";
+import { initialize } from "../../codespin/initialize.js";
+import { isInitialized } from "../../codespin/isInitialized.js";
 import { getAPIConfigPath } from "../../settings/getAPIConfigPath.js";
 import { processConvention } from "../../settings/processConvention.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
@@ -27,23 +28,22 @@ type Result =
 
 export async function getGenerateArgs(
   unprocessedArgsFromPanel: EventTemplate<ArgsFromGeneratePanel>,
+  setCancel: (onCancel: () => void) => void,
   context: vscode.ExtensionContext
 ): Promise<Result> {
   const workspaceRoot = getWorkspaceRoot(context);
 
-  const projectConfigDir = path.join(workspaceRoot, ".codespin");
-
   // Check if .codespin dir exists
-  if (!fs.existsSync(projectConfigDir)) {
+  if (!isInitialized(workspaceRoot)) {
     // Ask the user if they want to force initialize
     const userChoice = await vscode.window.showWarningMessage(
-      "Codespin settings not found for this project. Create?",
+      "Codespin configuration is not initialized for this project. Create?",
       "Yes",
       "No"
     );
 
     if (userChoice === "Yes") {
-      await codespinInit({}, { workingDir: workspaceRoot });
+      await initialize(false, workspaceRoot);
     }
     // If the user chooses No, we must exit.
     else {
@@ -113,6 +113,7 @@ export async function getGenerateArgs(
       parse: undefined,
       go: undefined,
       maxDeclare: undefined,
+      cancelCallback: (onCancel) => {},
     };
 
     return {

@@ -5,6 +5,9 @@ import { ViewProvider } from "../../ui/ViewProvider.js";
 import { HistoryEntry, UserInput } from "./types.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { HistoryPageArgs } from "../../ui/pages/history/HistoryPageArgs.js";
+import { isInitialized } from "../../codespin/isInitialized.js";
+import { EventTemplate } from "../../EventTemplate.js";
+import { initialize } from "../../codespin/initialize.js";
 
 export class HistoryViewProvider extends ViewProvider {
   constructor(context: vscode.ExtensionContext) {
@@ -14,15 +17,36 @@ export class HistoryViewProvider extends ViewProvider {
   async init() {
     await this.onInitialize();
     await this.onWebviewReady();
+    const workspaceRoot = getWorkspaceRoot(this.context);
 
-    const historyPageArgs: HistoryPageArgs = {
-      entries: await getHistory(this.context),
-    };
+    const initialized = await isInitialized(workspaceRoot);
 
-    this.navigateTo("/history", historyPageArgs);
+    if (initialized) {
+      const historyPageArgs: HistoryPageArgs = {
+        entries: initialized ? await getHistory(this.context) : [],
+      };
+
+      this.navigateTo("/history", historyPageArgs);
+    } else {
+      this.navigateTo("/initialize");
+    }
   }
 
-  onMessage(data: any) {}
+  async onMessage(data: EventTemplate<unknown>) {
+    const workspaceRoot = getWorkspaceRoot(this.context);
+    switch (data.type) {
+      case "initialize":
+        await initialize(false, workspaceRoot);
+
+        const historyPageArgs: HistoryPageArgs = {
+          entries: await getHistory(this.context),
+        };
+
+        this.navigateTo("/history", historyPageArgs);
+
+        break;
+    }
+  }
 }
 
 // Functional style utility functions

@@ -40,8 +40,8 @@ export function GenerateStream() {
     return () => window.removeEventListener("click", listeners);
   }, []);
 
-  function close() {
-    getVsCodeApi().postMessage({ type: "close" });
+  function cancel() {
+    getVsCodeApi().postMessage({ type: "cancel" });
   }
 
   return (
@@ -50,7 +50,7 @@ export function GenerateStream() {
         Generating ({args.api}:{args.model})
       </h1>
       <CSFormField>
-        <VSCodeButton onClick={close}>Cancel</VSCodeButton>
+        <VSCodeButton onClick={cancel}>Cancel</VSCodeButton>
       </CSFormField>
       <VSCodeDivider />
       <h3>Response</h3>

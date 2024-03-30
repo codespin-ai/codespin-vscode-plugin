@@ -8,6 +8,7 @@ import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
 import { EditConfig } from "./pages/api/EditConfig.js";
 import { GenerateStream } from "./pages/generate/GenerateStream.js";
 import { History } from "./pages/history/History.js";
+import { Initialize } from "./pages/initialize/Initialize.js";
 
 function App() {
   React.useEffect(() => {
@@ -35,7 +36,7 @@ function App() {
         <Route path="/generate/invoke" component={GenerateStream} />
         <Route path="/api/config/edit" component={EditConfig} />
         <Route path="/history" component={History} />
-        <Route>404... Missing feature</Route>
+        <Route path="/initialize" component={Initialize} />
       </Switch>
     </>
   );

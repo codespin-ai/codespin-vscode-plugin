@@ -1,10 +1,7 @@
 import * as React from "react";
-import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { HistoryPageArgs } from "./HistoryPageArgs.js";
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react/index.js";
 
 export function History() {
-  const vsCodeApi = getVsCodeApi();
   const args: HistoryPageArgs = history.state;
 
   // Helper function to convert timestamp to a readable format
@@ -13,8 +10,7 @@ export function History() {
   };
 
   return (
-    <div style={{ padding: "10px" }}>
-      <VSCodeButton>Generate Code</VSCodeButton>
+    <div>
       {args.entries.length > 0 ? (
         <ul style={{ listStyle: "none", padding: 0 }}>
           {args.entries.map((entry, index) => (
