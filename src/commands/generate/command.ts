@@ -1,19 +1,17 @@
 import { generate as codespinGenerate } from "codespin/dist/commands/generate.js";
-import { existsSync, promises as fs, readdirSync } from "fs";
+import { promises as fs } from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { EventTemplate } from "../../EventTemplate.js";
 import { getDefaultModel } from "../../models/getDefaultModel.js";
 import { getModels } from "../../models/getModels.js";
 import { createAPIConfig } from "../../settings/createAPIConfig.js";
-import { GeneratePageArgs } from "../../ui/pages/generate/GeneratePageArgs.js";
+import { getConventions } from "../../settings/getConventions.js";
 import { UIPanel } from "../../ui/UIPanel.js";
+import { GeneratePageArgs } from "../../ui/pages/generate/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
-import { EventTemplate } from "../../EventTemplate.js";
-import { getConventions } from "../../settings/getConventions.js";
-import { processConvention } from "../../settings/processConvention.js";
-import { setWorkingDir } from "codespin/dist/fs/workingDir.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -27,7 +25,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     let generateArgs: EventTemplate<ArgsFromGeneratePanel> | undefined;
 
     const workspaceRoot = getWorkspaceRoot(context);
-    setWorkingDir(workspaceRoot);
 
     const fileDetails = (
       await Promise.all(
@@ -84,7 +81,9 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               result.args.responseCallback = (text) => {
                 uiPanel.dispose();
               };
-              await codespinGenerate(result.args);
+              await codespinGenerate(result.args, {
+                workingDir: workspaceRoot,
+              });
               break;
             case "missing_config":
               await uiPanel.navigateTo(`/api/config/edit`, {

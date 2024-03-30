@@ -4,13 +4,11 @@ import { mkdirSync } from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { setWorkingDir } from "codespin/dist/fs/workingDir.js";
 
 export function getInitCommand(context: vscode.ExtensionContext) {
   return async function initCommand(_: unknown): Promise<void> {
     const workspaceRoot = getWorkspaceRoot(context);
-    setWorkingDir(workspaceRoot);
-    
+
     const codespinConfigPath = path.join(workspaceRoot, ".codespin");
     const conventionsPath = path.join(codespinConfigPath, "conventions");
     const historyPath = path.join(codespinConfigPath, "history");
@@ -23,14 +21,17 @@ export function getInitCommand(context: vscode.ExtensionContext) {
       );
 
       if (userChoice === "Yes") {
-        await init({
-          force: true,
-        });
+        await init(
+          {
+            force: true,
+          },
+          { workingDir: workspaceRoot }
+        );
         mkdirSync(conventionsPath, { recursive: true });
         mkdirSync(historyPath, { recursive: true });
       }
     } else {
-      await init({});
+      await init({}, { workingDir: workspaceRoot });
       mkdirSync(conventionsPath, { recursive: true });
       mkdirSync(historyPath, { recursive: true });
     }

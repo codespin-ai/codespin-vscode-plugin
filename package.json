@@ -96,7 +96,7 @@
     "@types/react-dom": "^18.2.22",
     "@types/react-router-dom": "^5.3.3",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.123",
+    "codespin": "^0.0.124",
     "gray-matter": "^4.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

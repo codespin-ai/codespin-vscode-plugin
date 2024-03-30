@@ -43,7 +43,7 @@ export async function getGenerateArgs(
     );
 
     if (userChoice === "Yes") {
-      await codespinInit({});
+      await codespinInit({}, { workingDir: workspaceRoot });
     }
     // If the user chooses No, we must exit.
     else {
