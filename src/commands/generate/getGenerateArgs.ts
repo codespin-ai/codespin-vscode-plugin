@@ -1,4 +1,7 @@
-import { GenerateArgs as CodespinGenerateArgs } from "codespin/dist/commands/generate.js";
+import {
+  GenerateArgs as CodespinGenerateArgs,
+  GenerateArgs,
+} from "codespin/dist/commands/generate.js";
 import { init as codespinInit } from "codespin/dist/commands/init.js";
 import * as fs from "fs";
 import * as os from "os";
@@ -61,18 +64,19 @@ export async function getGenerateArgs(
 
     const [vendor, model] = argsFromPanel.model.split(":");
 
-    const codespinGenerateArgs = {
+    const codespinGenerateArgs: GenerateArgs = {
       promptFile: tmpFilePath,
-      source:
+      out:
         argsFromPanel.codegenTargets !== ":prompt"
           ? argsFromPanel.codegenTargets
           : undefined,
-      version: argsFromPanel.fileVersion,
       model,
       write: true,
       include: argsFromPanel.includedFiles
         .filter((f) => f.includeOption === "source")
-        .map((f) => f.path),
+        .map((f) =>
+          argsFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
+        ),
       exclude: undefined,
       declare: argsFromPanel.includedFiles
         .filter((f) => f.includeOption === "declaration")
@@ -92,8 +96,6 @@ export async function getGenerateArgs(
       parse: undefined,
       go: undefined,
       maxDeclare: undefined,
-      apiVersion: undefined,
-      dataCallback: (data: string) => {},
     };
 
     return {

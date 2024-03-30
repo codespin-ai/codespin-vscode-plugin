@@ -23,7 +23,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     if (!uris) {
       return;
     }
-    
+
     let generateArgs: EventTemplate<ArgsFromGeneratePanel> | undefined;
 
     const workspaceRoot = getWorkspaceRoot(context);

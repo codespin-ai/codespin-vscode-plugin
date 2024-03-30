@@ -1,5 +1,6 @@
 import { existsSync, promises as fsPromises } from "fs";
 import { join } from "path";
+import matter = require("gray-matter");
 
 export async function processConvention(
   prompt: string,
@@ -11,18 +12,16 @@ export async function processConvention(
 
   // Check if the specific convention file exists
   if (existsSync(filePath)) {
-    try {
-      let fileContents = await fsPromises.readFile(filePath, {
-        encoding: "utf-8",
-      });
-      // Replace occurrences of {prompt} in the file content with the actual prompt value
-      fileContents = fileContents.replace(/\{prompt\}/g, prompt);
-      return fileContents;
-    } catch (error) {
-      console.error("Error reading the file:", error);
-      // In case of any error reading the file, return prompt unmodified
-      return prompt;
-    }
+    const templateContents = await fsPromises.readFile(filePath, {
+      encoding: "utf-8",
+    });
+    const parsedTemplate = matter(templateContents);
+
+    console.log({
+      msx2: parsedTemplate.content.replace("{prompt}", prompt),
+      mxee: parsedTemplate,
+    });
+    return parsedTemplate.content.replace("{prompt}", prompt);
   } else {
     // If the file doesn't exist, return the prompt unmodified
     return prompt;
