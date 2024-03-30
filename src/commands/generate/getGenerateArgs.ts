@@ -4,10 +4,11 @@ import {
 } from "codespin/dist/commands/generate.js";
 import { init as codespinInit } from "codespin/dist/commands/init.js";
 import * as fs from "fs";
-import * as os from "os";
 import * as path from "path";
 import * as vscode from "vscode";
+import { EventTemplate } from "../../EventTemplate.js";
 import { getAPIConfigPath } from "../../settings/getAPIConfigPath.js";
+import { processConvention } from "../../settings/processConvention.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 
@@ -25,7 +26,7 @@ type Result =
     };
 
 export async function getGenerateArgs(
-  argsFromPanel: ArgsFromGeneratePanel,
+  unprocessedArgsFromPanel: EventTemplate<ArgsFromGeneratePanel>,
   context: vscode.ExtensionContext
 ): Promise<Result> {
   const workspaceRoot = getWorkspaceRoot(context);
@@ -50,22 +51,38 @@ export async function getGenerateArgs(
     }
   }
 
-  const api = argsFromPanel.model.split(":")[0];
+  const api = unprocessedArgsFromPanel.model.split(":")[0];
 
   const configFilePath = await getAPIConfigPath(api, workspaceRoot);
 
-  // Check if the config file exists
   if (configFilePath) {
-    const tmpFilePath = path.join(
-      os.tmpdir(),
-      `codespin-prompt-${Date.now()}.txt`
+    const historyDirPath = path.join(
+      workspaceRoot,
+      ".codespin",
+      "history",
+      `${Date.now()}`
     );
-    fs.writeFileSync(tmpFilePath, argsFromPanel.prompt, "utf8");
+
+    if (!fs.existsSync(historyDirPath)) {
+      fs.mkdirSync(historyDirPath, { recursive: true });
+    }
+
+    const inputsPath = path.join(historyDirPath, "user-input.json");
+    fs.writeFileSync(
+      inputsPath,
+      JSON.stringify(unprocessedArgsFromPanel, null, 2),
+      "utf8"
+    );
+
+    const argsFromPanel = await processArgs(unprocessedArgsFromPanel, context);
+
+    const promptFilePath = path.join(historyDirPath, "prompt.txt");
+    fs.writeFileSync(promptFilePath, argsFromPanel.prompt, "utf8");
 
     const [vendor, model] = argsFromPanel.model.split(":");
 
     const codespinGenerateArgs: GenerateArgs = {
-      promptFile: tmpFilePath,
+      promptFile: promptFilePath,
       out:
         argsFromPanel.codegenTargets !== ":prompt"
           ? argsFromPanel.codegenTargets
@@ -110,4 +127,18 @@ export async function getGenerateArgs(
       api,
     };
   }
+}
+
+async function processArgs(
+  args: EventTemplate<ArgsFromGeneratePanel>,
+  context: vscode.ExtensionContext
+): Promise<EventTemplate<ArgsFromGeneratePanel>> {
+  if (args.codingConvention !== undefined) {
+    args.prompt = await processConvention(
+      args.prompt,
+      args.codingConvention,
+      getWorkspaceRoot(context)
+    );
+  }
+  return args;
 }

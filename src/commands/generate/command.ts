@@ -58,11 +58,10 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
     async function onMessage(message: EventTemplate<unknown>) {
       switch (message.type) {
         case "generate":
-          generateArgs = await processArgs(
-            message as EventTemplate<ArgsFromGeneratePanel>,
-            context
-          );
+          generateArgs = message as EventTemplate<ArgsFromGeneratePanel>;
+
           const result = await getGenerateArgs(generateArgs!, context);
+
           switch (result.status) {
             case "can_generate":
               await uiPanel.navigateTo(`/generate/invoke`, {
@@ -105,18 +104,4 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
       }
     }
   };
-}
-
-async function processArgs(
-  args: EventTemplate<ArgsFromGeneratePanel>,
-  context: vscode.ExtensionContext
-): Promise<EventTemplate<ArgsFromGeneratePanel>> {
-  if (args.codingConvention !== undefined) {
-    args.prompt = await processConvention(
-      args.prompt,
-      args.codingConvention,
-      getWorkspaceRoot(context)
-    );
-  }
-  return args;
 }
