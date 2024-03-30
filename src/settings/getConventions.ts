@@ -1,10 +1,11 @@
 import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import matter = require("gray-matter");
+import { CodingConvention } from "./CodingConvention.js";
 
 export async function getConventions(
   workspaceRoot: string
-): Promise<Array<{ filename: string; description: string }>> {
+): Promise<Array<CodingConvention>> {
   const conventionsDir = join(workspaceRoot, ".codespin", "conventions");
 
   return existsSync(conventionsDir)
@@ -14,11 +15,19 @@ export async function getConventions(
           const filePath = join(conventionsDir, file);
           const fileContents = readFileSync(filePath, "utf8");
           const parsedContent = matter(fileContents);
-          const description =
-            parsedContent.data && parsedContent.data.description
-              ? parsedContent.data.description
-              : getDescription(file);
-          return { filename: file, description };
+          const autoSelectedConvention = autoSelectConvention(file);
+
+          return {
+            filename: file,
+            extension:
+              parsedContent.data.extension && parsedContent.data.extension
+                ? parsedContent.data.extension
+                : autoSelectedConvention?.extension || "$$unknown$$",
+            description:
+              parsedContent.data && parsedContent.data.description
+                ? parsedContent.data.description
+                : autoSelectedConvention?.description || file,
+          };
         })
     : [];
 }
@@ -116,15 +125,19 @@ const knownTypes = {
   patch: "patch",
 };
 
-function getDescription(filename: string): string {
+function autoSelectConvention(
+  filename: string
+): { extension: string; description: string } | undefined {
   // Extract the file extension from the filename
   const extension = filename.split(".")[0];
 
   // Check if the extension exists in knownTypes and return the corresponding description
   if (extension && extension in knownTypes) {
-    return (knownTypes as any)[extension];
+    return {
+      extension,
+      description: (knownTypes as any)[extension],
+    };
   }
 
-  // If the extension is not found in knownTypes, return "Unknown Convention"
-  return "Unknown Convention";
+  return undefined;
 }

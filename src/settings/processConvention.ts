@@ -16,11 +16,6 @@ export async function processConvention(
       encoding: "utf-8",
     });
     const parsedTemplate = matter(templateContents);
-
-    console.log({
-      msx2: parsedTemplate.content.replace("{prompt}", prompt),
-      mxee: parsedTemplate,
-    });
     return parsedTemplate.content.replace("{prompt}", prompt);
   } else {
     // If the file doesn't exist, return the prompt unmodified

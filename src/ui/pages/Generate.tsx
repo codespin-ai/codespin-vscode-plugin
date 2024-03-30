@@ -23,8 +23,8 @@ export function Generate() {
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>("");
   const [codegenTargets, setCodegenTargets] = useState(":prompt");
-  const [codingConvention, setCodingConvention] = useState(
-    args.conventions.length ? args.conventions[0].filename : undefined
+  const [codingConvention, setCodingConvention] = useState<string | undefined>(
+    undefined
   );
   const [fileVersion, setFileVersion] = useState<"current" | "HEAD">("current");
   const [includedFiles, setIncludedFiles] = useState<
@@ -41,6 +41,21 @@ export function Generate() {
       setCodegenTargets(includedFiles[0].path);
     }
 
+    if (includedFiles.length >= 1) {
+      const fileExtension = getFileExtension(includedFiles[0].path);
+      if (includedFiles.every((x) => x.path.endsWith(fileExtension))) {
+        const matchingConvention = args.conventions.find((convention) => {
+          return convention.extension === fileExtension;
+        });
+
+        if (matchingConvention) {
+          setCodingConvention(matchingConvention.filename);
+        } else {
+          setCodingConvention(undefined);
+        }
+      }
+    }
+
     const promptTextArea = promptRef.current;
     if (promptTextArea) {
       promptTextArea.focus();
@@ -52,7 +67,28 @@ export function Generate() {
         );
       };
     }
-  }, [includedFiles]);
+  }, []);
+
+  useEffect(() => {
+    const targetExtension =
+      codegenTargets !== ":prompt"
+        ? getFileExtension(codegenTargets)
+        : undefined;
+
+    if (targetExtension) {
+      const matchingConvention = args.conventions.find((convention) => {
+        return convention.extension === targetExtension;
+      });
+
+      if (matchingConvention) {
+        setCodingConvention(matchingConvention.filename);
+      } else {
+        setCodingConvention(undefined);
+      }
+    } else {
+      setCodingConvention(undefined);
+    }
+  }, [codegenTargets]);
 
   function handleGenerateClick() {
     const message: EventTemplate<ArgsFromGeneratePanel> = {
@@ -149,10 +185,17 @@ export function Generate() {
           <VSCodeDropdown
             style={{ width: "180px" }}
             onChange={(e: React.FormEvent<Dropdown>) =>
-              setCodingConvention(e.currentTarget.value)
+              setCodingConvention(
+                e.currentTarget.value === "None"
+                  ? undefined
+                  : e.currentTarget.value
+              )
             }
-            currentValue={codingConvention}
+            currentValue={codingConvention || "None"}
           >
+            <VSCodeOption key="none" value="None">
+              None
+            </VSCodeOption>
             {args.conventions.map((item) => (
               <VSCodeOption key={item.filename} value={item.filename}>
                 {item.description}
@@ -228,4 +271,8 @@ export function Generate() {
       </form>
     </div>
   );
+}
+
+function getFileExtension(fileName: string) {
+  return fileName.slice(((fileName.lastIndexOf(".") - 1) >>> 0) + 2);
 }
