@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 import { getDefaultModel } from "../../models/getDefaultModel.js";
 import { getModels } from "../../models/getModels.js";
 import { createAPIConfig } from "../../settings/createAPIConfig.js";
-import { GeneratePageArgs } from "../../ui/pages/GeneratePageArgs.js";
+import { GeneratePageArgs } from "../../ui/pages/generate/GeneratePageArgs.js";
 import { UIPanel } from "../../ui/UIPanel.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
@@ -42,7 +42,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     const uiPanel = new UIPanel(context, onMessage);
 
-    await uiPanel.onReady();
+    await uiPanel.onWebviewReady();
 
     const conventions = await getConventions(workspaceRoot);
 

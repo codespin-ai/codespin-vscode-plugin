@@ -1,14 +1,13 @@
 import * as vscode from "vscode";
 import { getWebviewContent } from "./getWebView.js";
-
-export type MessageHandler = (message: any) => void;
+import { MessageHandler } from "./MessageHandler.js";
 
 export class UIPanel {
   context: vscode.ExtensionContext;
   disposables: vscode.Disposable[] = [];
   panel: vscode.WebviewPanel;
-  readyPromise: Promise<void>;
-  resolveReady: () => void = () => {};
+  webviewReadyPromise: Promise<void>;
+  resolveWebviewReady: () => void = () => {};
   navigationPromiseResolvers: Map<string, () => void>;
   onMessage: MessageHandler;
   isDisposed: boolean;
@@ -46,19 +45,19 @@ export class UIPanel {
 
     this.panel.onDidDispose(() => {}, null, this.disposables);
 
-    this.readyPromise = new Promise((resolve) => {
-      this.resolveReady = resolve;
+    this.webviewReadyPromise = new Promise((resolve) => {
+      this.resolveWebviewReady = resolve;
     });
   }
 
-  onReady() {
-    return this.readyPromise;
+  onWebviewReady() {
+    return this.webviewReadyPromise;
   }
 
   handleMessageFromWebview(message: any) {
     switch (message.type) {
       case "webviewReady":
-        this.resolveReady();
+        this.resolveWebviewReady();
       case "navigated":
         const resolver = this.navigationPromiseResolvers.get(message.url);
         if (resolver) {

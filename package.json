@@ -64,11 +64,6 @@
           "type": "webview",
           "id": "codespin-ai.history",
           "name": "History"
-        },
-        {
-          "type": "webview",
-          "id": "codespin-ai.settings",
-          "name": "Settings"
         }
       ]
     }

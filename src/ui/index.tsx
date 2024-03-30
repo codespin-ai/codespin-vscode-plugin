@@ -3,10 +3,11 @@ import { createRoot } from "react-dom/client";
 import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
 import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
-import { Generate } from "./pages/Generate.js";
+import { Generate } from "./pages/generate/Generate.js";
 import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
 import { EditConfig } from "./pages/api/EditConfig.js";
-import { GenerateStream } from "./pages/GenerateStream.js";
+import { GenerateStream } from "./pages/generate/GenerateStream.js";
+import { History } from "./pages/history/History.js";
 
 function App() {
   React.useEffect(() => {
@@ -33,6 +34,7 @@ function App() {
         <Route path="/generate" component={Generate} />
         <Route path="/generate/invoke" component={GenerateStream} />
         <Route path="/api/config/edit" component={EditConfig} />
+        <Route path="/history" component={History} />
         <Route>404... Missing feature</Route>
       </Switch>
     </>
