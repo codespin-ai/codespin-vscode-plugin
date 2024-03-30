@@ -17,24 +17,24 @@ export class HistoryViewProvider extends ViewProvider {
   async init() {
     await this.onInitialize();
     await this.onWebviewReady();
-    const workspaceRoot = getWorkspaceRoot(this.context);
-
-    const initialized = await isInitialized(workspaceRoot);
-
-    if (initialized) {
-      const historyPageArgs: HistoryPageArgs = {
-        entries: initialized ? await getHistory(this.context) : [],
-      };
-
-      this.navigateTo("/history", historyPageArgs);
-    } else {
-      this.navigateTo("/initialize");
-    }
   }
 
   async onMessage(data: EventTemplate<unknown>) {
     const workspaceRoot = getWorkspaceRoot(this.context);
     switch (data.type) {
+      case "webviewReady":
+        const initialized = await isInitialized(workspaceRoot);
+
+        if (initialized) {
+          const historyPageArgs: HistoryPageArgs = {
+            entries: initialized ? await getHistory(this.context) : [],
+          };
+
+          this.navigateTo("/history", historyPageArgs);
+        } else {
+          this.navigateTo("/initialize");
+        }
+        break;
       case "initialize":
         await initialize(false, workspaceRoot);
 

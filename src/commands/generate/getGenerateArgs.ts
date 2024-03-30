@@ -28,7 +28,7 @@ type Result =
 
 export async function getGenerateArgs(
   unprocessedArgsFromPanel: EventTemplate<ArgsFromGeneratePanel>,
-  setCancel: (onCancel: () => void) => void,
+  cancelCallback: (cancel: () => void) => void,
   context: vscode.ExtensionContext
 ): Promise<Result> {
   const workspaceRoot = getWorkspaceRoot(context);
@@ -113,7 +113,7 @@ export async function getGenerateArgs(
       parse: undefined,
       go: undefined,
       maxDeclare: undefined,
-      cancelCallback: (onCancel) => {},
+      cancelCallback,
     };
 
     return {
