@@ -25,7 +25,7 @@ export class HistoryViewProvider extends ViewProvider {
 
         if (initialized) {
           const historyPageArgs: HistoryPageArgs = {
-            entries: initialized ? await getHistory(this.context) : [],
+            entries: initialized ? await getHistory(workspaceRoot) : [],
           };
 
           this.navigateTo("/history", historyPageArgs);
@@ -37,7 +37,7 @@ export class HistoryViewProvider extends ViewProvider {
         await initialize(false, workspaceRoot);
 
         const historyPageArgs: HistoryPageArgs = {
-          entries: await getHistory(this.context),
+          entries: await getHistory(workspaceRoot),
         };
 
         this.navigateTo("/history", historyPageArgs);

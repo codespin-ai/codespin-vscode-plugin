@@ -31,10 +31,8 @@ type Result =
 export async function getGenerateArgs(
   unprocessedArgsFromPanel: EventTemplate<ArgsFromGeneratePanel>,
   cancelCallback: (cancel: () => void) => void,
-  context: vscode.ExtensionContext
+  workspaceRoot: string
 ): Promise<Result> {
-  const workspaceRoot = getWorkspaceRoot(context);
-
   // Check if .codespin dir exists
   if (!isInitialized(workspaceRoot)) {
     // Ask the user if they want to force initialize
@@ -77,7 +75,10 @@ export async function getGenerateArgs(
       "utf8"
     );
 
-    const argsFromPanel = await processArgs(unprocessedArgsFromPanel, context);
+    const argsFromPanel = await processArgs(
+      unprocessedArgsFromPanel,
+      workspaceRoot
+    );
 
     const promptFilePath = path.join(historyDirPath, "prompt.txt");
     await writeFile(promptFilePath, argsFromPanel.prompt, "utf8");
@@ -136,13 +137,13 @@ export async function getGenerateArgs(
 
 async function processArgs(
   args: EventTemplate<ArgsFromGeneratePanel>,
-  context: vscode.ExtensionContext
+  workspaceRoot: string
 ): Promise<EventTemplate<ArgsFromGeneratePanel>> {
   if (args.codingConvention !== undefined) {
     args.prompt = await processConvention(
       args.prompt,
       args.codingConvention,
-      getWorkspaceRoot(context)
+      workspaceRoot
     );
   }
   return args;

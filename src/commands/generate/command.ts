@@ -7,13 +7,12 @@ import { getDefaultModel } from "../../models/getDefaultModel.js";
 import { getModels } from "../../models/getModels.js";
 import { createAPIConfig } from "../../settings/api/createAPIConfig.js";
 import { getConventions } from "../../settings/conventions/getConventions.js";
+import { writeGeneratedFiles } from "../../settings/history/writeGeneratedFiles.js";
 import { UIPanel } from "../../ui/UIPanel.js";
 import { GeneratePageArgs } from "../../ui/pages/generate/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
-import { getHistoryDir } from "../../settings/codespinDirs.js";
-import { writeGeneratedFiles } from "../../settings/history/writeGeneratedFiles.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -68,7 +67,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           const result = await getGenerateArgs(
             generateArgs!,
             setCancelGeneration,
-            context
+            workspaceRoot
           );
 
           switch (result.status) {
