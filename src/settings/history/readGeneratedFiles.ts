@@ -1,7 +1,27 @@
-import { GeneratedSourceFile } from "codespin/dist/sourceCode/GeneratedSourceFile.js";
 import { promises as fs } from "fs";
 import * as path from "path";
 import { getHistoryDir } from "../codespinDirs.js";
+
+// Helper function to recursively get all file paths
+async function getAllFiles(
+  dirPath: string,
+  arrayOfFiles: string[] = []
+): Promise<string[]> {
+  const files = await fs.readdir(dirPath, { withFileTypes: true });
+
+  for (const file of files) {
+    if (file.isDirectory()) {
+      arrayOfFiles = await getAllFiles(
+        path.join(dirPath, file.name),
+        arrayOfFiles
+      );
+    } else {
+      arrayOfFiles.push(path.join(dirPath, file.name));
+    }
+  }
+
+  return arrayOfFiles;
+}
 
 export async function readGeneratedFiles(
   dirName: string,
@@ -11,19 +31,20 @@ export async function readGeneratedFiles(
   const originalDirPath = path.join(historyDir, dirName, "original");
   const generatedDirPath = path.join(historyDir, dirName, "generated");
 
-  // Assume directory structure and file names are identical between original and generated
-  const originalFiles = await fs.readdir(originalDirPath);
+  // Get all file paths in the original directory, including subdirectories
+  const originalFilePaths = await getAllFiles(originalDirPath);
 
   const files = await Promise.all(
-    originalFiles.map(async (fileName) => {
-      const originalFilePath = path.join(originalDirPath, fileName);
-      const generatedFilePath = path.join(generatedDirPath, fileName);
+    originalFilePaths.map(async (originalFilePath) => {
+      // Calculate the relative path to use it for finding the corresponding generated file
+      const relativePath = path.relative(originalDirPath, originalFilePath);
+      const generatedFilePath = path.join(generatedDirPath, relativePath);
 
       const originalContent = await fs.readFile(originalFilePath, "utf8");
       const generatedContent = await fs.readFile(generatedFilePath, "utf8");
 
-      const sourceFile: GeneratedSourceFile = {
-        path: fileName, // Assuming fileName includes any relative directory structure within the history
+      const sourceFile = {
+        path: relativePath,
         original: originalContent,
         generated: generatedContent,
       };

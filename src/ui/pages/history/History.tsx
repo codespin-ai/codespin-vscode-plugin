@@ -2,6 +2,8 @@ import * as React from "react";
 import { HistoryPageArgs } from "./HistoryPageArgs";
 import { HistoryEntry } from "../../../viewProviders/history/types";
 import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
+import { EventTemplate } from "../../../EventTemplate.js";
+import { SelectHistoryEntryArgs } from "../../../commands/selectHistoryEntry/SelectHistoryEntryArgs.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
 
@@ -67,10 +69,11 @@ export function History() {
   // Function to handle click events
   const handleItemClick = (timestamp: number) => {
     const vsCodeApi = getVsCodeApi();
-    vsCodeApi.postMessage({
+    const message: EventTemplate<SelectHistoryEntryArgs> = {
       type: "history:selectItem",
-      id: timestamp,
-    });
+      itemId: timestamp.toString(),
+    };
+    vsCodeApi.postMessage(message);
   };
 
   return (

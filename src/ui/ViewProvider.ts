@@ -74,7 +74,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
         break;
       case "history:selectItem":
         const args: SelectHistoryEntryArgs = {
-          itemId: message.id,
+          itemId: message.itemId,
         };
         vscode.commands.executeCommand("codespin-ai.selectHistoryEntry", args);
         break;

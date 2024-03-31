@@ -1,6 +1,9 @@
 import * as vscode from "vscode";
 import { UIPanel } from "../../ui/UIPanel.js";
 import { SelectHistoryEntryArgs } from "./SelectHistoryEntryArgs.js";
+import { getFullHistoryEntry } from "../../settings/history/getHistoryEntry.js";
+import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
+import { HistoryEntryPageArgs } from "../../ui/pages/history/HistoryEntryPageArgs.js";
 
 export function getSelectHistoryEntryCommand(context: vscode.ExtensionContext) {
   return async function selectHistoryItemCommand(
@@ -14,10 +17,17 @@ export function getSelectHistoryEntryCommand(context: vscode.ExtensionContext) {
     const uiPanel = new UIPanel(context, onMessage);
     await uiPanel.onWebviewReady();
 
-    // Todo: fill this up...
-    const historyItemDetails = {};
+    const workspaceRoot = await getWorkspaceRoot(context);
+    const historyEntryDetails = await getFullHistoryEntry(
+      args.itemId,
+      workspaceRoot
+    );
 
-    await uiPanel.navigateTo("/history/item", historyItemDetails);
+    const pageArgs: HistoryEntryPageArgs = {
+      entry: historyEntryDetails,
+    };
+
+    await uiPanel.navigateTo("/history/entry", pageArgs);
 
     async function onMessage(message: any) {
       switch (message.type) {

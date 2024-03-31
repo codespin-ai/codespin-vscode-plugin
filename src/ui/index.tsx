@@ -9,6 +9,7 @@ import { EditConfig } from "./pages/api/EditConfig.js";
 import { GenerateStream } from "./pages/generate/GenerateStream.js";
 import { History } from "./pages/history/History.js";
 import { Initialize } from "./pages/initialize/Initialize.js";
+import { HistoryEntry } from "./pages/history/HistoryEntry.js";
 
 function App() {
   React.useEffect(() => {
@@ -36,6 +37,7 @@ function App() {
         <Route path="/generate/invoke" component={GenerateStream} />
         <Route path="/api/config/edit" component={EditConfig} />
         <Route path="/history" component={History} />
+        <Route path="/history/entry" component={HistoryEntry} />
         <Route path="/initialize" component={Initialize} />
       </Switch>
     </>
