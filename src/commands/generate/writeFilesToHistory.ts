@@ -12,8 +12,19 @@ export async function writeFilesToHistory(
 
   files.forEach(async (file) => {
     // Construct the full paths for the original and generated files
-    const originalFilePath = path.join(historyDir, "original", file.path);
-    const generatedFilePath = path.join(historyDir, "generated", file.path);
+    const originalFilePath = path.join(
+      historyDir,
+      dirName,
+      "original",
+      file.path
+    );
+    
+    const generatedFilePath = path.join(
+      historyDir,
+      dirName,
+      "generated",
+      file.path
+    );
 
     // Ensure the directories exist
     await fs.mkdir(path.dirname(originalFilePath), {
