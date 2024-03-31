@@ -97,6 +97,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               result.args.promptCallback = async (prompt) => {
                 await writeRawPrompt(result.dirName, prompt, workspaceRoot);
               };
+              
 
               result.args.responseStreamCallback = (text) => {
                 uiPanel.postMessageToWebview({
