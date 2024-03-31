@@ -13,6 +13,9 @@ import { GeneratePageArgs } from "../../ui/pages/generate/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
+import { writePrompt } from "../../settings/history/writePrompt.js";
+import { writeRawPrompt } from "../../settings/history/writeRawPrompt.js";
+import { writeUserInput } from "../../settings/history/writeUserInput.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -72,32 +75,48 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
           switch (result.status) {
             case "can_generate":
+              await writePrompt(
+                result.dirName,
+                generateArgs.prompt,
+                workspaceRoot
+              );
+
+              const { type: unused1, ...messageSansType } = message;
+              
+              await writeUserInput(
+                result.dirName,
+                messageSansType as ArgsFromGeneratePanel,
+                workspaceRoot
+              );
+
               await uiPanel.navigateTo(`/generate/invoke`, {
                 api: result.args.api,
                 model: result.args.model,
               });
 
-              result.args.promptCallback = (prompt) => {
-                uiPanel.postMessageToWebview({
-                  type: "generate:stream:prompt",
-                  prompt,
-                });
+              result.args.promptCallback = async (prompt) => {
+                await writeRawPrompt(result.dirName, prompt, workspaceRoot);
               };
+
               result.args.responseStreamCallback = (text) => {
                 uiPanel.postMessageToWebview({
                   type: "generate:stream:response",
                   data: text,
                 });
               };
+
               result.args.responseCallback = (text) => {
                 uiPanel.dispose();
               };
+
               result.args.parseCallback = async (files) => {
                 await writeGeneratedFiles(result.dirName, files, workspaceRoot);
               };
+
               await codespinGenerate(result.args, {
                 workingDir: workspaceRoot,
               });
+
               break;
             case "missing_config":
               await uiPanel.navigateTo(`/api/config/edit`, {

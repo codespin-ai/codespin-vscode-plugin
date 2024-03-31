@@ -17,6 +17,7 @@ export type HistoryEntry = {
   timestamp: number;
   userInput: UserInput;
   prompt: string;
+  rawPrompt: string;
 };
 
 export type FullHistoryEntry = {

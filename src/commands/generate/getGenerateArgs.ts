@@ -68,22 +68,14 @@ export async function getGenerateArgs(
       await mkdir(historyDirPath, { recursive: true });
     }
 
-    const inputsPath = path.join(historyDirPath, "user-input.json");
-    await writeFile(
-      inputsPath,
-      JSON.stringify(unprocessedArgsFromPanel, null, 2),
-      "utf8"
-    );
-
     const argsFromPanel = await processArgs(
       unprocessedArgsFromPanel,
       workspaceRoot
     );
 
-    const promptFilePath = path.join(historyDirPath, "prompt.txt");
-    await writeFile(promptFilePath, argsFromPanel.prompt, "utf8");
-
     const [vendor, model] = argsFromPanel.model.split(":");
+
+    const promptFilePath = path.join(historyDirPath, "prompt.txt");
 
     const codespinGenerateArgs: GenerateArgs = {
       promptFile: promptFilePath,
