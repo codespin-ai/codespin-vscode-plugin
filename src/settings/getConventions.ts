@@ -2,33 +2,40 @@ import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import matter = require("gray-matter");
 import { CodingConvention } from "./CodingConvention.js";
+import { getConventionsDir } from "./codespinDirs.js";
+import { readdir, readFile } from "fs/promises";
+import { pathExists } from "../fs/pathExists.js";
 
 export async function getConventions(
   workspaceRoot: string
 ): Promise<Array<CodingConvention>> {
-  const conventionsDir = join(workspaceRoot, ".codespin", "conventions");
+  const conventionsDir = await getConventionsDir(workspaceRoot);
 
-  return existsSync(conventionsDir)
-    ? readdirSync(conventionsDir)
-        .filter((file) => file.endsWith(".md")) // Select only Markdown files
-        .map((file) => {
-          const filePath = join(conventionsDir, file);
-          const fileContents = readFileSync(filePath, "utf8");
-          const parsedContent = matter(fileContents);
-          const autoSelectedConvention = autoSelectConvention(file);
+  return (await pathExists(conventionsDir))
+    ? await Promise.all(
+        (
+          await readdir(conventionsDir)
+        )
+          .filter((file) => file.endsWith(".md")) // Select only Markdown files
+          .map(async (file) => {
+            const filePath = join(conventionsDir, file);
+            const fileContents = await readFile(filePath, "utf8");
+            const parsedContent = matter(fileContents);
+            const autoSelectedConvention = autoSelectConvention(file);
 
-          return {
-            filename: file,
-            extension:
-              parsedContent.data.extension && parsedContent.data.extension
-                ? parsedContent.data.extension
-                : autoSelectedConvention?.extension || "$$unknown$$",
-            description:
-              parsedContent.data && parsedContent.data.description
-                ? parsedContent.data.description
-                : autoSelectedConvention?.description || file,
-          };
-        })
+            return {
+              filename: file,
+              extension:
+                parsedContent.data.extension && parsedContent.data.extension
+                  ? parsedContent.data.extension
+                  : autoSelectedConvention?.extension || "$$unknown$$",
+              description:
+                parsedContent.data && parsedContent.data.description
+                  ? parsedContent.data.description
+                  : autoSelectedConvention?.description || file,
+            };
+          })
+      )
     : [];
 }
 

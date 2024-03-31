@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as path from "path";
-import * as fs from "fs";
 import { createDirIfMissing } from "../fs/createDirIfMissing.js";
+import { writeFile } from "fs/promises";
 
 export type CreateAPIConfigArgs = {
   api: string;
@@ -28,7 +28,7 @@ export async function createAPIConfig(args: CreateAPIConfigArgs) {
         }
       : {};
 
-  fs.writeFileSync(
+  await writeFile(
     configFilePath,
     JSON.stringify(revisedConfig, null, 2),
     "utf8"

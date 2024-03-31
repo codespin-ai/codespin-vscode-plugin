@@ -5,9 +5,10 @@ import { ViewProvider } from "../../ui/ViewProvider.js";
 import { HistoryEntry, UserInput } from "./types.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { HistoryPageArgs } from "../../ui/pages/history/HistoryPageArgs.js";
-import { isInitialized } from "../../codespin/isInitialized.js";
+import { isInitialized } from "../../settings/isInitialized.js";
 import { EventTemplate } from "../../EventTemplate.js";
-import { initialize } from "../../codespin/initialize.js";
+import { initialize } from "../../settings/initialize.js";
+import { getHistoryDir } from "../../settings/codespinDirs.js";
 
 export class HistoryViewProvider extends ViewProvider {
   constructor(context: vscode.ExtensionContext) {
@@ -99,8 +100,7 @@ async function getHistory(
   context: vscode.ExtensionContext
 ): Promise<HistoryEntry[]> {
   const workspaceRoot = getWorkspaceRoot(context);
-  const projectConfigDir = path.join(workspaceRoot, ".codespin");
-  const directoryPath = path.join(projectConfigDir, "history");
+  const directoryPath = await getHistoryDir(workspaceRoot);
   const dirs = await fs.readdir(directoryPath, { withFileTypes: true });
   const historyDirs = dirs.filter((dir) => dir.isDirectory());
 

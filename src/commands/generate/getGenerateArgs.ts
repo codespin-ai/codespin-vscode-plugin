@@ -2,16 +2,17 @@ import {
   GenerateArgs as CodespinGenerateArgs,
   GenerateArgs,
 } from "codespin/dist/commands/generate.js";
-import * as fs from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
 import { EventTemplate } from "../../EventTemplate.js";
-import { initialize } from "../../codespin/initialize.js";
-import { isInitialized } from "../../codespin/isInitialized.js";
+import { initialize } from "../../settings/initialize.js";
+import { isInitialized } from "../../settings/isInitialized.js";
 import { getAPIConfigPath } from "../../settings/getAPIConfigPath.js";
 import { processConvention } from "../../settings/processConvention.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
+import { pathExists } from "../../fs/pathExists.js";
+import { mkdir, writeFile } from "fs/promises";
 
 type Result =
   | {
@@ -21,6 +22,7 @@ type Result =
   | {
       status: "can_generate";
       args: CodespinGenerateArgs;
+      dirName: string;
     }
   | {
       status: "close";
@@ -55,20 +57,21 @@ export async function getGenerateArgs(
 
   const configFilePath = await getAPIConfigPath(api, workspaceRoot);
 
+  const dirName = Date.now().toString();
   if (configFilePath) {
     const historyDirPath = path.join(
       workspaceRoot,
       ".codespin",
       "history",
-      `${Date.now()}`
+      dirName
     );
 
-    if (!fs.existsSync(historyDirPath)) {
-      fs.mkdirSync(historyDirPath, { recursive: true });
+    if (!(await pathExists(historyDirPath))) {
+      await mkdir(historyDirPath, { recursive: true });
     }
 
     const inputsPath = path.join(historyDirPath, "user-input.json");
-    fs.writeFileSync(
+    await writeFile(
       inputsPath,
       JSON.stringify(unprocessedArgsFromPanel, null, 2),
       "utf8"
@@ -77,7 +80,7 @@ export async function getGenerateArgs(
     const argsFromPanel = await processArgs(unprocessedArgsFromPanel, context);
 
     const promptFilePath = path.join(historyDirPath, "prompt.txt");
-    fs.writeFileSync(promptFilePath, argsFromPanel.prompt, "utf8");
+    await writeFile(promptFilePath, argsFromPanel.prompt, "utf8");
 
     const [vendor, model] = argsFromPanel.model.split(":");
 
@@ -119,6 +122,7 @@ export async function getGenerateArgs(
     return {
       status: "can_generate",
       args: codespinGenerateArgs,
+      dirName,
     };
   }
   // config file doesn't exist.

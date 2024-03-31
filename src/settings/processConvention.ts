@@ -1,5 +1,7 @@
-import { existsSync, promises as fsPromises } from "fs";
+import { promises as fsPromises } from "fs";
 import { join } from "path";
+import { pathExists } from "../fs/pathExists.js";
+import { getConventionsDir } from "./codespinDirs.js";
 import matter = require("gray-matter");
 
 export async function processConvention(
@@ -7,11 +9,11 @@ export async function processConvention(
   filename: string,
   workspaceRoot: string
 ): Promise<string> {
-  const conventionsDir = join(workspaceRoot, ".codespin", "conventions");
+  const conventionsDir = await getConventionsDir(workspaceRoot);
   const filePath = join(conventionsDir, filename);
 
   // Check if the specific convention file exists
-  if (existsSync(filePath)) {
+  if (await pathExists(filePath)) {
     const templateContents = await fsPromises.readFile(filePath, {
       encoding: "utf-8",
     });

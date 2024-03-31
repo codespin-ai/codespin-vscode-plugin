@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
-import { initialize } from "../../codespin/initialize.js";
-import { isInitialized } from "../../codespin/isInitialized.js";
+import { initialize } from "../../settings/initialize.js";
+import { isInitialized } from "../../settings/isInitialized.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 
 export function getInitCommand(context: vscode.ExtensionContext) {

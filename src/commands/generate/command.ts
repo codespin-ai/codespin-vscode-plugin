@@ -12,6 +12,8 @@ import { GeneratePageArgs } from "../../ui/pages/generate/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
+import { getHistoryDir } from "../../settings/codespinDirs.js";
+import { writeFilesToHistory } from "./writeFilesToHistory.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -52,7 +54,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     let cancelGeneration: (() => void) | undefined = undefined;
 
-    function setGenerationCancel(cancel: () => void) {
+    function setCancelGeneration(cancel: () => void) {
       cancelGeneration = cancel;
     }
 
@@ -65,7 +67,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
           const result = await getGenerateArgs(
             generateArgs!,
-            setGenerationCancel,
+            setCancelGeneration,
             context
           );
 
@@ -90,6 +92,9 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               };
               result.args.responseCallback = (text) => {
                 uiPanel.dispose();
+              };
+              result.args.parseCallback = async (files) => {
+                await writeFilesToHistory(result.dirName, files, workspaceRoot);
               };
               await codespinGenerate(result.args, {
                 workingDir: workspaceRoot,
