@@ -1,10 +1,10 @@
 import * as vscode from "vscode";
 import { UIPanel } from "../../ui/UIPanel.js";
-import { SelectHistoryItemArgs } from "./SelectHistoryItemArgs.js";
+import { SelectHistoryEntryArgs } from "./SelectHistoryEntryArgs.js";
 
-export function getSelectHistoryItemCommand(context: vscode.ExtensionContext) {
+export function getSelectHistoryEntryCommand(context: vscode.ExtensionContext) {
   return async function selectHistoryItemCommand(
-    args: SelectHistoryItemArgs
+    args: SelectHistoryEntryArgs
   ): Promise<void> {
     if (!args.itemId) {
       vscode.window.showErrorMessage("No history item ID provided.");
@@ -14,9 +14,8 @@ export function getSelectHistoryItemCommand(context: vscode.ExtensionContext) {
     const uiPanel = new UIPanel(context, onMessage);
     await uiPanel.onWebviewReady();
 
-    const historyItemDetails = {
-      id: args.itemId,
-    };
+    // Todo: fill this up...
+    const historyItemDetails = {};
 
     await uiPanel.navigateTo("/history/item", historyItemDetails);
 

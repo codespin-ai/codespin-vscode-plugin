@@ -1,7 +1,7 @@
 import { promises as fsPromises } from "fs";
 import { join } from "path";
-import { pathExists } from "../fs/pathExists.js";
-import { getConventionsDir } from "./codespinDirs.js";
+import { pathExists } from "../../fs/pathExists.js";
+import { getConventionsDir } from "../codespinDirs.js";
 import matter = require("gray-matter");
 
 export async function processConvention(

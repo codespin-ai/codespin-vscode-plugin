@@ -1,7 +1,7 @@
 import * as path from "path";
 import * as os from "os";
-import { pathExists } from "../fs/pathExists.js";
-import { getCodespinDir } from "./codespinDirs.js";
+import { pathExists } from "../../fs/pathExists.js";
+import { getCodespinDir } from "../codespinDirs.js";
 
 export async function getAPIConfigPath(
   api: string,

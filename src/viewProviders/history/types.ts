@@ -1,3 +1,5 @@
+import { GeneratedSourceFile } from "codespin/dist/sourceCode/GeneratedSourceFile.js";
+
 export type UserInput = {
   type: string;
   model: string;
@@ -16,3 +18,7 @@ export type HistoryEntry = {
   userInput: UserInput;
   prompt: string;
 };
+
+export type FullHistoryEntry = {
+  files: GeneratedSourceFile[];
+} & HistoryEntry;

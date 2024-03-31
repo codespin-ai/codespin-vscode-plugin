@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getWebviewContent } from "./getWebView.js";
-import { SelectHistoryItemArgs } from "../commands/selectHistoryItem/SelectHistoryItemArgs.js";
+import { SelectHistoryEntryArgs } from "../commands/selectHistoryEntry/SelectHistoryEntryArgs.js";
 
 export abstract class ViewProvider implements vscode.WebviewViewProvider {
   private webviewView?: vscode.WebviewView;
@@ -73,10 +73,10 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
         }
         break;
       case "history:selectItem":
-        const args: SelectHistoryItemArgs = {
+        const args: SelectHistoryEntryArgs = {
           itemId: message.id,
         };
-        vscode.commands.executeCommand("codespin-ai.selectHistoryItem", args);
+        vscode.commands.executeCommand("codespin-ai.selectHistoryEntry", args);
         break;
     }
     this.onMessage(message);

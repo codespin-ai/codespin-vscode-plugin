@@ -5,15 +5,15 @@ import * as vscode from "vscode";
 import { EventTemplate } from "../../EventTemplate.js";
 import { getDefaultModel } from "../../models/getDefaultModel.js";
 import { getModels } from "../../models/getModels.js";
-import { createAPIConfig } from "../../settings/createAPIConfig.js";
-import { getConventions } from "../../settings/getConventions.js";
+import { createAPIConfig } from "../../settings/api/createAPIConfig.js";
+import { getConventions } from "../../settings/conventions/getConventions.js";
 import { UIPanel } from "../../ui/UIPanel.js";
 import { GeneratePageArgs } from "../../ui/pages/generate/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import { getHistoryDir } from "../../settings/codespinDirs.js";
-import { writeFilesToHistory } from "./writeFilesToHistory.js";
+import { writeGeneratedFiles } from "../../settings/history/writeGeneratedFiles.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -94,7 +94,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
                 uiPanel.dispose();
               };
               result.args.parseCallback = async (files) => {
-                await writeFilesToHistory(result.dirName, files, workspaceRoot);
+                await writeGeneratedFiles(result.dirName, files, workspaceRoot);
               };
               await codespinGenerate(result.args, {
                 workingDir: workspaceRoot,

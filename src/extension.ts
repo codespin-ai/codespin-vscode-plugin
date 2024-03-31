@@ -5,7 +5,7 @@ import * as vscode from "vscode";
 import { getGenerateCommand } from "./commands/generate/command.js";
 import { getInitCommand } from "./commands/init/command.js";
 import { HistoryViewProvider } from "./viewProviders/history/HistoryViewProvider.js";
-import { getSelectHistoryItemCommand } from "./commands/selectHistoryItem/command.js";
+import { getSelectHistoryEntryCommand } from "./commands/selectHistoryEntry/command.js";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -34,12 +34,12 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(initCommand);
 
-  const selectHistoryItemCommand = vscode.commands.registerCommand(
-    "codespin-ai.selectHistoryItem",
-    getSelectHistoryItemCommand(context)
+  const selectHistoryEntryCommand = vscode.commands.registerCommand(
+    "codespin-ai.selectHistoryEntry",
+    getSelectHistoryEntryCommand(context)
   );
 
-  context.subscriptions.push(selectHistoryItemCommand);
+  context.subscriptions.push(selectHistoryEntryCommand);
 }
 
 // This method is called when your extension is deactivated

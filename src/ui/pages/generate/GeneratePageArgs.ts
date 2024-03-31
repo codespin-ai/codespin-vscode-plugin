@@ -1,4 +1,4 @@
-import { CodingConvention } from "../../../settings/CodingConvention.js";
+import { CodingConvention } from "../../../settings/conventions/CodingConvention.js";
 
 export type GeneratePageArgs = {
   files: { path: string; size: number | undefined }[];

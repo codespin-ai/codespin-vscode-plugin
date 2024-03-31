@@ -2,9 +2,9 @@ import { existsSync, readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import matter = require("gray-matter");
 import { CodingConvention } from "./CodingConvention.js";
-import { getConventionsDir } from "./codespinDirs.js";
+import { getConventionsDir } from "../codespinDirs.js";
 import { readdir, readFile } from "fs/promises";
-import { pathExists } from "../fs/pathExists.js";
+import { pathExists } from "../../fs/pathExists.js";
 
 export async function getConventions(
   workspaceRoot: string
