@@ -62,32 +62,43 @@ export function History() {
     return date === today ? "Today" : date === yesterday ? "Yesterday" : date;
   };
 
+  const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
+
   return (
     <div>
       {Object.keys(groupedEntries).length > 0 ? (
-        Object.entries(groupedEntries).map(([date, entries], index) => (
-          <React.Fragment key={index}>
+        Object.entries(groupedEntries).map(([date, entries], dateIndex) => (
+          <React.Fragment key={dateIndex}>
             <h3>{toHumanReadableDate(date)}</h3>
             <ul style={{ listStyle: "none", padding: 0 }}>
-              {entries.map((entry, entryIndex) => (
-                <li
-                  key={entryIndex}
-                  style={{
-                    marginBottom: "1em",
-                  }}
-                >
-                  <div>{truncatePrompt(entry.prompt)}</div>
-                  <div
+              {entries.map((entry, entryIndex) => {
+                // Generate a unique identifier for each list item
+                const itemId = `${dateIndex}-${entryIndex}`;
+                return (
+                  <li
+                    key={entryIndex}
+                    onMouseEnter={() => setHoveredItemId(itemId)}
+                    onMouseLeave={() => setHoveredItemId(null)}
                     style={{
-                      fontStyle: "italic",
-                      fontSize: "smaller",
-                      marginTop: "4px",
+                      marginBottom: "1em",
+                      cursor: "pointer",
+                      filter:
+                        hoveredItemId === itemId ? "brightness(2)" : undefined,
                     }}
                   >
-                    {formatRelativeTime(entry.timestamp)}
-                  </div>
-                </li>
-              ))}
+                    <div>{truncatePrompt(entry.prompt)}</div>
+                    <div
+                      style={{
+                        fontStyle: "italic",
+                        fontSize: "smaller",
+                        marginTop: "4px",
+                      }}
+                    >
+                      {formatRelativeTime(entry.timestamp)}
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           </React.Fragment>
         ))
