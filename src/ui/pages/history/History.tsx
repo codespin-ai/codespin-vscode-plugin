@@ -1,10 +1,10 @@
 import * as React from "react";
 import { HistoryPageArgs } from "./HistoryPageArgs";
 import { HistoryEntry } from "../../../viewProviders/history/types";
+import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
 
-// Function to truncate prompts to the nearest full word after 100 characters
 const truncatePrompt = (prompt: string): string => {
   if (prompt.length <= 100) {
     return prompt;
@@ -64,6 +64,15 @@ export function History() {
 
   const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
 
+  // Function to handle click events
+  const handleItemClick = (timestamp: number) => {
+    const vsCodeApi = getVsCodeApi();
+    vsCodeApi.postMessage({
+      type: "history:selectItem",
+      id: timestamp,
+    });
+  };
+
   return (
     <div>
       {Object.keys(groupedEntries).length > 0 ? (
@@ -79,6 +88,7 @@ export function History() {
                     key={entryIndex}
                     onMouseEnter={() => setHoveredItemId(itemId)}
                     onMouseLeave={() => setHoveredItemId(null)}
+                    onClick={() => handleItemClick(entry.timestamp)}
                     style={{
                       marginBottom: "1em",
                       cursor: "pointer",

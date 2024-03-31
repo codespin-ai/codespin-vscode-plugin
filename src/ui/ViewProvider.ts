@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { getWebviewContent } from "./getWebView.js";
+import { SelectHistoryItemArgs } from "../commands/selectHistoryItem/SelectHistoryItemArgs.js";
 
 export abstract class ViewProvider implements vscode.WebviewViewProvider {
   private webviewView?: vscode.WebviewView;
@@ -60,16 +61,23 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   }
 
   handleMessageFromWebview(message: any) {
-    console.log("MESSAGE", message);
     switch (message.type) {
       case "webviewReady":
         this.resolveWebviewReady();
+        break;
       case "navigated":
         const resolver = this.navigationPromiseResolvers.get(message.url);
         if (resolver) {
           resolver();
           this.navigationPromiseResolvers.delete(message.url);
         }
+        break;
+      case "history:selectItem":
+        const args: SelectHistoryItemArgs = {
+          itemId: message.id,
+        };
+        vscode.commands.executeCommand("codespin-ai.selectHistoryItem", args);
+        break;
     }
     this.onMessage(message);
   }
