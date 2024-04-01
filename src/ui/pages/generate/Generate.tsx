@@ -2,6 +2,7 @@ import {
   VSCodeButton,
   VSCodeDivider,
   VSCodeDropdown,
+  VSCodeLink,
   VSCodeOption,
   VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
@@ -261,9 +262,10 @@ export function Generate() {
                   </VSCodeOption>
                 ))}
               </VSCodeDropdown>
-              <span>
+              <span style={{ marginRight: "1em" }}>
                 {file.path} {file.size ? `(${formatFileSize(file.size)})` : ""}
               </span>
+              <VSCodeLink>Add deps</VSCodeLink>
               <br />
             </div>
           ))}

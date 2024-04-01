@@ -12,7 +12,7 @@ import {
   vsCodeTextField,
 } from "@vscode/webview-ui-toolkit";
 
-export { initWebView } from "../ui/index.js";
+export { initWebview } from "../ui/index.js";
 
 provideVSCodeDesignSystem().register(
   vsCodeButton(),

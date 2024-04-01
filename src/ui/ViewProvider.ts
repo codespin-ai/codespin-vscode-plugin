@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { getWebviewContent } from "./getWebView.js";
+import { getWebviewContent } from "./getWebviewContent.js";
 import { SelectHistoryEntryArgs } from "../commands/selectHistoryEntry/SelectHistoryEntryArgs.js";
 
 export abstract class ViewProvider implements vscode.WebviewViewProvider {
@@ -46,7 +46,10 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.html = getWebviewContent(
       webviewView.webview,
-      this.context.extensionUri
+      this.context.extensionUri,
+      {
+        style: this.getStyle(),
+      }
     );
 
     webviewView.onDidDispose(() => this.dispose(), null, this.disposables);
@@ -84,6 +87,10 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
 
   abstract init(): Promise<void>;
   abstract onMessage(data: any): void;
+
+  getStyle() {
+    return undefined;
+  }
 
   onInitialize() {
     return this.initializePromise;

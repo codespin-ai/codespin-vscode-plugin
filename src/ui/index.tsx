@@ -44,7 +44,7 @@ function App() {
   );
 }
 
-export function initWebView() {
+export function initWebview() {
   function onReady() {
     const domRootNode = document.getElementById("root")!;
     const root = createRoot(domRootNode);

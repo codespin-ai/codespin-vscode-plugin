@@ -17,23 +17,19 @@ import { writePrompt } from "../../settings/history/writePrompt.js";
 import { writeRawPrompt } from "../../settings/history/writeRawPrompt.js";
 import { writeUserInput } from "../../settings/history/writeUserInput.js";
 
-export function getGenerateCommand(context: vscode.ExtensionContext) {
-  return async function generateCommand(
+export function getRedoGenerateCommand(context: vscode.ExtensionContext) {
+  return async function redoGenerateCommand(
     _: unknown,
-    uris: vscode.Uri[]
+    args: GeneratePageArgs
   ): Promise<void> {
-    if (!uris) {
-      return;
-    }
-
     let generateArgs: EventTemplate<ArgsFromGeneratePanel> | undefined;
 
     const workspaceRoot = getWorkspaceRoot(context);
 
     const fileDetails = (
       await Promise.all(
-        uris.map(async (uri) => {
-          const fullPath = uri.fsPath;
+        args.files.map(async (file) => {
+          const fullPath = path.join(workspaceRoot, file.path);
           const size = (await fs.stat(fullPath)).size;
           const relativePath = path.relative(workspaceRoot, fullPath);
           return { path: relativePath, size };
@@ -82,7 +78,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               );
 
               const { type: unused1, ...messageSansType } = message;
-              
+
               await writeUserInput(
                 result.dirName,
                 messageSansType as ArgsFromGeneratePanel,
@@ -97,7 +93,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               result.args.promptCallback = async (prompt) => {
                 await writeRawPrompt(result.dirName, prompt, workspaceRoot);
               };
-              
 
               result.args.responseStreamCallback = (text) => {
                 uiPanel.postMessageToWebview({

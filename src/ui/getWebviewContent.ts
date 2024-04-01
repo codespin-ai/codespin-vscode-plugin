@@ -1,9 +1,14 @@
 import * as vscode from "vscode";
 import { getUri } from "../vscode/getUri.js";
 
+type WebviewOptions = {
+  style?: string;
+};
+
 export function getWebviewContent(
   webview: vscode.Webview,
-  extensionUri: vscode.Uri
+  extensionUri: vscode.Uri,
+  options: WebviewOptions
 ) {
   const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
   return `
@@ -14,15 +19,16 @@ export function getWebviewContent(
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>CodeSpin</title>
         <style>
-          body { font-family: var(--font-family); }            
-        </style>
+          body { font-family: var(--font-family); }
+          ${options.style || ""}
+        </style>        
       </head>
       <body>
         <div id="root"></div>
         <script>
           (async () => {
             const module = await import('${webviewUri}');
-            module.initWebView();
+            module.initWebview();
           })();
         </script>
       </body>

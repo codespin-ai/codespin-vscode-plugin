@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { getWebviewContent } from "./getWebView.js";
+import { getWebviewContent } from "./getWebviewContent.js";
 import { MessageHandler } from "./MessageHandler.js";
 
 export class UIPanel {
@@ -32,7 +32,10 @@ export class UIPanel {
 
     this.panel.webview.html = getWebviewContent(
       this.panel.webview,
-      this.context.extensionUri
+      this.context.extensionUri,
+      {
+        style: this.getStyle(),
+      }
     );
 
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
@@ -48,6 +51,10 @@ export class UIPanel {
     this.webviewReadyPromise = new Promise((resolve) => {
       this.resolveWebviewReady = resolve;
     });
+  }
+
+  getStyle() {
+    return `code { background: initial; }`;
   }
 
   onWebviewReady() {
