@@ -17,6 +17,10 @@
         "title": "CodeSpin.AI: Generate"
       },
       {
+        "command": "codespin-ai.regenerate",
+        "title": "CodeSpin.AI: Regenerate"
+      },
+      {
         "command": "codespin-ai.init",
         "title": "CodeSpin.AI: Initialize Project"
       }
@@ -78,9 +82,9 @@
     "package": "NODE_ENV=production node ./esbuild.js"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.1",
-    "@types/node": "16.x",
-    "@types/vscode": "^1.82.0",
+    "@types/mocha": "^10.0.6",
+    "@types/node": "^20.12.2",
+    "@types/vscode": "^1.87.0",
     "@types/vscode-webview": "^1.57.5",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
@@ -92,15 +96,15 @@
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@types/react": "^18.2.66",
-    "@types/react-dom": "^18.2.22",
+    "@types/react": "^18.2.74",
+    "@types/react-dom": "^18.2.23",
     "@types/react-router-dom": "^5.3.3",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.131",
+    "codespin": "^0.0.132",
     "gray-matter": "^4.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "shiki": "^1.2.2",
+    "shiki": "^1.2.3",
     "wouter": "^3.1.0"
   }
 }

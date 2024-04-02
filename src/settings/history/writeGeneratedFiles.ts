@@ -18,7 +18,7 @@ export async function writeGeneratedFiles(
       "original",
       file.path
     );
-    
+
     const generatedFilePath = path.join(
       historyDir,
       dirName,
@@ -36,7 +36,9 @@ export async function writeGeneratedFiles(
     });
 
     // Write the original and generated content to their respective files
-    await fs.writeFile(originalFilePath, file.original, "utf8");
+    if (file.original) {
+      await fs.writeFile(originalFilePath, file.original, "utf8");
+    }
     await fs.writeFile(generatedFilePath, file.generated, "utf8");
   });
 }

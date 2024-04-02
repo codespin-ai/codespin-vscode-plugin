@@ -3,6 +3,14 @@ import { CodingConvention } from "../../../settings/conventions/CodingConvention
 export type GeneratePageArgs = {
   files: { path: string; size: number | undefined }[];
   models: { name: string; value: string }[];
+  codingConventions: Array<CodingConvention>;
   selectedModel: string;
-  conventions: Array<CodingConvention>;
+  selectedCodingConvention: string | undefined;
+  prompt: string;
+  codegenTargets: string;
+  fileVersion: "current" | "HEAD";
+  includedFiles: {
+    path: string;
+    includeOption: "source" | "declaration";
+  }[];
 };

@@ -9,32 +9,17 @@ import {
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { diffContent } from "../../../git/diffContent.js";
-import { getCommitMessage } from "../../../git/getCommitMessage.js";
-import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
-import { HistoryEntryPageArgs } from "./HistoryEntryPageArgs.js";
+import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
+import { HistoryEntryPageArgs } from "./HistoryEntryPageArgs.js";
+import { RegeneratePageArgs } from "./RegeneratePageArgs.js";
 
 // HistoryEntry component definition
 export function HistoryEntry() {
-  const [entry, setEntry] = useState<FullHistoryEntry | null>(null);
+  const args: HistoryEntryPageArgs = history.state;
+
   const [commitMessage, setCommitMessage] = useState<string>("");
   const [diffs, setDiffs] = useState<Array<{ path: string; diff: string }>>([]);
-  const [formattedFiles, setFormattedFiles] = useState<{
-    [key: string]: { original: string; generated: string };
-  }>({});
-
-  // Extract the history entry from the page's state
-  useEffect(() => {
-    const args: HistoryEntryPageArgs = history.state;
-    setEntry(args.entry);
-    setFormattedFiles(args.formattedFiles || {});
-  }, []);
-
-  // Extract the history entry from the page's state
-  useEffect(() => {
-    const args: HistoryEntryPageArgs = history.state;
-    setEntry(args.entry);
-  }, []);
 
   // Function to format date from timestamp
   const formatDate = (timestamp: number): string => {
@@ -42,27 +27,13 @@ export function HistoryEntry() {
     return date.toLocaleString();
   };
 
-  // Function to fetch commit message asynchronously
-  const fetchCommitMessage = async () => {
-    if (!entry) {
-      return;
-    }
-    const message = await getCommitMessage(entry.prompt);
-    setCommitMessage(message);
-  };
-
-  // Invoke fetchCommitMessage when the entry state updates
-  useEffect(() => {
-    fetchCommitMessage();
-  }, [entry]);
-
   // Function to fetch diffs asynchronously
   useEffect(() => {
     const fetchDiffs = async () => {
-      if (!entry || !entry.files) {
+      if (!args.entry.files) {
         return;
       }
-      const diffsPromises = entry.files.map(async (file) => ({
+      const diffsPromises = args.entry.files.map(async (file) => ({
         path: file.path,
         diff: await diffContent(file.original, file.generated),
       }));
@@ -71,15 +42,69 @@ export function HistoryEntry() {
     };
 
     fetchDiffs();
-  }, [entry]);
+  }, [args.entry]);
+
+  // const gatherArgsForRegenerateCommand = (): RegeneratePageArgs => {
+  //   // Example data structure for files, models, conventions, and other properties.
+  //   // You will need to replace these with actual data from your component's state,
+  //   // props, or other sources as appropriate.
+  //   const files = entry.userInput.includedFiles.map((file) => ({
+  //     path: file.path,
+  //     size: undefined, // Assuming size is not readily available; set appropriately.
+  //   }));
+
+  //   // Assuming you have a way to determine the models, selected model, and conventions.
+  //   // These could be state variables, fetched data, etc.
+  //   const models = [
+  //     { name: "ModelName1", value: "ModelValue1" },
+  //     // Add more models as necessary
+  //   ];
+
+  //   const selectedModel = "ModelName1"; // The model selected by the user or a default one
+
+  //   const conventions = [
+  //     {
+  //       filename: "ExampleFilename",
+  //       extension: ".ext",
+  //       description: "Example coding convention",
+  //     },
+  //     // Add more coding conventions as necessary
+  //   ];
+
+  //   // Optional properties, populate as needed
+  //   const prompt = entry.prompt; // Example: use the current entry's prompt
+  //   const codegenTargets = "targets"; // Placeholder, set appropriately
+  //   const codingConvention = "standard"; // Placeholder, set appropriately
+  //   const fileVersion = "current"; // or 'HEAD', depending on your use case
+  //   const includedFiles = [
+  //     {
+  //       path: "path/to/file",
+  //       includeOption: "source", // or 'declaration', as applicable
+  //     },
+  //     // Add more included files as necessary
+  //   ];
+
+  //   // Assemble the args object
+  //   return {
+  //     files,
+  //     models,
+  //     selectedModel,
+  //     conventions,
+  //     prompt,
+  //     codegenTargets,
+  //     codingConvention,
+  //     fileVersion,
+  //     includedFiles,
+  //   };
+  // };
 
   // Function to post the commit message
-  const postCommit = () => {
-    window.postMessage({
-      type: "history:commit",
-      commitMessage: commitMessage,
-    });
-  };
+  // const postCommit = () => {
+  //   getVsCodeApi().postMessage({
+  //     type: "command:codespin-ai.regenerate",
+  //     args: gatherArgsForRegenerateCommand(),
+  //   });
+  // };
 
   // Render the component
   return (
@@ -91,7 +116,7 @@ export function HistoryEntry() {
         <VSCodePanelTab>COMMIT</VSCodePanelTab>
         <VSCodePanelView>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {entry && (
+            {
               <>
                 <CSFormField>
                   <div
@@ -102,14 +127,14 @@ export function HistoryEntry() {
                       borderRadius: "4px",
                     }}
                   >
-                    {entry.prompt}
+                    {args.entry.prompt}
                   </div>
                 </CSFormField>
                 <CSFormField>
-                  <VSCodeButton onClick={postCommit}>Edit Prompt</VSCodeButton>
+                  <VSCodeButton>Edit Prompt</VSCodeButton>
                 </CSFormField>
                 {Array.from(
-                  Object.keys(formattedFiles).map((key) => (
+                  Object.keys(args.formattedFiles).map((key) => (
                     <div key={`file-gen-${key}`}>
                       <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
                         Generated Files
@@ -124,14 +149,14 @@ export function HistoryEntry() {
                           borderRadius: "4px",
                         }}
                         dangerouslySetInnerHTML={{
-                          __html: formattedFiles[key].generated,
+                          __html: args.formattedFiles[key].generated,
                         }}
                       />
                     </div>
                   ))
                 )}
               </>
-            )}
+            }
           </div>
         </VSCodePanelView>
         <VSCodePanelView>
@@ -145,7 +170,7 @@ export function HistoryEntry() {
           >
             <pre>
               {/* Show the raw prompt */}
-              {entry && <div>{entry.rawPrompt}</div>}
+              {<div>{args.entry.rawPrompt}</div>}
             </pre>
           </div>
         </VSCodePanelView>
@@ -161,7 +186,7 @@ export function HistoryEntry() {
         <VSCodePanelView>
           {/* Show commit message and provide a commit action */}
           <VSCodeTextArea value={commitMessage} readOnly />
-          <VSCodeButton onClick={postCommit}>Commit</VSCodeButton>
+          <VSCodeButton>Commit</VSCodeButton>
         </VSCodePanelView>
       </VSCodePanels>
     </div>

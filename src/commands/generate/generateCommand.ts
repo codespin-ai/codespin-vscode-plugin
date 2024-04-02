@@ -49,9 +49,17 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     const generatePageArgs: GeneratePageArgs = {
       files: fileDetails,
-      conventions,
+      codingConventions: conventions,
       models: getModels(),
       selectedModel: getDefaultModel(),
+      codegenTargets: ":prompt",
+      fileVersion: "current",
+      includedFiles: uris.map((x) => ({
+        includeOption: "source",
+        path: path.relative(workspaceRoot, x.fsPath),
+      })),
+      prompt: "",
+      selectedCodingConvention: undefined,
     };
 
     let cancelGeneration: (() => void) | undefined = undefined;
@@ -82,7 +90,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               );
 
               const { type: unused1, ...messageSansType } = message;
-              
+
               await writeUserInput(
                 result.dirName,
                 messageSansType as ArgsFromGeneratePanel,
@@ -97,7 +105,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               result.args.promptCallback = async (prompt) => {
                 await writeRawPrompt(result.dirName, prompt, workspaceRoot);
               };
-              
 
               result.args.responseStreamCallback = (text) => {
                 uiPanel.postMessageToWebview({

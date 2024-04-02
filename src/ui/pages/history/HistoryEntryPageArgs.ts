@@ -1,8 +1,8 @@
 import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
 
 export type HistoryEntryPageArgs = {
-  entry: FullHistoryEntry | null;
+  entry: FullHistoryEntry;
   formattedFiles: {
-    [key: string]: { original: string; generated: string };
-  } | null;
+    [key: string]: { original: string | undefined; generated: string };
+  };
 };

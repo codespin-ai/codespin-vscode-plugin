@@ -69,9 +69,11 @@ export function History() {
   // Function to handle click events
   const handleItemClick = (timestamp: number) => {
     const vsCodeApi = getVsCodeApi();
-    const message: EventTemplate<SelectHistoryEntryArgs> = {
-      type: "history:selectItem",
-      itemId: timestamp.toString(),
+    const message: EventTemplate<{ args: SelectHistoryEntryArgs }> = {
+      type: "command:codespin-ai.selectHistoryEntry",
+      args: {
+        itemId: timestamp.toString(),
+      },
     };
     vsCodeApi.postMessage(message);
   };

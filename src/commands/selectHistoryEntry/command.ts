@@ -28,10 +28,9 @@ export function getSelectHistoryEntryCommand(context: vscode.ExtensionContext) {
 
     // Function to asynchronously transform a single file's content to its HTML representation
     async function formatFileContent(file: GeneratedSourceFile) {
-      const originalHtml = await getHtmlForCode(
-        file.original,
-        getLangFromFilename(file.path)
-      );
+      const originalHtml = file.original
+        ? await getHtmlForCode(file.original, getLangFromFilename(file.path))
+        : undefined;
       const generatedHtml = await getHtmlForCode(
         file.generated,
         getLangFromFilename(file.path)
@@ -62,19 +61,24 @@ export function getSelectHistoryEntryCommand(context: vscode.ExtensionContext) {
               return acc;
             },
             {} as {
-              [key: string]: { original: string; generated: string };
+              [key: string]: {
+                original: string | undefined;
+                generated: string;
+              };
             }
           );
         })()
       : null;
 
-    // Populate the pageArgs with the entry details and the formattedFiles object
-    const pageArgs: HistoryEntryPageArgs = {
-      entry: historyEntryDetails,
-      formattedFiles: formattedFilesObject,
-    };
+    if (historyEntryDetails && formattedFilesObject) {
+      // Populate the pageArgs with the entry details and the formattedFiles object
+      const pageArgs: HistoryEntryPageArgs = {
+        entry: historyEntryDetails,
+        formattedFiles: formattedFilesObject,
+      };
 
-    await uiPanel.navigateTo("/history/entry", pageArgs);
+      await uiPanel.navigateTo("/history/entry", pageArgs);
+    }
 
     async function onMessage(message: any) {
       switch (message.type) {

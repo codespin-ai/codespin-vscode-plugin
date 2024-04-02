@@ -62,15 +62,21 @@ export class UIPanel {
   }
 
   handleMessageFromWebview(message: any) {
-    switch (message.type) {
-      case "webviewReady":
-        this.resolveWebviewReady();
-      case "navigated":
-        const resolver = this.navigationPromiseResolvers.get(message.url);
-        if (resolver) {
-          resolver();
-          this.navigationPromiseResolvers.delete(message.url);
-        }
+    if (message.type.startsWith("command:")) {
+      const command = message.type.split(":")[1];
+      const args = message.args;
+      vscode.commands.executeCommand(command, args);
+    } else {
+      switch (message.type) {
+        case "webviewReady":
+          this.resolveWebviewReady();
+        case "navigated":
+          const resolver = this.navigationPromiseResolvers.get(message.url);
+          if (resolver) {
+            resolver();
+            this.navigationPromiseResolvers.delete(message.url);
+          }
+      }
     }
     this.onMessage(message);
   }

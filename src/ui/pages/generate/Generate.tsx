@@ -22,19 +22,24 @@ export function Generate() {
   const promptRef = useRef<TextArea>(null);
 
   const [model, setModel] = useState(args.selectedModel);
-  const [prompt, setPrompt] = useState<string>("");
-  const [codegenTargets, setCodegenTargets] = useState(":prompt");
-  const [codingConvention, setCodingConvention] = useState<string | undefined>(
-    undefined
+  const [prompt, setPrompt] = useState<string>(args.prompt || "");
+  const [codegenTargets, setCodegenTargets] = useState(
+    args.codegenTargets || ":prompt"
   );
-  const [fileVersion, setFileVersion] = useState<"current" | "HEAD">("current");
+  const [codingConvention, setCodingConvention] = useState<string | undefined>(
+    args.selectedCodingConvention
+  );
+  const [fileVersion, setFileVersion] = useState<"current" | "HEAD">(
+    args.fileVersion || "current"
+  );
   const [includedFiles, setIncludedFiles] = useState<
     { path: string; includeOption: "source" | "declaration" }[]
   >(
-    args.files.map((file) => ({
-      path: file.path,
-      includeOption: "source",
-    }))
+    args.includedFiles ||
+      args.files.map((file) => ({
+        path: file.path,
+        includeOption: "source",
+      }))
   );
 
   useEffect(() => {
@@ -45,7 +50,7 @@ export function Generate() {
     if (includedFiles.length >= 1) {
       const fileExtension = getFileExtension(includedFiles[0].path);
       if (includedFiles.every((x) => x.path.endsWith(fileExtension))) {
-        const matchingConvention = args.conventions.find((convention) => {
+        const matchingConvention = args.codingConventions.find((convention) => {
           return convention.extension === fileExtension;
         });
 
@@ -77,7 +82,7 @@ export function Generate() {
         : undefined;
 
     if (targetExtension) {
-      const matchingConvention = args.conventions.find((convention) => {
+      const matchingConvention = args.codingConventions.find((convention) => {
         return convention.extension === targetExtension;
       });
 
@@ -197,7 +202,7 @@ export function Generate() {
             <VSCodeOption key="none" value="None">
               None
             </VSCodeOption>
-            {args.conventions.map((item) => (
+            {args.codingConventions.map((item) => (
               <VSCodeOption key={item.filename} value={item.filename}>
                 {item.description}
               </VSCodeOption>
