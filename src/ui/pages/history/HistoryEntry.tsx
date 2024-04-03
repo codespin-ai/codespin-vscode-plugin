@@ -50,7 +50,7 @@ export function HistoryEntry() {
     const regenerateArgs: RegeneratePageArgs = {
       model: userInput.model,
       codegenTargets: userInput.codegenTargets,
-      prompt: args.entry.unevaluatedPrompt,
+      prompt: args.entry.prompt,
       codingConvention: userInput.codingConvention,
       fileVersion: userInput.fileVersion,
       includedFiles: userInput.includedFiles,

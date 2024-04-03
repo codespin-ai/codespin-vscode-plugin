@@ -19,7 +19,6 @@ export type HistoryEntry = {
   userInput: UserInput;
   prompt: string;
   rawPrompt: string;
-  unevaluatedPrompt: string;
 };
 
 export type FullHistoryEntry = {

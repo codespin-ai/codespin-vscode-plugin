@@ -121,13 +121,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               const { type: unused1, ...messageSansType } =
                 message as EventTemplate<ArgsFromGeneratePanel>;
 
-              await writeHistoryItem(
-                messageSansType.prompt,
-                "unevaluated-prompt.txt",
-                result.dirName,
-                workspaceRoot
-              );
-
               await writeUserInput(
                 result.dirName,
                 messageSansType as ArgsFromGeneratePanel,

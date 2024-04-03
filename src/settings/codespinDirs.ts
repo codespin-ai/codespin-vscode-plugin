@@ -4,7 +4,7 @@ export async function getCodespinDir(workspaceRoot: string) {
   return path.join(workspaceRoot, ".codespin");
 }
 
-export async function getConventionsDir(workspaceRoot: string) {
+export async function getCodingConventionsDir(workspaceRoot: string) {
   return path.join(await getCodespinDir(workspaceRoot), "conventions");
 }
 

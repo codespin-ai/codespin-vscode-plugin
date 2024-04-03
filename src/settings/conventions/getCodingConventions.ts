@@ -1,15 +1,14 @@
-import { existsSync, readdirSync, readFileSync } from "fs";
-import { join } from "path";
-import matter = require("gray-matter");
-import { CodingConvention } from "./CodingConvention.js";
-import { getConventionsDir } from "../codespinDirs.js";
 import { readdir, readFile } from "fs/promises";
+import { join } from "path";
 import { pathExists } from "../../fs/pathExists.js";
+import { getCodingConventionsDir } from "../codespinDirs.js";
+import { CodingConvention } from "./CodingConvention.js";
+import matter = require("gray-matter");
 
 export async function getConventions(
   workspaceRoot: string
 ): Promise<Array<CodingConvention>> {
-  const conventionsDir = await getConventionsDir(workspaceRoot);
+  const conventionsDir = await getCodingConventionsDir(workspaceRoot);
 
   return (await pathExists(conventionsDir))
     ? await Promise.all(

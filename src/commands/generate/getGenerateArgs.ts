@@ -8,10 +8,10 @@ import * as vscode from "vscode";
 import { EventTemplate } from "../../EventTemplate.js";
 import { pathExists } from "../../fs/pathExists.js";
 import { getAPIConfigPath } from "../../settings/api/getAPIConfigPath.js";
-import { processConvention } from "../../settings/conventions/processCodingConvention.js";
 import { initialize } from "../../settings/initialize.js";
 import { isInitialized } from "../../settings/isInitialized.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
+import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 
 type Result =
   | {
@@ -28,7 +28,7 @@ type Result =
     };
 
 export async function getGenerateArgs(
-  unprocessedArgsFromPanel: EventTemplate<ArgsFromGeneratePanel>,
+  argsFromPanel: EventTemplate<ArgsFromGeneratePanel>,
   cancelCallback: (cancel: () => void) => void,
   workspaceRoot: string
 ): Promise<Result> {
@@ -50,7 +50,7 @@ export async function getGenerateArgs(
     }
   }
 
-  const api = unprocessedArgsFromPanel.model.split(":")[0];
+  const api = argsFromPanel.model.split(":")[0];
 
   const configFilePath = await getAPIConfigPath(api, workspaceRoot);
 
@@ -66,11 +66,6 @@ export async function getGenerateArgs(
     if (!(await pathExists(historyDirPath))) {
       await mkdir(historyDirPath, { recursive: true });
     }
-
-    const argsFromPanel = await processArgs(
-      unprocessedArgsFromPanel,
-      workspaceRoot
-    );
 
     const [vendor, model] = argsFromPanel.model.split(":");
 
@@ -93,6 +88,12 @@ export async function getGenerateArgs(
       declare: argsFromPanel.includedFiles
         .filter((f) => f.includeOption === "declaration")
         .map((f) => f.path),
+      spec: argsFromPanel.codingConvention
+        ? await getCodingConventionPath(
+            argsFromPanel.codingConvention,
+            workspaceRoot
+          )
+        : undefined,
       prompt: undefined,
       api: vendor,
       maxTokens: 4000,
@@ -124,21 +125,4 @@ export async function getGenerateArgs(
       api,
     };
   }
-}
-
-async function processArgs(
-  unprocessedArgs: EventTemplate<ArgsFromGeneratePanel>,
-  workspaceRoot: string
-): Promise<EventTemplate<ArgsFromGeneratePanel>> {
-  const args = JSON.parse(
-    JSON.stringify(unprocessedArgs)
-  ) as EventTemplate<ArgsFromGeneratePanel>;
-  if (args.codingConvention !== undefined) {
-    args.prompt = await processConvention(
-      args.prompt,
-      args.codingConvention,
-      workspaceRoot
-    );
-  }
-  return args;
 }

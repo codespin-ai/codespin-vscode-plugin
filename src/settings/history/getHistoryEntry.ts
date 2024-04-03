@@ -32,11 +32,7 @@ export async function getHistoryEntry(
     const userInputPath = path.join(entryDirPath, "user-input.json");
     const promptPath = path.join(entryDirPath, "prompt.txt");
     const rawPromptPath = path.join(entryDirPath, "raw-prompt.txt");
-    const unevaluatedPromptPath = path.join(
-      entryDirPath,
-      "unevaluated-prompt.txt"
-    );
-
+    
     const timestamp = parseInt(path.basename(entryDirName), 10);
 
     if (isNaN(timestamp)) {
@@ -58,8 +54,7 @@ export async function getHistoryEntry(
       const userInput = await readJsonFile<UserInput>(userInputPath);
       const prompt = await readTextFile(promptPath);
       const rawPrompt = await readTextFile(rawPromptPath);
-      const unevaluatedPrompt = await readTextFile(unevaluatedPromptPath);
-      return { timestamp, userInput, prompt, rawPrompt, unevaluatedPrompt };
+      return { timestamp, userInput, prompt, rawPrompt };
     } else {
       return null;
     }
