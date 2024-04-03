@@ -17,10 +17,6 @@
         "title": "CodeSpin.AI: Generate"
       },
       {
-        "command": "codespin-ai.regenerate",
-        "title": "CodeSpin.AI: Regenerate"
-      },
-      {
         "command": "codespin-ai.init",
         "title": "CodeSpin.AI: Initialize Project"
       }

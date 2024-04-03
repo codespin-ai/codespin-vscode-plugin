@@ -9,9 +9,9 @@ import {
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { diffContent } from "../../../git/diffContent.js";
-import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { HistoryEntryPageArgs } from "./HistoryEntryPageArgs.js";
+import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { RegeneratePageArgs } from "./RegeneratePageArgs.js";
 
 // HistoryEntry component definition
@@ -44,67 +44,28 @@ export function HistoryEntry() {
     fetchDiffs();
   }, [args.entry]);
 
-  // const gatherArgsForRegenerateCommand = (): RegeneratePageArgs => {
-  //   // Example data structure for files, models, conventions, and other properties.
-  //   // You will need to replace these with actual data from your component's state,
-  //   // props, or other sources as appropriate.
-  //   const files = entry.userInput.includedFiles.map((file) => ({
-  //     path: file.path,
-  //     size: undefined, // Assuming size is not readily available; set appropriately.
-  //   }));
+  const gatherArgsForRegenerateCommand = (): RegeneratePageArgs => {
+    const { userInput } = args.entry;
 
-  //   // Assuming you have a way to determine the models, selected model, and conventions.
-  //   // These could be state variables, fetched data, etc.
-  //   const models = [
-  //     { name: "ModelName1", value: "ModelValue1" },
-  //     // Add more models as necessary
-  //   ];
+    const regenerateArgs: RegeneratePageArgs = {
+      model: userInput.model,
+      codegenTargets: userInput.codegenTargets,
+      prompt: args.entry.unevaluatedPrompt,
+      codingConvention: userInput.codingConvention,
+      fileVersion: userInput.fileVersion,
+      includedFiles: userInput.includedFiles,
+    };
 
-  //   const selectedModel = "ModelName1"; // The model selected by the user or a default one
-
-  //   const conventions = [
-  //     {
-  //       filename: "ExampleFilename",
-  //       extension: ".ext",
-  //       description: "Example coding convention",
-  //     },
-  //     // Add more coding conventions as necessary
-  //   ];
-
-  //   // Optional properties, populate as needed
-  //   const prompt = entry.prompt; // Example: use the current entry's prompt
-  //   const codegenTargets = "targets"; // Placeholder, set appropriately
-  //   const codingConvention = "standard"; // Placeholder, set appropriately
-  //   const fileVersion = "current"; // or 'HEAD', depending on your use case
-  //   const includedFiles = [
-  //     {
-  //       path: "path/to/file",
-  //       includeOption: "source", // or 'declaration', as applicable
-  //     },
-  //     // Add more included files as necessary
-  //   ];
-
-  //   // Assemble the args object
-  //   return {
-  //     files,
-  //     models,
-  //     selectedModel,
-  //     conventions,
-  //     prompt,
-  //     codegenTargets,
-  //     codingConvention,
-  //     fileVersion,
-  //     includedFiles,
-  //   };
-  // };
+    return regenerateArgs;
+  };
 
   // Function to post the commit message
-  // const postCommit = () => {
-  //   getVsCodeApi().postMessage({
-  //     type: "command:codespin-ai.regenerate",
-  //     args: gatherArgsForRegenerateCommand(),
-  //   });
-  // };
+  const editClick = () => {
+    getVsCodeApi().postMessage({
+      type: "command:codespin-ai.generate",
+      args: [undefined, gatherArgsForRegenerateCommand()],
+    });
+  };
 
   // Render the component
   return (
@@ -127,11 +88,13 @@ export function HistoryEntry() {
                       borderRadius: "4px",
                     }}
                   >
-                    {args.entry.prompt}
+                    <pre style={{ margin: "0px", padding: "0px" }}>
+                      {args.entry.prompt}
+                    </pre>
                   </div>
                 </CSFormField>
                 <CSFormField>
-                  <VSCodeButton>Edit Prompt</VSCodeButton>
+                  <VSCodeButton onClick={editClick}>Edit Prompt</VSCodeButton>
                 </CSFormField>
                 {Array.from(
                   Object.keys(args.formattedFiles).map((key) => (

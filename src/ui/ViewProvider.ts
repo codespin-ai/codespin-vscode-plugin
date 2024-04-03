@@ -64,12 +64,10 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   }
 
   handleMessageFromWebview(message: any) {
-    console.log("MSG", { message });
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
       const args = message.args;
-
-      vscode.commands.executeCommand(command, args);
+      vscode.commands.executeCommand(command, ...args);
     } else {
       switch (message.type) {
         case "webviewReady":

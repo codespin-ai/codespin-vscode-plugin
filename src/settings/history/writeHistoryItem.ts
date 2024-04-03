@@ -2,17 +2,18 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { getHistoryDir } from "../codespinDirs.js";
 
-export async function writePrompt(
+export async function writeHistoryItem(
+  content: string,
+  filename: string,
   dirName: string,
-  prompt: string,
   workspaceRoot: string
 ) {
   const historyDir = await getHistoryDir(workspaceRoot);
-  const promptPath = path.join(historyDir, dirName, "prompt.txt");
+  const filePath = path.join(historyDir, dirName, filename);
 
-  await fs.mkdir(path.dirname(promptPath), {
+  await fs.mkdir(path.dirname(filePath), {
     recursive: true,
   });
 
-  await fs.writeFile(promptPath, prompt);
+  await fs.writeFile(filePath, content);
 }

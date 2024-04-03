@@ -65,7 +65,7 @@ export class UIPanel {
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
       const args = message.args;
-      vscode.commands.executeCommand(command, args);
+      vscode.commands.executeCommand(command, ...args);
     } else {
       switch (message.type) {
         case "webviewReady":

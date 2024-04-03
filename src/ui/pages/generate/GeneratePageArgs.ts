@@ -5,7 +5,7 @@ export type GeneratePageArgs = {
   models: { name: string; value: string }[];
   codingConventions: Array<CodingConvention>;
   selectedModel: string;
-  selectedCodingConvention: string | undefined;
+  codingConvention: string | undefined;
   prompt: string;
   codegenTargets: string;
   fileVersion: "current" | "HEAD";

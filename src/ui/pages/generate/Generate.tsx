@@ -27,7 +27,7 @@ export function Generate() {
     args.codegenTargets || ":prompt"
   );
   const [codingConvention, setCodingConvention] = useState<string | undefined>(
-    args.selectedCodingConvention
+    args.codingConvention
   );
   const [fileVersion, setFileVersion] = useState<"current" | "HEAD">(
     args.fileVersion || "current"
@@ -62,7 +62,7 @@ export function Generate() {
       }
     }
 
-    const promptTextArea = promptRef.current;
+    const promptTextArea = promptRef.current;    
     if (promptTextArea) {
       promptTextArea.focus();
       promptTextArea.addEventListener("keydown", handlePromptTextAreaKeyDown);
@@ -158,7 +158,8 @@ export function Generate() {
             onChange={(e: React.FormEvent<HTMLTextAreaElement>) =>
               setPrompt(e.currentTarget.value)
             }
-          />
+            value={prompt}
+          ></VSCodeTextArea>
         </CSFormField>
         <CSFormField>
           <VSCodeButton onClick={handleGenerateClick}>

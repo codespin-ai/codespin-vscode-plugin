@@ -6,23 +6,23 @@ import { EventTemplate } from "../../EventTemplate.js";
 import { getDefaultModel } from "../../models/getDefaultModel.js";
 import { getModels } from "../../models/getModels.js";
 import { createAPIConfig } from "../../settings/api/createAPIConfig.js";
-import { getConventions } from "../../settings/conventions/getConventions.js";
+import { getConventions } from "../../settings/conventions/getCodingConventions.js";
 import { writeGeneratedFiles } from "../../settings/history/writeGeneratedFiles.js";
 import { UIPanel } from "../../ui/UIPanel.js";
 import { GeneratePageArgs } from "../../ui/pages/generate/GeneratePageArgs.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
-import { writePrompt } from "../../settings/history/writePrompt.js";
-import { writeRawPrompt } from "../../settings/history/writeRawPrompt.js";
 import { writeUserInput } from "../../settings/history/writeUserInput.js";
+import { RegeneratePageArgs } from "../../ui/pages/history/RegeneratePageArgs.js";
+import { writeHistoryItem } from "../../settings/history/writeHistoryItem.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
     _: unknown,
-    uris: vscode.Uri[]
+    commandArgs: vscode.Uri[] | RegeneratePageArgs
   ): Promise<void> {
-    if (!uris) {
+    if (!commandArgs) {
       return;
     }
 
@@ -30,37 +30,65 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
     const workspaceRoot = getWorkspaceRoot(context);
 
-    const fileDetails = (
-      await Promise.all(
-        uris.map(async (uri) => {
-          const fullPath = uri.fsPath;
-          const size = (await fs.stat(fullPath)).size;
-          const relativePath = path.relative(workspaceRoot, fullPath);
-          return { path: relativePath, size };
-        })
-      )
-    ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
-
     const uiPanel = new UIPanel(context, onMessage);
 
     await uiPanel.onWebviewReady();
 
     const conventions = await getConventions(workspaceRoot);
 
-    const generatePageArgs: GeneratePageArgs = {
-      files: fileDetails,
-      codingConventions: conventions,
-      models: getModels(),
-      selectedModel: getDefaultModel(),
-      codegenTargets: ":prompt",
-      fileVersion: "current",
-      includedFiles: uris.map((x) => ({
-        includeOption: "source",
-        path: path.relative(workspaceRoot, x.fsPath),
-      })),
-      prompt: "",
-      selectedCodingConvention: undefined,
-    };
+    const generatePageArgs: GeneratePageArgs = Array.isArray(commandArgs)
+      ? await (async () => {
+          const fileDetails = (
+            await Promise.all(
+              commandArgs.map(async (x) => {
+                const fullPath = x.fsPath;
+                const size = (await fs.stat(fullPath)).size;
+                const relativePath = path.relative(workspaceRoot, fullPath);
+                return { path: relativePath, size };
+              })
+            )
+          ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
+
+          return {
+            files: fileDetails,
+            codingConventions: conventions,
+            models: getModels(),
+            selectedModel: getDefaultModel(),
+            codegenTargets: ":prompt",
+            fileVersion: "current",
+            includedFiles: commandArgs.map((x) => ({
+              includeOption: "source",
+              path: path.relative(workspaceRoot, x.fsPath),
+            })),
+            prompt: "",
+            codingConvention: undefined,
+          };
+        })()
+      : await (async () => {
+          const fileDetails = (
+            await Promise.all(
+              commandArgs.includedFiles.map(async (x) => {
+                const fullPath = path.resolve(workspaceRoot, x.path);
+                const size = (await fs.stat(fullPath)).size;
+                const relativePath = path.relative(workspaceRoot, fullPath);
+                return { path: relativePath, size };
+              })
+            )
+          ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
+
+          const args: GeneratePageArgs = {
+            files: fileDetails,
+            codingConventions: conventions,
+            models: getModels(),
+            selectedModel: commandArgs.model,
+            codegenTargets: commandArgs.codegenTargets,
+            fileVersion: commandArgs.fileVersion,
+            includedFiles: commandArgs.includedFiles,
+            prompt: commandArgs.prompt,
+            codingConvention: commandArgs.codingConvention?.filename,
+          };
+          return args;
+        })();
 
     let cancelGeneration: (() => void) | undefined = undefined;
 
@@ -83,13 +111,22 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
           switch (result.status) {
             case "can_generate":
-              await writePrompt(
-                result.dirName,
+              await writeHistoryItem(
                 generateArgs.prompt,
+                "prompt.txt",
+                result.dirName,
                 workspaceRoot
               );
 
-              const { type: unused1, ...messageSansType } = message;
+              const { type: unused1, ...messageSansType } =
+                message as EventTemplate<ArgsFromGeneratePanel>;
+
+              await writeHistoryItem(
+                messageSansType.prompt,
+                "unevaluated-prompt.txt",
+                result.dirName,
+                workspaceRoot
+              );
 
               await writeUserInput(
                 result.dirName,
@@ -103,7 +140,12 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               });
 
               result.args.promptCallback = async (prompt) => {
-                await writeRawPrompt(result.dirName, prompt, workspaceRoot);
+                await writeHistoryItem(
+                  prompt,
+                  "raw-prompt.txt",
+                  result.dirName,
+                  workspaceRoot
+                );
               };
 
               result.args.responseStreamCallback = (text) => {

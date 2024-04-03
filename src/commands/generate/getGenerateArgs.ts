@@ -2,17 +2,16 @@ import {
   GenerateArgs as CodespinGenerateArgs,
   GenerateArgs,
 } from "codespin/dist/commands/generate.js";
+import { mkdir } from "fs/promises";
 import * as path from "path";
 import * as vscode from "vscode";
 import { EventTemplate } from "../../EventTemplate.js";
+import { pathExists } from "../../fs/pathExists.js";
+import { getAPIConfigPath } from "../../settings/api/getAPIConfigPath.js";
+import { processConvention } from "../../settings/conventions/processCodingConvention.js";
 import { initialize } from "../../settings/initialize.js";
 import { isInitialized } from "../../settings/isInitialized.js";
-import { getAPIConfigPath } from "../../settings/api/getAPIConfigPath.js";
-import { processConvention } from "../../settings/conventions/processConvention.js";
-import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
-import { pathExists } from "../../fs/pathExists.js";
-import { mkdir, writeFile } from "fs/promises";
 
 type Result =
   | {
@@ -128,9 +127,12 @@ export async function getGenerateArgs(
 }
 
 async function processArgs(
-  args: EventTemplate<ArgsFromGeneratePanel>,
+  unprocessedArgs: EventTemplate<ArgsFromGeneratePanel>,
   workspaceRoot: string
 ): Promise<EventTemplate<ArgsFromGeneratePanel>> {
+  const args = JSON.parse(
+    JSON.stringify(unprocessedArgs)
+  ) as EventTemplate<ArgsFromGeneratePanel>;
   if (args.codingConvention !== undefined) {
     args.prompt = await processConvention(
       args.prompt,
