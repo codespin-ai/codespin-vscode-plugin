@@ -79,7 +79,6 @@ export class HistoryEntryPanel extends UIPanel {
   }
 
   async onMessage(message: any) {
-    console.log("MSG", message);
     switch (message.type) {
       case "cancel":
         this.dispose();

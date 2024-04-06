@@ -69,8 +69,6 @@ export abstract class UIPanel {
   }
 
   onDidReceiveMessageBase(message: any) {
-    console.log("ROOT MSG", message);
-
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
       const args = message.args;

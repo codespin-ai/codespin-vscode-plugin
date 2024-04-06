@@ -250,8 +250,6 @@ export class GeneratePanel extends UIPanel {
       "codespin-ai.enableIncludeFilesMenuItem",
       activePanel !== undefined
     );
-
-    console.log("ACTPANEL", activePanel !== undefined, activePanel === this);
   }
 
   onDispose(): void {
