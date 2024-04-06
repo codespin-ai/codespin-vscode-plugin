@@ -69,6 +69,8 @@ export abstract class UIPanel {
   }
 
   onDidReceiveMessageBase(message: any) {
+    console.log("ROOT MSG", message);
+
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
       const args = message.args;
@@ -77,12 +79,14 @@ export abstract class UIPanel {
       switch (message.type) {
         case "webviewReady":
           this.resolveWebviewReady();
+          break;
         case "navigated":
           const resolver = this.navigationPromiseResolvers.get(message.url);
           if (resolver) {
             resolver();
             this.navigationPromiseResolvers.delete(message.url);
           }
+          break;
       }
     }
 

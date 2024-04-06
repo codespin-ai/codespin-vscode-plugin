@@ -4,12 +4,12 @@ import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
 import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
 import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
-import { History } from "./pages/history/History.js";
 import { Generate } from "./html/pages/generate/Generate.js";
 import { GenerateStream } from "./html/pages/generate/GenerateStream.js";
 import { EditConfig } from "./html/pages/api/EditConfig.js";
 import { HistoryEntry } from "./html/pages/history/HistoryEntry.js";
 import { Initialize } from "./html/pages/initialize/Initialize.js";
+import { History } from "./html/pages/history/History.js";
 
 function App() {
   React.useEffect(() => {

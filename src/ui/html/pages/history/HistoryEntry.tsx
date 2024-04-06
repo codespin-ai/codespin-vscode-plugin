@@ -60,11 +60,14 @@ export function HistoryEntry() {
   };
 
   // Function to post the commit message
-  const editClick = () => {
+  const onEditClick = () => {
     getVsCodeApi().postMessage({
       type: "command:codespin-ai.generate",
       args: [undefined, gatherArgsForRegenerateCommand()],
     });
+    getVsCodeApi().postMessage({
+      type: "cancel",
+    });    
   };
 
   // Render the component
@@ -94,7 +97,7 @@ export function HistoryEntry() {
                   </div>
                 </CSFormField>
                 <CSFormField>
-                  <VSCodeButton onClick={editClick}>Edit Prompt</VSCodeButton>
+                  <VSCodeButton onClick={onEditClick}>Edit Prompt</VSCodeButton>
                 </CSFormField>
                 {Array.from(
                   Object.keys(args.formattedFiles).map((key) => (

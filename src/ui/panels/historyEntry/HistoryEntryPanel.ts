@@ -76,15 +76,17 @@ export class HistoryEntryPanel extends UIPanel {
 
       await this.navigateTo("/history/entry", pageArgs);
     }
+  }
 
-    async function onMessage(message: any) {
-      switch (message.type) {
-        case "historyItemAction":
-          break;
-        default:
-          console.log("Unhandled message type from webview:", message.type);
-          break;
-      }
+  async onMessage(message: any) {
+    console.log("MSG", message);
+    switch (message.type) {
+      case "cancel":
+        this.dispose();
+        break;
+      default:
+        console.log("Unhandled message type from webview:", message.type);
+        break;
     }
   }
 }
