@@ -193,7 +193,6 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           await onMessage(generateArgs!);
           break;
         case "modelChange":
-          console.log("CHANGING MODEL", message);
           await setDefaultModel(
             (message as EventTemplate<ModelChange>).model,
             workspaceRoot
