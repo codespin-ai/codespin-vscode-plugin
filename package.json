@@ -17,6 +17,10 @@
         "title": "CodeSpin.AI: Generate"
       },
       {
+        "command": "codespin-ai.includeFilesMenuItem",
+        "title": "CodeSpin.AI: Include Files"
+      },
+      {
         "command": "codespin-ai.init",
         "title": "CodeSpin.AI: Initialize Project"
       }
@@ -26,6 +30,11 @@
         {
           "command": "codespin-ai.generate",
           "group": "codespin-ai"
+        },
+        {
+          "command": "codespin-ai.includeFilesMenuItem",
+          "group": "codespin-ai",
+          "when": "codespin-ai.enableIncludeFilesMenuItem"
         },
         {
           "submenu": "codespin-ai.more",
