@@ -27,7 +27,7 @@ export function GenerateStream() {
           const { prompt } = incomingMessage;
           setPrompt(prompt);
           return;
-        case "responseStream":
+        case "onResponseStream":
           const { data: chunk } = incomingMessage;
           data = data + chunk;
           setData(data);
