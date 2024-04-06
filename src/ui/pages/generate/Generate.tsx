@@ -15,6 +15,7 @@ import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
 import { Dropdown, TextArea } from "@vscode/webview-ui-toolkit";
+import { ModelChange } from "../../../commands/generate/ModelChange.js";
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();
@@ -62,7 +63,7 @@ export function Generate() {
       }
     }
 
-    const promptTextArea = promptRef.current;    
+    const promptTextArea = promptRef.current;
     if (promptTextArea) {
       promptTextArea.focus();
       promptTextArea.addEventListener("keydown", handlePromptTextAreaKeyDown);
@@ -95,6 +96,15 @@ export function Generate() {
       setCodingConvention(undefined);
     }
   }, [codegenTargets]);
+
+  function handleModelChange(e: any) {
+    setModel(e.target.value);
+    const message: EventTemplate<ModelChange> = {
+      type: "modelChange",
+      model,
+    };
+    vsCodeApi.postMessage(message);
+  }
 
   function handleGenerateClick() {
     const message: EventTemplate<ArgsFromGeneratePanel> = {
@@ -133,17 +143,17 @@ export function Generate() {
       <form id="mainform">
         <CSFormField label={{ text: "Model" }}>
           <VSCodeDropdown
-            items={args.models.map((x) => ({
-              text: x.name,
-              value: x.value,
+            items={Object.keys(args.models).map((x) => ({
+              text: x,
+              value: args.models[x],
             }))}
             currentValue={model}
             style={{ width: "180px" }}
-            onChange={(e: any) => setModel(e.target.value)}
+            onChange={handleModelChange}
           >
-            {args.models.map((item) => (
-              <VSCodeOption key={item.value} value={item.value}>
-                {item.name}
+            {Object.keys(args.models).map((x) => (
+              <VSCodeOption key={x} value={args.models[x]}>
+                {x}
               </VSCodeOption>
             ))}
           </VSCodeDropdown>

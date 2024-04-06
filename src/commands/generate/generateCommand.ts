@@ -52,8 +52,8 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           return {
             files: fileDetails,
             codingConventions: conventions,
-            models: getModels(),
-            selectedModel: getDefaultModel(),
+            models: await getModels(workspaceRoot),
+            selectedModel: await getDefaultModel(workspaceRoot),
             codegenTargets: ":prompt",
             fileVersion: "current",
             includedFiles: commandArgs.map((x) => ({
@@ -79,7 +79,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           const args: GeneratePageArgs = {
             files: fileDetails,
             codingConventions: conventions,
-            models: getModels(),
+            models: await getModels(workspaceRoot),
             selectedModel: commandArgs.model,
             codegenTargets: commandArgs.codegenTargets,
             fileVersion: commandArgs.fileVersion,
@@ -133,6 +133,11 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               });
 
               result.args.promptCallback = async (prompt) => {
+                uiPanel.postMessageToWebview({
+                  type: "onPrompt",
+                  prompt,
+                });
+
                 await writeHistoryItem(
                   prompt,
                   "raw-prompt.txt",
@@ -143,7 +148,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
               result.args.responseStreamCallback = (text) => {
                 uiPanel.postMessageToWebview({
-                  type: "generate:stream:response",
+                  type: "onResponseStream",
                   data: text,
                 });
               };
