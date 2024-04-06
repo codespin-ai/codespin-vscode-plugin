@@ -23,11 +23,11 @@ export function GenerateStream() {
     function listeners(event: any) {
       const incomingMessage = event.data;
       switch (incomingMessage.type) {
-        case "onPrompt":
+        case "promptCreated":
           const { prompt } = incomingMessage;
           setPrompt(prompt);
           return;
-        case "onResponseStream":
+        case "responseStream":
           const { data: chunk } = incomingMessage;
           data = data + chunk;
           setData(data);

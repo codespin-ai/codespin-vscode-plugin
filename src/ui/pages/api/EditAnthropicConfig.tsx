@@ -6,21 +6,16 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
-import { EditAPIConfigArgs } from "../../../commands/generate/EditAPIConfigArgs.js";
 import { EventTemplate } from "../../../EventTemplate.js";
+import { AnthropicConfigArgs } from "../../../settings/api/editAnthropicConfig.js";
 
-type EditAnthropicConfigProps = {
-  apiKey: string;
-};
-
-export function EditAnthropicConfig(props: EditAnthropicConfigProps) {
+export function EditAnthropicConfig(props: AnthropicConfigArgs) {
   const vsCodeApi = getVsCodeApi();
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
 
   function handleSave() {
-    const message: EventTemplate<EditAPIConfigArgs> = {
-      type: "provider:editConfig",
-      api: "anthropic",
+    const message: EventTemplate<AnthropicConfigArgs> = {
+      type: "editAnthropicConfig",
       apiKey,
     };
     vsCodeApi.postMessage(message);

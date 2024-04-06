@@ -5,7 +5,6 @@ import * as vscode from "vscode";
 import { EventTemplate } from "../../EventTemplate.js";
 import { getDefaultModel } from "../../models/getDefaultModel.js";
 import { getModels } from "../../models/getModels.js";
-import { createAPIConfig } from "../../settings/api/createAPIConfig.js";
 import { getConventions } from "../../settings/conventions/getCodingConventions.js";
 import { writeGeneratedFiles } from "../../settings/history/writeGeneratedFiles.js";
 import { UIPanel } from "../../ui/UIPanel.js";
@@ -16,6 +15,16 @@ import { getGenerateArgs } from "./getGenerateArgs.js";
 import { writeUserInput } from "../../settings/history/writeUserInput.js";
 import { RegeneratePageArgs } from "../../ui/pages/history/RegeneratePageArgs.js";
 import { writeHistoryItem } from "../../settings/history/writeHistoryItem.js";
+import { setDefaultModel } from "../../models/setDefaultModel.js";
+import { ModelChange } from "./ModelChange.js";
+import {
+  AnthropicConfigArgs,
+  editAnthropicConfig,
+} from "../../settings/api/editAnthropicConfig.js";
+import {
+  OpenAIConfigArgs,
+  editOpenAIConfig,
+} from "../../settings/api/editOpenAIConfig.js";
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
@@ -134,7 +143,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
               result.args.promptCallback = async (prompt) => {
                 uiPanel.postMessageToWebview({
-                  type: "onPrompt",
+                  type: "promptCreated",
                   prompt,
                 });
 
@@ -148,7 +157,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
 
               result.args.responseStreamCallback = (text) => {
                 uiPanel.postMessageToWebview({
-                  type: "onResponseStream",
+                  type: "responseStream",
                   data: text,
                 });
               };
@@ -173,9 +182,22 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
               break;
           }
           break;
-        case "api:editConfig":
-          await createAPIConfig(message as any);
+        case "editAnthropicConfig":
+          await editAnthropicConfig(
+            message as EventTemplate<AnthropicConfigArgs>
+          );
           await onMessage(generateArgs!);
+          break;
+        case "editOpenAIConfig":
+          await editOpenAIConfig(message as EventTemplate<OpenAIConfigArgs>);
+          await onMessage(generateArgs!);
+          break;
+        case "modelChange":
+          console.log("CHANGING MODEL", message);
+          await setDefaultModel(
+            (message as EventTemplate<ModelChange>).model,
+            workspaceRoot
+          );
           break;
         case "cancel":
           if (cancelGeneration) {
