@@ -1,12 +1,9 @@
 import { promises as fs } from "fs";
 import * as path from "path";
-import {
-  FullHistoryEntry,
-  HistoryEntry,
-  UserInput,
-} from "../../viewProviders/history/types.js";
+
 import { getHistoryDir } from "../codespinDirs.js";
 import { readGeneratedFiles } from "./readGeneratedFiles.js";
+import { FullHistoryEntry, HistoryEntry, UserInput } from "../../ui/viewProviders/history/types.js";
 
 // Functional style utility functions
 async function readJsonFile<T>(filePath: string): Promise<T> {
@@ -32,7 +29,7 @@ export async function getHistoryEntry(
     const userInputPath = path.join(entryDirPath, "user-input.json");
     const promptPath = path.join(entryDirPath, "prompt.txt");
     const rawPromptPath = path.join(entryDirPath, "raw-prompt.txt");
-    
+
     const timestamp = parseInt(path.basename(entryDirName), 10);
 
     if (isNaN(timestamp)) {

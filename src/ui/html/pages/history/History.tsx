@@ -1,9 +1,9 @@
 import * as React from "react";
-import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
-import { EventTemplate } from "../../EventTemplate.js";
-import { SelectHistoryEntryArgs } from "../../panels/historyEntry/SelectHistoryEntryArgs.js";
-import { HistoryPageArgs } from "../../html/pages/history/HistoryPageArgs.js";
-import { HistoryEntry } from "../../viewProviders/history/types.js";
+import { HistoryPageArgs } from "./HistoryPageArgs";
+import { HistoryEntry } from "../../../viewProviders/history/types";
+import { EventTemplate } from "../../../EventTemplate.js";
+import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { SelectHistoryEntryArgs } from "../../../panels/historyEntry/SelectHistoryEntryArgs.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
 

@@ -1,11 +1,12 @@
 import * as vscode from "vscode";
+import { ViewProvider } from "../ViewProvider.js";
 import { EventTemplate } from "../../EventTemplate.js";
-import { initialize } from "../../settings/initialize.js";
-import { isInitialized } from "../../settings/isInitialized.js";
-import { ViewProvider } from "../../ui/ViewProvider.js";
-import { HistoryPageArgs } from "../../ui/pages/history/HistoryPageArgs.js";
-import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { getHistory } from "../../settings/history/getHistory.js";
+import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
+import { isInitialized } from "../../../settings/isInitialized.js";
+import { HistoryPageArgs } from "../../html/pages/history/HistoryPageArgs.js";
+import { getHistory } from "../../../settings/history/getHistory.js";
+import { initialize } from "../../../settings/initialize.js";
+
 
 export class HistoryViewProvider extends ViewProvider {
   constructor(context: vscode.ExtensionContext) {

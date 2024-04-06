@@ -1,4 +1,4 @@
-import { CodingConvention } from "../../../settings/conventions/CodingConvention.js";
+import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
 
 export type RegeneratePageArgs = {
   model: string;

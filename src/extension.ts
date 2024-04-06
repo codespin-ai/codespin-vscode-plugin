@@ -2,10 +2,10 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
-import { getGenerateCommand } from "./commands/generate/generateCommand.js";
+import { getGenerateCommand } from "./commands/generate/command.js";
 import { getInitCommand } from "./commands/init/command.js";
-import { HistoryViewProvider } from "./viewProviders/history/HistoryViewProvider.js";
 import { getSelectHistoryEntryCommand } from "./commands/selectHistoryEntry/command.js";
+import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvider.js";
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed

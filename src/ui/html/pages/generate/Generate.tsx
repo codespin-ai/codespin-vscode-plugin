@@ -8,14 +8,14 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useState, useEffect, useRef } from "react"; // Import useRef
-import { EventTemplate } from "../../../EventTemplate.js";
-import { ArgsFromGeneratePanel } from "../../../commands/generate/ArgsFromGeneratePanel.js";
-import { formatFileSize } from "../../../text/formatFileSize.js";
-import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
 import { Dropdown, TextArea } from "@vscode/webview-ui-toolkit";
-import { ModelChange } from "../../../commands/generate/ModelChange.js";
+import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { ArgsFromGeneratePanel } from "../../../panels/generate/ArgsFromGeneratePanel.js";
+import { EventTemplate } from "../../../EventTemplate.js";
+import { ModelChange } from "../../../panels/generate/ModelChange.js";
+import { formatFileSize } from "../../../../text/formatFileSize.js";
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();

@@ -8,11 +8,11 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { diffContent } from "../../../git/diffContent.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { HistoryEntryPageArgs } from "./HistoryEntryPageArgs.js";
-import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { RegeneratePageArgs } from "./RegeneratePageArgs.js";
+import { diffContent } from "../../../../git/diffContent.js";
+import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 
 // HistoryEntry component definition
 export function HistoryEntry() {

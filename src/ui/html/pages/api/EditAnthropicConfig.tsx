@@ -1,25 +1,21 @@
+import * as React from "react";
+import { useState } from "react";
 import {
   VSCodeButton,
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react/index.js";
-import * as React from "react";
-import { useState } from "react";
-import { EventTemplate } from "../../../EventTemplate.js";
-import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { OpenAIConfigArgs } from "../../../settings/api/editOpenAIConfig.js";
+import { EventTemplate } from "../../../EventTemplate.js";
+import { AnthropicConfigArgs } from "../../../../settings/api/editAnthropicConfig.js";
+import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 
-interface EditOpenAIConfigProps {
-  apiKey: string;
-}
-
-export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
+export function EditAnthropicConfig(props: AnthropicConfigArgs) {
   const vsCodeApi = getVsCodeApi();
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
 
   function handleSave() {
-    const message: EventTemplate<OpenAIConfigArgs> = {
-      type: "editOpenAIConfig",
+    const message: EventTemplate<AnthropicConfigArgs> = {
+      type: "editAnthropicConfig",
       apiKey,
     };
     vsCodeApi.postMessage(message);
@@ -27,15 +23,15 @@ export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
 
   return (
     <div>
-      {apiKey === "" ? (
-        <h1>Configure OpenAI Keys</h1>
+      {!props.apiKey ? (
+        <h1>Configure Anthropic Keys</h1>
       ) : (
-        <h1>OpenAI API Config</h1>
+        <h1>Anthropic API Config</h1>
       )}
-      {apiKey === "" ? (
+      {!props.apiKey ? (
         <p>
           You need to set up OpenAI API keys. This will be stored in
-          .codespin/openai.json
+          .codespin/anthropic.json
         </p>
       ) : (
         <></>
@@ -47,7 +43,7 @@ export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
         />
       </CSFormField>
       <CSFormField>
-        <VSCodeButton onClick={handleSave}>Proceed</VSCodeButton>
+        <VSCodeButton onClick={handleSave}>Save</VSCodeButton>
       </CSFormField>
     </div>
   );

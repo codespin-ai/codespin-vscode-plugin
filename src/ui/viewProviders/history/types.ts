@@ -1,5 +1,5 @@
 import { GeneratedSourceFile } from "codespin/dist/sourceCode/GeneratedSourceFile.js";
-import { CodingConvention } from "../../settings/conventions/CodingConvention.js";
+import { CodingConvention } from "../../../settings/conventions/CodingConvention.js";
 
 export type UserInput = {
   type: string;

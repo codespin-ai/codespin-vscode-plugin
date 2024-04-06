@@ -4,8 +4,8 @@ import {
   VSCodeProgressRing,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { getVsCodeApi } from "../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
+import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 
 type GenerateStreamArgs = {
   api: string;

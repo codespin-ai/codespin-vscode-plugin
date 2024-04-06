@@ -1,21 +1,19 @@
+import { randomInt } from "crypto";
 import * as vscode from "vscode";
-import { getWebviewContent } from "./getWebviewContent.js";
-import { MessageHandler } from "./MessageHandler.js";
+import { getWebviewContent } from "../getWebviewContent.js";
 
-export class UIPanel {
+export abstract class UIPanel {
   context: vscode.ExtensionContext;
   disposables: vscode.Disposable[] = [];
   panel: vscode.WebviewPanel;
   webviewReadyPromise: Promise<void>;
   resolveWebviewReady: () => void = () => {};
   navigationPromiseResolvers: Map<string, () => void>;
-  onMessage: MessageHandler;
   isDisposed: boolean;
 
-  constructor(context: vscode.ExtensionContext, onMessage: MessageHandler) {
+  constructor(context: vscode.ExtensionContext) {
     this.navigationPromiseResolvers = new Map();
     this.context = context;
-    this.onMessage = onMessage;
     this.isDisposed = false;
     this.panel = vscode.window.createWebviewPanel(
       "codespin-panel",
@@ -30,6 +28,8 @@ export class UIPanel {
       }
     );
 
+    (this.panel as any).id = randomInt(100000);
+
     this.panel.webview.html = getWebviewContent(
       this.panel.webview,
       this.context.extensionUri,
@@ -41,7 +41,14 @@ export class UIPanel {
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
     this.panel.webview.onDidReceiveMessage(
-      (message) => this.handleMessageFromWebview(message),
+      (message) => this.onDidReceiveMessageBase(message),
+      null,
+      this.disposables
+    );
+
+    // Added to log when the panel is opened or brought to the front
+    this.panel.onDidChangeViewState(
+      (e) => this.onDidChangeViewState(e),
       null,
       this.disposables
     );
@@ -61,7 +68,7 @@ export class UIPanel {
     return this.webviewReadyPromise;
   }
 
-  handleMessageFromWebview(message: any) {
+  onDidReceiveMessageBase(message: any) {
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
       const args = message.args;
@@ -78,7 +85,8 @@ export class UIPanel {
           }
       }
     }
-    this.onMessage(message);
+
+    this.onDidReceiveMessage(message);
   }
 
   postMessageToWebview(message: any) {
@@ -98,7 +106,7 @@ export class UIPanel {
     });
   }
 
-  public dispose() {
+  dispose() {
     this.isDisposed = true;
     this.panel.dispose();
 
@@ -108,5 +116,12 @@ export class UIPanel {
         disposable.dispose();
       }
     }
+
+    this.onDispose();
   }
+
+  // These will be overridden
+  onDidReceiveMessage(message: any): void {}
+  onDispose(): void {}
+  onDidChangeViewState(e: vscode.WebviewPanelOnDidChangeViewStateEvent): void {}
 }

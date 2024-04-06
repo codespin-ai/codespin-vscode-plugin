@@ -3,13 +3,13 @@ import { createRoot } from "react-dom/client";
 import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
 import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
-import { Generate } from "./pages/generate/Generate.js";
 import { NavigateEventArgs } from "./webviewEvents/NavigateEventArgs.js";
-import { EditConfig } from "./pages/api/EditConfig.js";
-import { GenerateStream } from "./pages/generate/GenerateStream.js";
 import { History } from "./pages/history/History.js";
-import { Initialize } from "./pages/initialize/Initialize.js";
-import { HistoryEntry } from "./pages/history/HistoryEntry.js";
+import { Generate } from "./html/pages/generate/Generate.js";
+import { GenerateStream } from "./html/pages/generate/GenerateStream.js";
+import { EditConfig } from "./html/pages/api/EditConfig.js";
+import { HistoryEntry } from "./html/pages/history/HistoryEntry.js";
+import { Initialize } from "./html/pages/initialize/Initialize.js";
 
 function App() {
   React.useEffect(() => {

@@ -1,1 +1,3 @@
-export type MessageHandler = (message: any) => void;
+import { EventTemplate } from "./EventTemplate.js";
+
+export type MessageHandler = (message: EventTemplate<unknown>) => void;

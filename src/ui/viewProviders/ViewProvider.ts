@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
-import { getWebviewContent } from "./getWebviewContent.js";
-import { SelectHistoryEntryArgs } from "../commands/selectHistoryEntry/SelectHistoryEntryArgs.js";
+import { getWebviewContent } from "../getWebviewContent.js";
 
 export abstract class ViewProvider implements vscode.WebviewViewProvider {
   private webviewView?: vscode.WebviewView;
@@ -39,7 +38,6 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     this.webviewView = webviewView;
 
     webviewView.webview.options = {
-      // Allow scripts in the webview
       enableScripts: true,
       localResourceRoots: [this.context.extensionUri],
     };
@@ -55,7 +53,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     webviewView.onDidDispose(() => this.dispose(), null, this.disposables);
 
     webviewView.webview.onDidReceiveMessage(
-      (message) => this.handleMessageFromWebview(message),
+      (message) => this.onDidReceiveMessageBase(message),
       null,
       this.disposables
     );
@@ -63,7 +61,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     this.resolveInitialize();
   }
 
-  handleMessageFromWebview(message: any) {
+  onDidReceiveMessageBase(message: any) {
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
       const args = message.args;
@@ -82,11 +80,9 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
           break;
       }
     }
-    this.onMessage(message);
-  }
 
-  abstract init(): Promise<void>;
-  abstract onMessage(data: any): void;
+    this.onDidReceiveMessage(message);
+  }
 
   getStyle() {
     return undefined;
@@ -117,7 +113,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     });
   }
 
-  public dispose() {
+  dispose() {
     this.isDisposed = true;
     this.dispose();
 
@@ -127,5 +123,11 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
         disposable.dispose();
       }
     }
+
+    this.onDispose();
   }
+
+  // These will be overridden
+  onDidReceiveMessage(message: any): void {}
+  onDispose(): void {}
 }
