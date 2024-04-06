@@ -86,7 +86,7 @@ export abstract class UIPanel {
       }
     }
 
-    this.onDidReceiveMessage(message);
+    this.onMessage(message);
   }
 
   postMessageToWebview(message: any) {
@@ -121,7 +121,7 @@ export abstract class UIPanel {
   }
 
   // These will be overridden
-  onDidReceiveMessage(message: any): void {}
+  onMessage(message: any): void {}
   onDispose(): void {}
   onDidChangeViewState(e: vscode.WebviewPanelOnDidChangeViewStateEvent): void {}
 }

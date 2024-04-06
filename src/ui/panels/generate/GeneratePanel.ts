@@ -13,7 +13,7 @@ import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import {
   GenerateArgs as CodespinGenerateArgs,
   GenerateArgs,
-  generate as codespinGenerate
+  generate as codespinGenerate,
 } from "codespin/dist/commands/generate.js";
 import { mkdir } from "fs/promises";
 import { pathExists } from "../../../fs/pathExists.js";
@@ -24,8 +24,14 @@ import { getCodingConventionPath } from "../../../settings/conventions/getCoding
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
 import { writeUserInput } from "../../../settings/history/writeUserInput.js";
 import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFiles.js";
-import { AnthropicConfigArgs, editAnthropicConfig } from "../../../settings/api/editAnthropicConfig.js";
-import { OpenAIConfigArgs, editOpenAIConfig } from "../../../settings/api/editOpenAIConfig.js";
+import {
+  AnthropicConfigArgs,
+  editAnthropicConfig,
+} from "../../../settings/api/editAnthropicConfig.js";
+import {
+  OpenAIConfigArgs,
+  editOpenAIConfig,
+} from "../../../settings/api/editOpenAIConfig.js";
 import { setDefaultModel } from "../../../models/setDefaultModel.js";
 import { ModelChange } from "./ModelChange.js";
 

@@ -81,7 +81,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
       }
     }
 
-    this.onDidReceiveMessage(message);
+    this.onMessage(message);
   }
 
   getStyle() {
@@ -128,6 +128,6 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   }
 
   // These will be overridden
-  onDidReceiveMessage(message: any): void {}
+  onMessage(message: any): void {}
   onDispose(): void {}
 }
