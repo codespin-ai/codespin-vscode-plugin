@@ -66,11 +66,11 @@ export function Generate() {
     const promptTextArea = promptRef.current;
     if (promptTextArea) {
       promptTextArea.focus();
-      promptTextArea.addEventListener("keydown", handlePromptTextAreaKeyDown);
+      promptTextArea.addEventListener("keydown", onPromptTextAreaKeyDown);
       return () => {
         promptTextArea.removeEventListener(
           "keydown",
-          handlePromptTextAreaKeyDown
+          onPromptTextAreaKeyDown
         );
       };
     }
@@ -97,7 +97,7 @@ export function Generate() {
     }
   }, [codegenTargets]);
 
-  function handleModelChange(e: any) {
+  function onModelChange(e: any) {
     setModel(e.target.value);
     const message: EventTemplate<ModelChange> = {
       type: "modelChange",
@@ -106,7 +106,7 @@ export function Generate() {
     vsCodeApi.postMessage(message);
   }
 
-  function handleGenerateClick() {
+  function onGenerateButtonClick() {
     const message: EventTemplate<ArgsFromGeneratePanel> = {
       type: "generate",
       model,
@@ -119,7 +119,7 @@ export function Generate() {
     vsCodeApi.postMessage(message);
   }
 
-  function handlePromptTextAreaKeyDown(e: KeyboardEvent) {
+  function onPromptTextAreaKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
       e.preventDefault(); // Stop the textarea from causing form submission or other default actions
       e.stopPropagation(); // Prevent the event from propagating further
@@ -149,7 +149,7 @@ export function Generate() {
             }))}
             currentValue={model}
             style={{ width: "180px" }}
-            onChange={handleModelChange}
+            onChange={onModelChange}
           >
             {Object.keys(args.models).map((x) => (
               <VSCodeOption key={x} value={args.models[x]}>
@@ -172,7 +172,7 @@ export function Generate() {
           ></VSCodeTextArea>
         </CSFormField>
         <CSFormField>
-          <VSCodeButton onClick={handleGenerateClick}>
+          <VSCodeButton onClick={onGenerateButtonClick}>
             Generate Code
           </VSCodeButton>
         </CSFormField>

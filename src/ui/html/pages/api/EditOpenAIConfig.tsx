@@ -17,7 +17,7 @@ export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
   const vsCodeApi = getVsCodeApi();
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
 
-  function handleSave() {
+  function onSave() {
     const message: EventTemplate<OpenAIConfigArgs> = {
       type: "editOpenAIConfig",
       apiKey,
@@ -47,7 +47,7 @@ export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
         />
       </CSFormField>
       <CSFormField>
-        <VSCodeButton onClick={handleSave}>Proceed</VSCodeButton>
+        <VSCodeButton onClick={onSave}>Proceed</VSCodeButton>
       </CSFormField>
     </div>
   );

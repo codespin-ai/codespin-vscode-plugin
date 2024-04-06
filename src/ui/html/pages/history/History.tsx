@@ -66,8 +66,7 @@ export function History() {
 
   const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
 
-  // Function to handle click events
-  const handleItemClick = (timestamp: number) => {
+  const onItemClick = (timestamp: number) => {
     const vsCodeApi = getVsCodeApi();
     const message: EventTemplate<{ args: [SelectHistoryEntryArgs] }> = {
       type: "command:codespin-ai.selectHistoryEntry",
@@ -95,7 +94,7 @@ export function History() {
                     key={entryIndex}
                     onMouseEnter={() => setHoveredItemId(itemId)}
                     onMouseLeave={() => setHoveredItemId(null)}
-                    onClick={() => handleItemClick(entry.timestamp)}
+                    onClick={() => onItemClick(entry.timestamp)}
                     style={{
                       marginBottom: "1em",
                       cursor: "pointer",

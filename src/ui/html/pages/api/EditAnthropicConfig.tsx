@@ -13,7 +13,7 @@ export function EditAnthropicConfig(props: AnthropicConfigArgs) {
   const vsCodeApi = getVsCodeApi();
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
 
-  function handleSave() {
+  function onSave() {
     const message: EventTemplate<AnthropicConfigArgs> = {
       type: "editAnthropicConfig",
       apiKey,
@@ -43,7 +43,7 @@ export function EditAnthropicConfig(props: AnthropicConfigArgs) {
         />
       </CSFormField>
       <CSFormField>
-        <VSCodeButton onClick={handleSave}>Save</VSCodeButton>
+        <VSCodeButton onClick={onSave}>Save</VSCodeButton>
       </CSFormField>
     </div>
   );
