@@ -39,7 +39,7 @@ export function EditAnthropicConfig(props: AnthropicConfigArgs) {
       <CSFormField label={{ text: "API Key:" }}>
         <VSCodeTextField
           value={apiKey}
-          onChange={(e: any) => setApiKey(e.target.value)}
+          onChange={(e: unknown) => setApiKey((e as any).target.value)}
         />
       </CSFormField>
       <CSFormField>

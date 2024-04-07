@@ -6,6 +6,8 @@ import {
 import * as React from "react";
 import { CSFormField } from "../../components/CSFormField.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { EventTemplate } from "../../../EventTemplate.js";
+import { PromptCreatedEventArgs, ResponseStreamEventArgs } from "../../../panels/generate/eventArgs.js";
 
 type GenerateStreamArgs = {
   api: string;
@@ -20,15 +22,17 @@ export function GenerateStream() {
   const [prompt, setPrompt] = React.useState("");
 
   React.useEffect(() => {
-    function listeners(event: any) {
+    function listeners(event: MessageEvent<EventTemplate<unknown>>) {
       const incomingMessage = event.data;
       switch (incomingMessage.type) {
         case "promptCreated":
-          const { prompt } = incomingMessage;
+          const { prompt } =
+            incomingMessage as EventTemplate<PromptCreatedEventArgs>;
           setPrompt(prompt);
           return;
         case "responseStream":
-          const { data: chunk } = incomingMessage;
+          const { data: chunk } =
+            incomingMessage as EventTemplate<ResponseStreamEventArgs>;
           data = data + chunk;
           setData(data);
           setBytesReceived(data.length);
@@ -37,7 +41,7 @@ export function GenerateStream() {
     }
     window.addEventListener("message", listeners);
     getVsCodeApi().postMessage({ type: "webviewReady" });
-    return () => window.removeEventListener("click", listeners);
+    return () => window.removeEventListener("message", listeners);
   }, []);
 
   function cancel() {

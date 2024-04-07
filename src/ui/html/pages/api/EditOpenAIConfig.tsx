@@ -8,6 +8,7 @@ import { CSFormField } from "../../components/CSFormField.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 import { EventTemplate } from "../../../EventTemplate.js";
 import { OpenAIConfigArgs } from "../../../../settings/api/editOpenAIConfig.js";
+import { Dropdown } from "@vscode/webview-ui-toolkit";
 
 interface EditOpenAIConfigProps {
   apiKey: string;
@@ -43,7 +44,9 @@ export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
       <CSFormField label={{ text: "API Key:" }}>
         <VSCodeTextField
           value={apiKey}
-          onChange={(e: any) => setApiKey(e.target.value)}
+          onChange={(e: React.ChangeEvent<Dropdown>) =>
+            setApiKey(e.target.value)
+          }
         />
       </CSFormField>
       <CSFormField>

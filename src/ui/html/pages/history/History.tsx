@@ -3,7 +3,7 @@ import { HistoryPageArgs } from "./HistoryPageArgs";
 import { HistoryEntry } from "../../../viewProviders/history/types";
 import { EventTemplate } from "../../../EventTemplate.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
-import { SelectHistoryEntryArgs } from "../../../panels/historyEntry/SelectHistoryEntryArgs.js";
+import { SelectHistoryEntryArgs } from "../../../panels/historyEntry/eventArgs.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
 

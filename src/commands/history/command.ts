@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { HistoryEntryPanel } from "../../ui/panels/historyEntry/HistoryEntryPanel.js";
-import { SelectHistoryEntryArgs } from "../../ui/panels/historyEntry/SelectHistoryEntryArgs.js";
+import { SelectHistoryEntryArgs } from "../../ui/panels/historyEntry/eventArgs.js";
 
 export function getSelectHistoryEntryCommand(context: vscode.ExtensionContext) {
   return async function selectHistoryItemCommand(

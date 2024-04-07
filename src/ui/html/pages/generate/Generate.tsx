@@ -16,6 +16,10 @@ import { ArgsFromGeneratePanel } from "../../../panels/generate/ArgsFromGenerate
 import { EventTemplate } from "../../../EventTemplate.js";
 import { ModelChange } from "../../../panels/generate/ModelChange.js";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
+import { IncludeFilesEventArgs } from "../../../panels/generate/eventArgs.js";
+
+type FileVersions = "current" | "HEAD";
+type IncludeOptions = "source" | "declaration";
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();
@@ -30,11 +34,11 @@ export function Generate() {
   const [codingConvention, setCodingConvention] = useState<string | undefined>(
     args.codingConvention
   );
-  const [fileVersion, setFileVersion] = useState<"current" | "HEAD">(
+  const [fileVersion, setFileVersion] = useState<FileVersions>(
     args.fileVersion || "current"
   );
   const [includedFiles, setIncludedFiles] = useState<
-    { path: string; includeOption: "source" | "declaration" }[]
+    { path: string; includeOption: IncludeOptions }[]
   >(
     args.includedFiles ||
       args.files.map((file) => ({
@@ -63,17 +67,34 @@ export function Generate() {
       }
     }
 
-    const promptTextArea = promptRef.current;
-    if (promptTextArea) {
-      promptTextArea.focus();
-      promptTextArea.addEventListener("keydown", onPromptTextAreaKeyDown);
-      return () => {
-        promptTextArea.removeEventListener(
-          "keydown",
-          onPromptTextAreaKeyDown
-        );
-      };
+    const promptTextArea = promptRef.current!;
+
+    promptTextArea.focus();
+    promptTextArea.addEventListener("keydown", onPromptTextAreaKeyDown);
+
+    function listener(event: unknown) {
+      const message = (event as any).data;
+      switch (message.type) {
+        case "includeFiles":
+          const includeFilesEvent: IncludeFilesEventArgs = message;
+          setIncludedFiles(
+            includedFiles.concat(
+              includeFilesEvent.files.map((file: string) => ({
+                path: file,
+                includeOption: "source",
+              }))
+            )
+          );
+          break;
+      }
     }
+
+    window.addEventListener("message", listener);
+
+    return () => {
+      promptTextArea.removeEventListener("keydown", onPromptTextAreaKeyDown);
+      window.removeEventListener("message", listener);
+    };
   }, []);
 
   useEffect(() => {
@@ -97,7 +118,7 @@ export function Generate() {
     }
   }, [codegenTargets]);
 
-  function onModelChange(e: any) {
+  function onModelChange(e: React.ChangeEvent<Dropdown>) {
     setModel(e.target.value);
     const message: EventTemplate<ModelChange> = {
       type: "modelChange",
@@ -182,7 +203,9 @@ export function Generate() {
           <VSCodeDropdown
             currentValue={codegenTargets}
             style={{ width: "180px" }}
-            onChange={(e: any) => setCodegenTargets(e.target.value)}
+            onChange={(e: React.ChangeEvent<Dropdown>) =>
+              setCodegenTargets(e.target.value)
+            }
           >
             {[{ text: "As in Prompt", value: ":prompt" }]
               .concat(
@@ -224,7 +247,9 @@ export function Generate() {
           <VSCodeDropdown
             currentValue="current"
             style={{ width: "180px" }}
-            onChange={(e: any) => setFileVersion(e.target.value)}
+            onChange={(e: React.ChangeEvent<Dropdown>) =>
+              setFileVersion(e.target.value as FileVersions)
+            }
           >
             {[
               { text: "Working Copy", value: "current" },
@@ -253,17 +278,18 @@ export function Generate() {
                     ?.includeOption || "source"
                 }
                 style={{ width: "120px", marginRight: "8px" }}
-                onChange={(e: any) => {
+                onChange={(e: React.ChangeEvent<Dropdown>) => {
                   const newIncludedFiles = [...includedFiles];
                   const fileIndex = newIncludedFiles.findIndex(
                     (f) => f.path === file.path
                   );
                   if (fileIndex !== -1) {
-                    newIncludedFiles[fileIndex].includeOption = e.target.value;
+                    newIncludedFiles[fileIndex].includeOption = e.target
+                      .value as IncludeOptions;
                   } else {
                     newIncludedFiles.push({
                       path: file.path,
-                      includeOption: e.target.value,
+                      includeOption: e.target.value as IncludeOptions,
                     });
                   }
                   setIncludedFiles(newIncludedFiles);

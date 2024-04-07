@@ -1,12 +1,13 @@
 import { GeneratedSourceFile } from "codespin/dist/sourceCode/GeneratedSourceFile.js";
 import * as vscode from "vscode";
 import { UIPanel } from "../UIPanel.js";
-import { SelectHistoryEntryArgs } from "./SelectHistoryEntryArgs.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { getFullHistoryEntry } from "../../../settings/history/getHistoryEntry.js";
 import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
 import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
 import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntryPageArgs.js";
+import { EventTemplate } from "../../EventTemplate.js";
+import { SelectHistoryEntryArgs } from "./eventArgs.js";
 
 export class HistoryEntryPanel extends UIPanel {
   constructor(context: vscode.ExtensionContext) {
@@ -78,7 +79,7 @@ export class HistoryEntryPanel extends UIPanel {
     }
   }
 
-  async onMessage(message: any) {
+  async onMessage(message: EventTemplate<unknown>) {
     switch (message.type) {
       case "cancel":
         this.dispose();

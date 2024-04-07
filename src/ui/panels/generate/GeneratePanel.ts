@@ -104,6 +104,14 @@ export class GeneratePanel extends UIPanel {
     await this.navigateTo("/generate", generatePageArgs);
   }
 
+  // Method to include files
+  includeFiles(files: string[]) {
+    this.postMessageToWebview({
+      type: "includeFiles",
+      files,
+    });
+  }
+
   async onMessage(message: EventTemplate<unknown>) {
     const workspaceRoot = getWorkspaceRoot(this.context);
 
@@ -247,7 +255,7 @@ export class GeneratePanel extends UIPanel {
     // Set the context key to control visibility of the context menu item
     vscode.commands.executeCommand(
       "setContext",
-      "codespin-ai.enableIncludeFilesMenuItem",
+      "codespin-ai.enableIncludeFiles",
       activePanel !== undefined
     );
   }
