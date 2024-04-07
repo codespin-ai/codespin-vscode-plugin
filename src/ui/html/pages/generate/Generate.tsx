@@ -159,6 +159,10 @@ export function Generate() {
     }
   }
 
+  function handleDeleteFile(filePath: string) {
+    setFiles(files.filter((file) => file.path !== filePath));
+  }
+
   return (
     <div>
       <h1>Generate</h1>
@@ -310,6 +314,12 @@ export function Generate() {
                 {file.path} {file.size ? `(${formatFileSize(file.size)})` : ""}
               </span>
               <VSCodeLink>Add deps</VSCodeLink>
+              <VSCodeLink
+                onClick={() => handleDeleteFile(file.path)}
+                style={{ marginLeft: "10px", cursor: "pointer" }}
+              >
+                Delete
+              </VSCodeLink>
               <br />
             </div>
           ))}
