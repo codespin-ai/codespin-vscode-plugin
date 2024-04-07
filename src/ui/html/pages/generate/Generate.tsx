@@ -17,6 +17,7 @@ import { EventTemplate } from "../../../EventTemplate.js";
 import { ModelChange } from "../../../panels/generate/ModelChange.js";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
 import {
+  AddDepsEventArgs,
   FileVersions,
   IncludeFilesEventArgs,
   IncludeOptions,
@@ -166,8 +167,12 @@ export function Generate() {
     setFiles(files.filter((file) => file.path !== filePath));
   }
 
-  function handleAddDeps(filePath: string) {
-    const message = { type: "addDeps", file: filePath };
+  function onAddDeps(filePath: string) {
+    const message: EventTemplate<AddDepsEventArgs> = {
+      type: "addDeps",
+      file: filePath,
+      model,
+    };
     vsCodeApi.postMessage(message);
   }
 
@@ -321,7 +326,7 @@ export function Generate() {
               <span style={{ marginRight: "1em" }}>
                 {file.path} {file.size ? `(${formatFileSize(file.size)})` : ""}
               </span>
-              <VSCodeLink onClick={() => handleAddDeps(file.path)}>
+              <VSCodeLink onClick={() => onAddDeps(file.path)}>
                 Add deps
               </VSCodeLink>
               <VSCodeLink

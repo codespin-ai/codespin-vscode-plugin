@@ -26,9 +26,10 @@ import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { ModelChange } from "./ModelChange.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import { initialize } from "../../../settings/initialize.js";
-import { IncludeFilesEventArgs } from "./eventArgs.js";
+import { AddDepsEventArgs, IncludeFilesEventArgs } from "./eventArgs.js";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
 import { deps as codespinDeps } from "codespin/dist/commands/deps.js"; // Import codespinDeps
+import { pathExists } from "../../../fs/pathExists.js";
 
 let activePanel: GeneratePanel | undefined = undefined;
 
@@ -58,10 +59,10 @@ export class GeneratePanel extends UIPanel {
 
           const fileDetails = (
             await Promise.all(
-              allPaths.map(async (fullPath) => {
-                const size = (await fs.stat(fullPath)).size;
+              allPaths.map(async (filePath) => {
+                const size = (await fs.stat(filePath)).size;
                 return {
-                  path: path.relative(workspaceRoot, fullPath),
+                  path: path.relative(workspaceRoot, filePath),
                   size,
                   includeOption: "source" as "source",
                 };
@@ -76,7 +77,6 @@ export class GeneratePanel extends UIPanel {
             selectedModel: await getDefaultModel(workspaceRoot),
             codegenTargets: ":prompt",
             fileVersion: "current",
-
             prompt: "",
             codingConvention: undefined,
           };
@@ -85,9 +85,9 @@ export class GeneratePanel extends UIPanel {
           const fileDetails = (
             await Promise.all(
               commandArgs.includedFiles.map(async (x) => {
-                const fullPath = path.resolve(workspaceRoot, x.path);
-                const size = (await fs.stat(fullPath)).size;
-                const relativePath = path.relative(workspaceRoot, fullPath);
+                const filePath = path.resolve(workspaceRoot, x.path);
+                const size = (await fs.stat(filePath)).size;
+                const relativePath = path.relative(workspaceRoot, filePath);
                 return {
                   path: relativePath,
                   size,
@@ -114,15 +114,15 @@ export class GeneratePanel extends UIPanel {
   }
 
   // Method to include files
-  async includeFiles(fullPaths: string[]) {
-    const allPaths = await getFilesRecursive(fullPaths);
+  async includeFiles(filePaths: string[]) {
+    const allPaths = await getFilesRecursive(filePaths);
     const workspaceRoot = getWorkspaceRoot(this.context);
     const message: EventTemplate<IncludeFilesEventArgs> = {
       type: "includeFiles",
       files: await Promise.all(
-        allPaths.map(async (fullPath) => ({
-          path: path.relative(workspaceRoot, fullPath),
-          size: (await fs.stat(fullPath)).size,
+        allPaths.map(async (filePath) => ({
+          path: path.relative(workspaceRoot, filePath),
+          size: (await fs.stat(path.resolve(workspaceRoot, filePath))).size,
         }))
       ),
     };
@@ -134,20 +134,32 @@ export class GeneratePanel extends UIPanel {
 
     switch (message.type) {
       case "addDeps":
-        const [vendor, model] = this.generateArgs!.model.split(":");
+        const incomingMessage = message as EventTemplate<AddDepsEventArgs>;
+        const [vendor, model] = incomingMessage.model.split(":");
         const dependenciesArgs = {
-          file: (message as EventTemplate<{ type: "addDeps"; file: string }>)
-            .file,
+          file: incomingMessage.file,
           config: undefined,
           api: vendor,
           model,
           maxTokens: undefined,
           debug: undefined,
         };
-        const dependencyPaths = await codespinDeps(dependenciesArgs, {
+        const dependencies = await codespinDeps(dependenciesArgs, {
           workingDir: workspaceRoot,
         });
-        await this.includeFiles(dependencyPaths.split("\n").filter(Boolean));
+
+        this.includeFiles(
+          (
+            await Promise.all(
+              dependencies
+                .filter((x) => x.isProjectFile)
+                .map(async (x) => {
+                  const fullPath = path.resolve(workspaceRoot, x.filePath);
+                  return (await pathExists(fullPath)) ? fullPath : undefined;
+                })
+            )
+          ).filter(Boolean) as string[]
+        );
         break;
       case "generate":
         this.generateArgs = message as EventTemplate<ArgsFromGeneratePanel>;

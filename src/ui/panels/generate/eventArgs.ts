@@ -15,3 +15,8 @@ export type PromptCreatedEventArgs = {
 export type ResponseStreamEventArgs = {
   data: string;
 };
+
+export type AddDepsEventArgs = {
+  file: string;
+  model: string;
+};
