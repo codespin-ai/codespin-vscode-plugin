@@ -132,7 +132,7 @@ export function Generate() {
     const message: EventTemplate<ArgsFromGeneratePanel> = {
       type: "generate",
       model,
-      files,
+      includedFiles: files,
       prompt,
       codegenTargets,
       codingConvention,
@@ -148,7 +148,10 @@ export function Generate() {
 
       const message: EventTemplate<ArgsFromGeneratePanel> = {
         type: "generate",
-        files,
+        includedFiles: files.map((x) => ({
+          path: x.path,
+          includeOption: x.includeOption,
+        })),
         model,
         prompt: (e.currentTarget as any).value,
         codegenTargets,
