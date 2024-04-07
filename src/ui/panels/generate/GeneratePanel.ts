@@ -27,6 +27,7 @@ import { ModelChange } from "./ModelChange.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import { initialize } from "../../../settings/initialize.js";
 import { IncludeFilesEventArgs } from "./eventArgs.js";
+import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
 
 let activePanel: GeneratePanel | undefined = undefined;
 
@@ -50,14 +51,16 @@ export class GeneratePanel extends UIPanel {
 
     const generatePageArgs: GeneratePageArgs = Array.isArray(commandArgs)
       ? await (async () => {
+          const allPaths = await getFilesRecursive(
+            commandArgs.map((x) => x.fsPath)
+          );
+
           const fileDetails = (
             await Promise.all(
-              commandArgs.map(async (x) => {
-                const fullPath = x.fsPath;
+              allPaths.map(async (fullPath) => {
                 const size = (await fs.stat(fullPath)).size;
-                const relativePath = path.relative(workspaceRoot, fullPath);
                 return {
-                  path: relativePath,
+                  path: path.relative(workspaceRoot, fullPath),
                   size,
                   includeOption: "source" as "source",
                 };
@@ -111,11 +114,12 @@ export class GeneratePanel extends UIPanel {
 
   // Method to include files
   async includeFiles(fullPaths: string[]) {
+    const allPaths = await getFilesRecursive(fullPaths);
     const workspaceRoot = getWorkspaceRoot(this.context);
     const message: EventTemplate<IncludeFilesEventArgs> = {
       type: "includeFiles",
       files: await Promise.all(
-        fullPaths.map(async (fullPath) => ({
+        allPaths.map(async (fullPath) => ({
           path: path.relative(workspaceRoot, fullPath),
           size: (await fs.stat(fullPath)).size,
         }))
