@@ -166,6 +166,11 @@ export function Generate() {
     setFiles(files.filter((file) => file.path !== filePath));
   }
 
+  function handleAddDeps(filePath: string) {
+    const message = { type: "addDeps", file: filePath };
+    vsCodeApi.postMessage(message);
+  }
+
   return (
     <div>
       <h1>Generate</h1>
@@ -316,7 +321,9 @@ export function Generate() {
               <span style={{ marginRight: "1em" }}>
                 {file.path} {file.size ? `(${formatFileSize(file.size)})` : ""}
               </span>
-              <VSCodeLink>Add deps</VSCodeLink>
+              <VSCodeLink onClick={() => handleAddDeps(file.path)}>
+                Add deps
+              </VSCodeLink>
               <VSCodeLink
                 onClick={() => handleDeleteFile(file.path)}
                 style={{ marginLeft: "10px", cursor: "pointer" }}

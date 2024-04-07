@@ -79,7 +79,7 @@ export async function getGenerateArgs(
           : undefined,
         prompt: undefined,
         api: vendor,
-        maxTokens: 4000,
+        maxTokens: undefined,
         printPrompt: undefined,
         writePrompt: undefined,
         template: undefined,

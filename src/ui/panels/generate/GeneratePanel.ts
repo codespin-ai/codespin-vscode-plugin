@@ -28,6 +28,7 @@ import { getGenerateArgs } from "./getGenerateArgs.js";
 import { initialize } from "../../../settings/initialize.js";
 import { IncludeFilesEventArgs } from "./eventArgs.js";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
+import { deps as codespinDeps } from "codespin/dist/commands/deps.js"; // Import codespinDeps
 
 let activePanel: GeneratePanel | undefined = undefined;
 
@@ -132,6 +133,22 @@ export class GeneratePanel extends UIPanel {
     const workspaceRoot = getWorkspaceRoot(this.context);
 
     switch (message.type) {
+      case "addDeps":
+        const [vendor, model] = this.generateArgs!.model.split(":");
+        const dependenciesArgs = {
+          file: (message as EventTemplate<{ type: "addDeps"; file: string }>)
+            .file,
+          config: undefined,
+          api: vendor,
+          model,
+          maxTokens: undefined,
+          debug: undefined,
+        };
+        const dependencyPaths = await codespinDeps(dependenciesArgs, {
+          workingDir: workspaceRoot,
+        });
+        await this.includeFiles(dependencyPaths.split("\n").filter(Boolean));
+        break;
       case "generate":
         this.generateArgs = message as EventTemplate<ArgsFromGeneratePanel>;
 
