@@ -3,6 +3,7 @@ import { getActivePanel } from "../../ui/panels/generate/GeneratePanel.js";
 
 export function getIncludeFilesCommand(context: vscode.ExtensionContext) {
   return async function includeFilesCommand(
+    _: unknown,
     files: vscode.Uri[]
   ): Promise<void> {
     // Get the active GeneratePanel

@@ -71,20 +71,21 @@ export function Generate() {
       const message = (event as any).data;
       switch (message.type) {
         case "includeFiles":
-          const includeFilesMessage: IncludeFilesEventArgs = message;
-          console.log({
-            includeFilesMessage,
-            files,
-          });
-          setFiles(
-            files.concat(
-              includeFilesMessage.files.map((file) => ({
+          setFiles((files) => {
+            const includeFilesMessage: IncludeFilesEventArgs = message;
+
+            const newFiles = includeFilesMessage.files.filter((x) =>
+              files.every((file) => file.path !== x.path)
+            );
+
+            return files.concat(
+              newFiles.map((file) => ({
                 path: file.path,
                 includeOption: "source",
                 size: file.size,
               }))
-            )
-          );
+            );
+          });
           break;
       }
     }
@@ -209,7 +210,7 @@ export function Generate() {
           >
             {[{ text: "As in Prompt", value: ":prompt" }]
               .concat(
-                args.files.map((x) => ({
+                files.map((x) => ({
                   text: x.path,
                   value: `${x.path}`,
                 }))
@@ -262,7 +263,7 @@ export function Generate() {
           </VSCodeDropdown>
         </CSFormField>
         <CSFormField label={{ text: "Included Files:" }}>
-          {args.files.map((file) => (
+          {files.map((file) => (
             <div
               key={file.path}
               style={{

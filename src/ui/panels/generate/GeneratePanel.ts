@@ -26,6 +26,7 @@ import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
 import { ModelChange } from "./ModelChange.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import { initialize } from "../../../settings/initialize.js";
+import { IncludeFilesEventArgs } from "./eventArgs.js";
 
 let activePanel: GeneratePanel | undefined = undefined;
 
@@ -71,7 +72,7 @@ export class GeneratePanel extends UIPanel {
             selectedModel: await getDefaultModel(workspaceRoot),
             codegenTargets: ":prompt",
             fileVersion: "current",
-            
+
             prompt: "",
             codingConvention: undefined,
           };
@@ -109,11 +110,18 @@ export class GeneratePanel extends UIPanel {
   }
 
   // Method to include files
-  includeFiles(files: string[]) {
-    this.postMessageToWebview({
+  async includeFiles(fullPaths: string[]) {
+    const workspaceRoot = getWorkspaceRoot(this.context);
+    const message: EventTemplate<IncludeFilesEventArgs> = {
       type: "includeFiles",
-      files,
-    });
+      files: await Promise.all(
+        fullPaths.map(async (fullPath) => ({
+          path: path.relative(workspaceRoot, fullPath),
+          size: (await fs.stat(fullPath)).size,
+        }))
+      ),
+    };
+    this.postMessageToWebview(message);
   }
 
   async onMessage(message: EventTemplate<unknown>) {
