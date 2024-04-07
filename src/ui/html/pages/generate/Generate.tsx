@@ -16,10 +16,11 @@ import { ArgsFromGeneratePanel } from "../../../panels/generate/ArgsFromGenerate
 import { EventTemplate } from "../../../EventTemplate.js";
 import { ModelChange } from "../../../panels/generate/ModelChange.js";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
-import { IncludeFilesEventArgs } from "../../../panels/generate/eventArgs.js";
-
-type FileVersions = "current" | "HEAD";
-type IncludeOptions = "source" | "declaration";
+import {
+  FileVersions,
+  IncludeFilesEventArgs,
+  IncludeOptions,
+} from "../../../panels/generate/eventArgs.js";
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();
@@ -37,24 +38,18 @@ export function Generate() {
   const [fileVersion, setFileVersion] = useState<FileVersions>(
     args.fileVersion || "current"
   );
-  const [includedFiles, setIncludedFiles] = useState<
-    { path: string; includeOption: IncludeOptions }[]
-  >(
-    args.includedFiles ||
-      args.files.map((file) => ({
-        path: file.path,
-        includeOption: "source",
-      }))
-  );
+  const [files, setFiles] = useState<
+    { path: string; size: number; includeOption: IncludeOptions }[]
+  >(args.files);
 
   useEffect(() => {
-    if (includedFiles.length === 1) {
-      setCodegenTargets(includedFiles[0].path);
+    if (files.length === 1) {
+      setCodegenTargets(files[0].path);
     }
 
-    if (includedFiles.length >= 1) {
-      const fileExtension = getFileExtension(includedFiles[0].path);
-      if (includedFiles.every((x) => x.path.endsWith(fileExtension))) {
+    if (files.length >= 1) {
+      const fileExtension = getFileExtension(files[0].path);
+      if (files.every((x) => x.path.endsWith(fileExtension))) {
         const matchingConvention = args.codingConventions.find((convention) => {
           return convention.extension === fileExtension;
         });
@@ -76,12 +71,17 @@ export function Generate() {
       const message = (event as any).data;
       switch (message.type) {
         case "includeFiles":
-          const includeFilesEvent: IncludeFilesEventArgs = message;
-          setIncludedFiles(
-            includedFiles.concat(
-              includeFilesEvent.files.map((file: string) => ({
-                path: file,
+          const includeFilesMessage: IncludeFilesEventArgs = message;
+          console.log({
+            includeFilesMessage,
+            files,
+          });
+          setFiles(
+            files.concat(
+              includeFilesMessage.files.map((file) => ({
+                path: file.path,
                 includeOption: "source",
+                size: file.size,
               }))
             )
           );
@@ -131,11 +131,11 @@ export function Generate() {
     const message: EventTemplate<ArgsFromGeneratePanel> = {
       type: "generate",
       model,
+      files,
       prompt,
       codegenTargets,
       codingConvention,
       fileVersion,
-      includedFiles,
     };
     vsCodeApi.postMessage(message);
   }
@@ -147,12 +147,12 @@ export function Generate() {
 
       const message: EventTemplate<ArgsFromGeneratePanel> = {
         type: "generate",
+        files,
         model,
         prompt: (e.currentTarget as any).value,
         codegenTargets,
         codingConvention,
         fileVersion,
-        includedFiles,
       };
       vsCodeApi.postMessage(message);
     }
@@ -274,25 +274,26 @@ export function Generate() {
             >
               <VSCodeDropdown
                 currentValue={
-                  includedFiles.find((f) => f.path === file.path)
-                    ?.includeOption || "source"
+                  files.find((f) => f.path === file.path)?.includeOption ||
+                  "source"
                 }
                 style={{ width: "120px", marginRight: "8px" }}
                 onChange={(e: React.ChangeEvent<Dropdown>) => {
-                  const newIncludedFiles = [...includedFiles];
-                  const fileIndex = newIncludedFiles.findIndex(
+                  const filesCopy = [...files];
+                  const fileIndex = filesCopy.findIndex(
                     (f) => f.path === file.path
                   );
                   if (fileIndex !== -1) {
-                    newIncludedFiles[fileIndex].includeOption = e.target
+                    filesCopy[fileIndex].includeOption = e.target
                       .value as IncludeOptions;
                   } else {
-                    newIncludedFiles.push({
+                    filesCopy.push({
                       path: file.path,
                       includeOption: e.target.value as IncludeOptions,
+                      size: file.size,
                     });
                   }
-                  setIncludedFiles(newIncludedFiles);
+                  setFiles(filesCopy);
                 }}
               >
                 {[

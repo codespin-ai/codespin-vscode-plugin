@@ -4,8 +4,9 @@ export type ArgsFromGeneratePanel = {
   codegenTargets: string;
   codingConvention: string | undefined;
   fileVersion: "current" | "HEAD";
-  includedFiles: {
+  files: {
     path: string;
     includeOption: "source" | "declaration";
+    size: number;
   }[];
 };

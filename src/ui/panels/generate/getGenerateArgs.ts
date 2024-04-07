@@ -62,13 +62,13 @@ export async function getGenerateArgs(
             : undefined,
         model,
         write: true,
-        include: argsFromPanel.includedFiles
+        include: argsFromPanel.files
           .filter((f) => f.includeOption === "source")
           .map((f) =>
             argsFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
           ),
         exclude: undefined,
-        declare: argsFromPanel.includedFiles
+        declare: argsFromPanel.files
           .filter((f) => f.includeOption === "declaration")
           .map((f) => f.path),
         spec: argsFromPanel.codingConvention

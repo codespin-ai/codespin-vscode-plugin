@@ -55,10 +55,14 @@ export class GeneratePanel extends UIPanel {
                 const fullPath = x.fsPath;
                 const size = (await fs.stat(fullPath)).size;
                 const relativePath = path.relative(workspaceRoot, fullPath);
-                return { path: relativePath, size };
+                return {
+                  path: relativePath,
+                  size,
+                  includeOption: "source" as "source",
+                };
               })
             )
-          ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
+          ).sort((a, b) => a.path.localeCompare(b.path));
 
           return {
             files: fileDetails,
@@ -67,10 +71,7 @@ export class GeneratePanel extends UIPanel {
             selectedModel: await getDefaultModel(workspaceRoot),
             codegenTargets: ":prompt",
             fileVersion: "current",
-            includedFiles: commandArgs.map((x) => ({
-              includeOption: "source",
-              path: path.relative(workspaceRoot, x.fsPath),
-            })),
+            
             prompt: "",
             codingConvention: undefined,
           };
@@ -82,7 +83,11 @@ export class GeneratePanel extends UIPanel {
                 const fullPath = path.resolve(workspaceRoot, x.path);
                 const size = (await fs.stat(fullPath)).size;
                 const relativePath = path.relative(workspaceRoot, fullPath);
-                return { path: relativePath, size };
+                return {
+                  path: relativePath,
+                  size,
+                  includeOption: "source" as "source",
+                };
               })
             )
           ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
@@ -94,7 +99,6 @@ export class GeneratePanel extends UIPanel {
             selectedModel: commandArgs.model,
             codegenTargets: commandArgs.codegenTargets,
             fileVersion: commandArgs.fileVersion,
-            includedFiles: commandArgs.includedFiles,
             prompt: commandArgs.prompt,
             codingConvention: commandArgs.codingConvention?.filename,
           };
