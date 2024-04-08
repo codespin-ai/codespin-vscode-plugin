@@ -8,6 +8,7 @@ import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
 import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntryPageArgs.js";
 import { EventTemplate } from "../../EventTemplate.js";
 import { SelectHistoryEntryArgs } from "./eventArgs.js";
+import { diffContent } from "../../../git/diffContent.js";
 
 export class HistoryEntryPanel extends UIPanel {
   constructor(context: vscode.ExtensionContext) {
@@ -40,7 +41,7 @@ export class HistoryEntryPanel extends UIPanel {
       };
     }
 
-    const formattedFilesObject = historyEntryDetails
+    const files = historyEntryDetails
       ? await (async () => {
           // Map each file to a Promise of its formatted content, then resolve all promises concurrently
           const formattedFilesPromises =
@@ -50,29 +51,23 @@ export class HistoryEntryPanel extends UIPanel {
           const formattedFilesArray = await Promise.all(formattedFilesPromises);
 
           // Convert the array of formatted file objects into an Object
-          return formattedFilesArray.reduce(
-            (acc, file) => {
-              acc[file.path] = {
-                original: file.original,
-                generated: file.generated,
-              };
-              return acc;
-            },
-            {} as {
-              [key: string]: {
-                original: string | undefined;
-                generated: string;
-              };
-            }
-          );
+          return formattedFilesArray.reduce(async (accP, file) => {
+            const acc = await accP;
+            acc[file.path] = {
+              original: file.original,
+              generated: file.generated,
+              diff: await diffContent(file.original, file.generated),
+            };
+            return acc;
+          }, Promise.resolve({} as HistoryEntryPageArgs["files"]));
         })()
       : null;
 
-    if (historyEntryDetails && formattedFilesObject) {
+    if (historyEntryDetails && files) {
       // Populate the pageArgs with the entry details and the formattedFiles object
       const pageArgs: HistoryEntryPageArgs = {
         entry: historyEntryDetails,
-        formattedFiles: formattedFilesObject,
+        files,
       };
 
       await this.navigateTo("/history/entry", pageArgs);

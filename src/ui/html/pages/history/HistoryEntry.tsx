@@ -7,42 +7,17 @@ import {
   VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { HistoryEntryPageArgs } from "./HistoryEntryPageArgs.js";
 import { RegeneratePageArgs } from "./RegeneratePageArgs.js";
-import { diffContent } from "../../../../git/diffContent.js";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 
 // HistoryEntry component definition
 export function HistoryEntry() {
   const args: HistoryEntryPageArgs = history.state;
 
   const [commitMessage, setCommitMessage] = useState<string>("");
-  const [diffs, setDiffs] = useState<Array<{ path: string; diff: string }>>([]);
-
-  // Function to format date from timestamp
-  const formatDate = (timestamp: number): string => {
-    const date = new Date(timestamp);
-    return date.toLocaleString();
-  };
-
-  // Function to fetch diffs asynchronously
-  useEffect(() => {
-    const fetchDiffs = async () => {
-      if (!args.entry.files) {
-        return;
-      }
-      const diffsPromises = args.entry.files.map(async (file) => ({
-        path: file.path,
-        diff: await diffContent(file.original, file.generated),
-      }));
-      const diffs = await Promise.all(diffsPromises);
-      setDiffs(diffs);
-    };
-
-    fetchDiffs();
-  }, [args.entry]);
 
   const gatherArgsForRegenerateCommand = (): RegeneratePageArgs => {
     const { userInput } = args.entry;
@@ -67,7 +42,7 @@ export function HistoryEntry() {
     });
     getVsCodeApi().postMessage({
       type: "cancel",
-    });    
+    });
   };
 
   // Render the component
@@ -100,7 +75,7 @@ export function HistoryEntry() {
                   <VSCodeButton onClick={onEditClick}>Edit Prompt</VSCodeButton>
                 </CSFormField>
                 {Array.from(
-                  Object.keys(args.formattedFiles).map((key) => (
+                  Object.keys(args.files).map((key) => (
                     <div key={`file-gen-${key}`}>
                       <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
                         Generated Files
@@ -115,7 +90,7 @@ export function HistoryEntry() {
                           borderRadius: "4px",
                         }}
                         dangerouslySetInnerHTML={{
-                          __html: args.formattedFiles[key].generated,
+                          __html: args.files[key].generated,
                         }}
                       />
                     </div>
@@ -142,10 +117,22 @@ export function HistoryEntry() {
         </VSCodePanelView>
         <VSCodePanelView>
           {/* Show diffs of all files using the diffs state */}
-          {diffs.map((diff, index) => (
-            <div key={index}>
-              <h3>{diff.path}</h3>
-              <p>{diff.diff}</p>
+
+          {Object.keys(args.files).map((key) => (
+            <div key={`file-diff-${key}`}>
+              <h2 style={{ fontSize: "14px", marginTop: "1em" }}>Diff</h2>
+              <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
+                {args.files[key].diff}
+              </h3>
+              <pre
+                style={{
+                  padding: "0.5em 1em 0.5em 1em",
+                  background: "black",
+                  borderRadius: "4px",
+                }}
+              >
+                {args.files[key].diff}
+              </pre>
             </div>
           ))}
         </VSCodePanelView>
