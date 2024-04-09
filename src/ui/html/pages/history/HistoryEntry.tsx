@@ -6,7 +6,7 @@ import {
   VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { HistoryEntryPageArgs } from "./HistoryEntryPageArgs.js";
@@ -16,6 +16,7 @@ export function HistoryEntry() {
   const args: HistoryEntryPageArgs = history.state;
 
   const [commitMessage, setCommitMessage] = useState<string>("");
+  const [showCommitMessage, setShowCommitMessage] = useState<boolean>(false);
 
   const gatherArgsForRegenerateCommand = (): RegeneratePageArgs => {
     const { userInput } = args.entry;
@@ -41,6 +42,25 @@ export function HistoryEntry() {
       type: "cancel",
     });
   };
+
+  const onGenerateCommitMessage = () => {
+    getVsCodeApi().postMessage({ type: "generateCommitMessage" });
+  };
+
+  useEffect(() => {
+    const messageListener = (event: any) => {
+      if (event.data.type === "generatedCommitMessage") {
+        setCommitMessage(event.data.message);
+        setShowCommitMessage(true);
+      }
+    };
+
+    window.addEventListener("message", messageListener);
+
+    return () => {
+      window.removeEventListener("message", messageListener);
+    };
+  }, []);
 
   return (
     <div>
@@ -139,9 +159,21 @@ export function HistoryEntry() {
                 {args.entry.prompt}
               </pre>
             </div>
-            <div style={{ marginTop: "1em" }}>
-              <VSCodeButton>Generate Commit Message</VSCodeButton>
-            </div>
+            {!showCommitMessage && (
+              <div style={{ marginTop: "1em" }}>
+                <VSCodeButton onClick={onGenerateCommitMessage}>
+                  Generate Commit Message
+                </VSCodeButton>
+              </div>
+            )}
+            {showCommitMessage && (
+              <div style={{ marginTop: "1em" }}>
+                <div>{commitMessage}</div>
+                <VSCodeButton style={{ marginTop: "1em" }}>
+                  Commit Files
+                </VSCodeButton>
+              </div>
+            )}
             <div style={{ marginTop: "1em" }}>
               <h3>Files in commit:</h3>
               <ul
