@@ -3,7 +3,7 @@ import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
 export type HistoryEntryPageFile = {
   original: string | undefined;
   generated: string;
-  diff: string;
+  diffHtml: string;
 };
 
 export type HistoryEntryPageArgs = {

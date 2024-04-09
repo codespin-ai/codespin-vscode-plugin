@@ -47,6 +47,10 @@ export async function readGeneratedFiles(
         path: relativePath,
         original: originalContent,
         generated: generatedContent,
+        history: {
+          originalFilePath: originalFilePath,
+          generatedFilePath: generatedFilePath,
+        },
       };
       return sourceFile;
     })

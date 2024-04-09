@@ -21,6 +21,13 @@ export type HistoryEntry = {
   rawPrompt: string;
 };
 
+export type GeneratedSourceFileWithHistory = GeneratedSourceFile & {
+  history: {
+    generatedFilePath: string;
+    originalFilePath: string;
+  };
+};
+
 export type FullHistoryEntry = {
-  files: GeneratedSourceFile[];
+  files: GeneratedSourceFileWithHistory[];
 } & HistoryEntry;

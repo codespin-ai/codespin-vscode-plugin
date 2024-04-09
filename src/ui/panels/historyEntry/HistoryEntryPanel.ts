@@ -1,14 +1,14 @@
-import { GeneratedSourceFile } from "codespin/dist/sourceCode/GeneratedSourceFile.js";
 import * as vscode from "vscode";
-import { UIPanel } from "../UIPanel.js";
-import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
-import { getFullHistoryEntry } from "../../../settings/history/getHistoryEntry.js";
-import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
-import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
-import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntryPageArgs.js";
-import { EventTemplate } from "../../EventTemplate.js";
-import { SelectHistoryEntryArgs } from "./eventArgs.js";
 import { diffContent } from "../../../git/diffContent.js";
+import { getFullHistoryEntry } from "../../../settings/history/getHistoryEntry.js";
+import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
+import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
+import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
+import { EventTemplate } from "../../EventTemplate.js";
+import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntryPageArgs.js";
+import { GeneratedSourceFileWithHistory } from "../../viewProviders/history/types.js";
+import { UIPanel } from "../UIPanel.js";
+import { SelectHistoryEntryArgs } from "./eventArgs.js";
 
 export class HistoryEntryPanel extends UIPanel {
   constructor(context: vscode.ExtensionContext) {
@@ -26,7 +26,7 @@ export class HistoryEntryPanel extends UIPanel {
     );
 
     // Function to asynchronously transform a single file's content to its HTML representation
-    async function formatFileContent(file: GeneratedSourceFile) {
+    const formatFileContent = async (file: GeneratedSourceFileWithHistory) => {
       const originalHtml = file.original
         ? await getHtmlForCode(file.original, getLangFromFilename(file.path))
         : undefined;
@@ -34,12 +34,23 @@ export class HistoryEntryPanel extends UIPanel {
         file.generated,
         getLangFromFilename(file.path)
       );
+      console.log({
+        og1: file.history.originalFilePath,
+        gg1: file.history.generatedFilePath,
+      });
       return {
         path: file.path,
-        original: originalHtml,
-        generated: generatedHtml,
+        original: file.original,
+        generated: file.generated,
+        originalHtml: originalHtml,
+        generatedHtml: generatedHtml,
+        diffHtml: await diffContent(
+          file.history.originalFilePath,
+          file.history.generatedFilePath,
+          getWorkspaceRoot(this.context)
+        ),
       };
-    }
+    };
 
     const files = historyEntryDetails
       ? await (async () => {
@@ -54,9 +65,9 @@ export class HistoryEntryPanel extends UIPanel {
           return formattedFilesArray.reduce(async (accP, file) => {
             const acc = await accP;
             acc[file.path] = {
-              original: file.original,
-              generated: file.generated,
-              diff: await diffContent(file.original, file.generated),
+              original: file.originalHtml,
+              generated: file.generatedHtml,
+              diffHtml: file.diffHtml,
             };
             return acc;
           }, Promise.resolve({} as HistoryEntryPageArgs["files"]));

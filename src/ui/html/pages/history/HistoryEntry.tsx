@@ -121,18 +121,17 @@ export function HistoryEntry() {
           {Object.keys(args.files).map((key) => (
             <div key={`file-diff-${key}`}>
               <h2 style={{ fontSize: "14px", marginTop: "1em" }}>Diff</h2>
-              <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
-                {args.files[key].diff}
-              </h3>
-              <pre
+              <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>{key}</h3>
+              <div
                 style={{
                   padding: "0.5em 1em 0.5em 1em",
                   background: "black",
                   borderRadius: "4px",
                 }}
+                // dangerouslySetInnerHTML={{ __html: args.files[key].diffHtml }}
               >
-                {args.files[key].diff}
-              </pre>
+                <pre>{args.files[key].diffHtml}</pre>
+              </div>
             </div>
           ))}
         </VSCodePanelView>
