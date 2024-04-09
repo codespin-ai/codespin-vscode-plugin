@@ -1,11 +1,15 @@
 import * as vscode from "vscode";
 import { diffContent } from "../../../git/diffContent.js";
+import { getChanges } from "../../../git/getChanges.js";
 import { getFullHistoryEntry } from "../../../settings/history/getHistoryEntry.js";
 import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
-import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntryPageArgs.js";
+import {
+  HistoryEntryPageArgs,
+  HistoryEntryPageFile,
+} from "../../html/pages/history/HistoryEntryPageArgs.js";
 import { GeneratedSourceFileWithHistory } from "../../viewProviders/history/types.js";
 import { UIPanel } from "../UIPanel.js";
 import { SelectHistoryEntryArgs } from "./eventArgs.js";
@@ -58,23 +62,25 @@ export class HistoryEntryPanel extends UIPanel {
           const formattedFilesArray = await Promise.all(formattedFilesPromises);
 
           // Convert the array of formatted file objects into an Object
-          return formattedFilesArray.reduce(async (accP, file) => {
-            const acc = await accP;
-            acc[file.path] = {
+          return formattedFilesArray.map((file) => ({
+            filePath: file.path,
+            fileInfo: {
               original: file.originalHtml,
               generated: file.generatedHtml,
               diffHtml: file.diffHtml,
-            };
-            return acc;
-          }, Promise.resolve({} as HistoryEntryPageArgs["files"]));
+            },
+          }));
         })()
-      : null;
+      : [];
 
     if (historyEntryDetails && files) {
       // Populate the pageArgs with the entry details and the formattedFiles object
       const pageArgs: HistoryEntryPageArgs = {
         entry: historyEntryDetails,
         files,
+        git: {
+          files: await getChanges(workspaceRoot),
+        },
       };
 
       await this.navigateTo("/history/entry", pageArgs);

@@ -70,13 +70,13 @@ export function HistoryEntry() {
                 <VSCodeButton onClick={onEditClick}>Edit Prompt</VSCodeButton>
               </CSFormField>
               {Array.from(
-                Object.keys(args.files).map((key) => (
-                  <div key={`file-gen-${key}`}>
+                args.files.map((file) => (
+                  <div key={`file-gen-${file.filePath}`}>
                     <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
                       Generated Files
                     </h2>
                     <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
-                      {key}
+                      {file.filePath}
                     </h3>
                     <div
                       style={{
@@ -85,7 +85,7 @@ export function HistoryEntry() {
                         borderRadius: "4px",
                       }}
                       dangerouslySetInnerHTML={{
-                        __html: args.files[key].generated,
+                        __html: file.fileInfo.generated,
                       }}
                     />
                   </div>
@@ -103,16 +103,16 @@ export function HistoryEntry() {
               borderRadius: "4px",
             }}
           >
-            <pre>
-              {<div>{args.entry.rawPrompt}</div>}
-            </pre>
+            <pre>{<div>{args.entry.rawPrompt}</div>}</pre>
           </div>
         </VSCodePanelView>
         <VSCodePanelView>
-          {Object.keys(args.files).map((key) => (
-            <div key={`file-diff-${key}`}>
+          {args.files.map((file) => (
+            <div key={`file-diff-${file.filePath}`}>
               <h2 style={{ fontSize: "14px", marginTop: "1em" }}>Diff</h2>
-              <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>{key}</h3>
+              <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
+                {file.filePath}
+              </h3>
               <div
                 style={{
                   padding: "0.5em 1em 0.5em 1em",
@@ -120,23 +120,44 @@ export function HistoryEntry() {
                   borderRadius: "4px",
                 }}
               >
-                <pre>{args.files[key].diffHtml}</pre>
+                <pre>{file.fileInfo.diffHtml}</pre>
               </div>
             </div>
           ))}
         </VSCodePanelView>
         <VSCodePanelView>
-          <pre style={{ margin: "0px", padding: "0px" }}>{commitMessage}</pre>
-          <VSCodeButton>Commit Files</VSCodeButton>
-          {Array.from(
-            Object.keys(args.files).map((key) => (
-              <div key={`file-commit-${key}`}>
-                <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
-                  {key}
-                </h3>
-              </div>
-            ))
-          )}
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <div
+              style={{
+                padding: "1em",
+                background: "black",
+                fontFamily: "var(--vscode-editor-font-family)",
+                borderRadius: "4px",
+              }}
+            >
+              <pre style={{ margin: "0px", padding: "0px" }}>
+                {args.entry.prompt}
+              </pre>
+            </div>
+            <div style={{ marginTop: "1em" }}>
+              <VSCodeButton>Generate Commit Message</VSCodeButton>
+            </div>
+            <div style={{ marginTop: "1em" }}>
+              <h3>Files in commit:</h3>
+              <ul
+                style={{
+                  padding: "0px",
+                  margin: "0px",
+                }}
+              >
+                {args.git.files.map((file, i) => (
+                  <li key={`file-commit-${file.filePath}`}>
+                    {i + 1}. {file.filePath} ({file.change})
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </VSCodePanelView>
       </VSCodePanels>
     </div>

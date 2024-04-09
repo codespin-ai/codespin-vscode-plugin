@@ -9,6 +9,10 @@ export type HistoryEntryPageFile = {
 export type HistoryEntryPageArgs = {
   entry: FullHistoryEntry;
   files: {
-    [key: string]: HistoryEntryPageFile;
+    filePath: string;
+    fileInfo: HistoryEntryPageFile;
+  }[];
+  git: {
+    files: GitFileChange[];
   };
 };
