@@ -1,4 +1,3 @@
-// Import necessary React and VSCode UI toolkit components
 import {
   VSCodeButton,
   VSCodePanelTab,
@@ -13,7 +12,6 @@ import { CSFormField } from "../../components/CSFormField.js";
 import { HistoryEntryPageArgs } from "./HistoryEntryPageArgs.js";
 import { RegeneratePageArgs } from "./RegeneratePageArgs.js";
 
-// HistoryEntry component definition
 export function HistoryEntry() {
   const args: HistoryEntryPageArgs = history.state;
 
@@ -34,7 +32,6 @@ export function HistoryEntry() {
     return regenerateArgs;
   };
 
-  // Function to post the commit message
   const onEditClick = () => {
     getVsCodeApi().postMessage({
       type: "command:codespin-ai.generate",
@@ -45,7 +42,6 @@ export function HistoryEntry() {
     });
   };
 
-  // Render the component
   return (
     <div>
       <VSCodePanels>
@@ -55,49 +51,47 @@ export function HistoryEntry() {
         <VSCodePanelTab>COMMIT</VSCodePanelTab>
         <VSCodePanelView>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            {
-              <>
-                <CSFormField>
-                  <div
-                    style={{
-                      padding: "1em",
-                      background: "black",
-                      fontFamily: "var(--vscode-editor-font-family)",
-                      borderRadius: "4px",
-                    }}
-                  >
-                    <pre style={{ margin: "0px", padding: "0px" }}>
-                      {args.entry.prompt}
-                    </pre>
+            <>
+              <CSFormField>
+                <div
+                  style={{
+                    padding: "1em",
+                    background: "black",
+                    fontFamily: "var(--vscode-editor-font-family)",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <pre style={{ margin: "0px", padding: "0px" }}>
+                    {args.entry.prompt}
+                  </pre>
+                </div>
+              </CSFormField>
+              <CSFormField>
+                <VSCodeButton onClick={onEditClick}>Edit Prompt</VSCodeButton>
+              </CSFormField>
+              {Array.from(
+                Object.keys(args.files).map((key) => (
+                  <div key={`file-gen-${key}`}>
+                    <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
+                      Generated Files
+                    </h2>
+                    <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
+                      {key}
+                    </h3>
+                    <div
+                      style={{
+                        padding: "0.5em 1em 0.5em 1em",
+                        background: "black",
+                        borderRadius: "4px",
+                      }}
+                      dangerouslySetInnerHTML={{
+                        __html: args.files[key].generated,
+                      }}
+                    />
                   </div>
-                </CSFormField>
-                <CSFormField>
-                  <VSCodeButton onClick={onEditClick}>Edit Prompt</VSCodeButton>
-                </CSFormField>
-                {Array.from(
-                  Object.keys(args.files).map((key) => (
-                    <div key={`file-gen-${key}`}>
-                      <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
-                        Generated Files
-                      </h2>
-                      <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
-                        {key}
-                      </h3>
-                      <div
-                        style={{
-                          padding: "0.5em 1em 0.5em 1em",
-                          background: "black",
-                          borderRadius: "4px",
-                        }}
-                        dangerouslySetInnerHTML={{
-                          __html: args.files[key].generated,
-                        }}
-                      />
-                    </div>
-                  ))
-                )}
-              </>
-            }
+                ))
+              )}
+            </>
           </div>
         </VSCodePanelView>
         <VSCodePanelView>
@@ -110,14 +104,11 @@ export function HistoryEntry() {
             }}
           >
             <pre>
-              {/* Show the raw prompt */}
               {<div>{args.entry.rawPrompt}</div>}
             </pre>
           </div>
         </VSCodePanelView>
         <VSCodePanelView>
-          {/* Show diffs of all files using the diffs state */}
-
           {Object.keys(args.files).map((key) => (
             <div key={`file-diff-${key}`}>
               <h2 style={{ fontSize: "14px", marginTop: "1em" }}>Diff</h2>
@@ -128,7 +119,6 @@ export function HistoryEntry() {
                   background: "black",
                   borderRadius: "4px",
                 }}
-                // dangerouslySetInnerHTML={{ __html: args.files[key].diffHtml }}
               >
                 <pre>{args.files[key].diffHtml}</pre>
               </div>
@@ -136,9 +126,17 @@ export function HistoryEntry() {
           ))}
         </VSCodePanelView>
         <VSCodePanelView>
-          {/* Show commit message and provide a commit action */}
-          <VSCodeTextArea value={commitMessage} readOnly />
-          <VSCodeButton>Commit</VSCodeButton>
+          <pre style={{ margin: "0px", padding: "0px" }}>{commitMessage}</pre>
+          <VSCodeButton>Commit Files</VSCodeButton>
+          {Array.from(
+            Object.keys(args.files).map((key) => (
+              <div key={`file-commit-${key}`}>
+                <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
+                  {key}
+                </h3>
+              </div>
+            ))
+          )}
         </VSCodePanelView>
       </VSCodePanels>
     </div>
