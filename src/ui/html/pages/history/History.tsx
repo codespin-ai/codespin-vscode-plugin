@@ -1,6 +1,6 @@
 import * as React from "react";
-import { HistoryPageArgs } from "./HistoryPageArgs";
-import { HistoryEntry } from "../../../viewProviders/history/types";
+import { HistoryPageArgs } from "./HistoryPageArgs.js";
+import { HistoryEntry } from "../../../viewProviders/history/types.js";
 import { EventTemplate } from "../../../EventTemplate.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 import { SelectHistoryEntryArgs } from "../../../panels/historyEntry/eventArgs.js";

@@ -142,7 +142,7 @@ export class GeneratePanel extends UIPanel {
           api: vendor,
           model,
           maxTokens: undefined,
-          debug: undefined,
+          debug: true,
         };
         const dependencies = await codespinDeps(dependenciesArgs, {
           workingDir: workspaceRoot,
@@ -155,7 +155,8 @@ export class GeneratePanel extends UIPanel {
                 .filter((x) => x.isProjectFile)
                 .map(async (x) => {
                   const fullPath = path.resolve(workspaceRoot, x.filePath);
-                  return (await pathExists(fullPath)) ? fullPath : undefined;
+                  const fileExists = await pathExists(fullPath);
+                  return fileExists ? fullPath : undefined;
                 })
             )
           ).filter(Boolean) as string[]

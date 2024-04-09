@@ -199,7 +199,7 @@ export function Generate() {
         </CSFormField>
         <CSFormField label={{ text: "Prompt:" }}>
           <VSCodeTextArea
-            ref={promptRef}
+            ref={promptRef as React.RefObject<any>}
             rows={10}
             cols={50}
             style={{ fontFamily: "var(--vscode-editor-font-family)" }}

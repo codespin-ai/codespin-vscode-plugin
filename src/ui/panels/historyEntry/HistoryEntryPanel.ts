@@ -34,10 +34,6 @@ export class HistoryEntryPanel extends UIPanel {
         file.generated,
         getLangFromFilename(file.path)
       );
-      console.log({
-        og1: file.history.originalFilePath,
-        gg1: file.history.generatedFilePath,
-      });
       return {
         path: file.path,
         original: file.original,

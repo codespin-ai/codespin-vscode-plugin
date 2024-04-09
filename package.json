@@ -88,29 +88,29 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.6",
-    "@types/node": "^20.12.2",
-    "@types/vscode": "^1.87.0",
+    "@types/node": "^20.12.6",
+    "@types/vscode": "^1.88.0",
     "@types/vscode-webview": "^1.57.5",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
     "@typescript-eslint/parser": "^6.4.1",
     "@vscode/test-electron": "^2.3.4",
     "esbuild": "^0.16.17",
-    "eslint": "^8.47.0",
+    "eslint": "^8.57.0",
     "glob": "^10.3.3",
     "mocha": "^10.2.0",
     "typescript": "^5.1.6"
   },
   "dependencies": {
-    "@types/react": "^18.2.74",
-    "@types/react-dom": "^18.2.23",
+    "@types/react": "^18.2.75",
+    "@types/react-dom": "^18.2.24",
     "@types/react-router-dom": "^5.3.3",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.145",
+    "codespin": "^0.0.149",
     "diff2html": "^3.4.48",
     "gray-matter": "^4.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "shiki": "^1.2.3",
-    "wouter": "^3.1.0"
+    "shiki": "^1.2.4",
+    "wouter": "^3.1.2"
   }
 }
