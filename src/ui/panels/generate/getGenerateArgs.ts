@@ -34,7 +34,7 @@ export async function getGenerateArgs(
     return { status: "not_initialized" };
   } else {
     const [api] = argsFromPanel.model.split(":");
-    
+
     const configFilePath = await getAPIConfigPath(api, workspaceRoot);
     const dirName = Date.now().toString();
 
@@ -50,8 +50,6 @@ export async function getGenerateArgs(
         await mkdir(historyDirPath, { recursive: true });
       }
 
-      const [vendor, model] = argsFromPanel.model.split(":");
-
       const promptFilePath = path.join(historyDirPath, "prompt.txt");
 
       const codespinGenerateArgs: GenerateArgs = {
@@ -60,7 +58,7 @@ export async function getGenerateArgs(
           argsFromPanel.codegenTargets !== ":prompt"
             ? argsFromPanel.codegenTargets
             : undefined,
-        model,
+        model: argsFromPanel.model,
         write: true,
         include: argsFromPanel.includedFiles
           .filter((f) => f.includeOption === "source")

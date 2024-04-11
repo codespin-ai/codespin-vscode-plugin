@@ -137,12 +137,10 @@ export class GeneratePanel extends UIPanel {
     switch (message.type) {
       case "addDeps":
         const incomingMessage = message as AddDepsEvent;
-        const [vendor, model] = incomingMessage.model.split(":");
         const dependenciesArgs = {
           file: incomingMessage.file,
           config: undefined,
-          api: vendor,
-          model,
+          model: incomingMessage.model,
           maxTokens: undefined,
           debug: true,
         };
