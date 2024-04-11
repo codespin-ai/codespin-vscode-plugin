@@ -3,14 +3,33 @@ import {
   VSCodePanelTab,
   VSCodePanelView,
   VSCodePanels,
-  VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { GenerateCommitMessageEvent } from "../../../panels/historyEntry/types.js";
+import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { HistoryEntryPageArgs } from "./HistoryEntryPageArgs.js";
-import { RegeneratePageArgs } from "./RegeneratePageArgs.js";
+import { RegenerateArgs } from "../../../panels/generate/types.js";
+import { CancelEvent } from "../../../types.js";
+import { GenerateCommandEvent } from "../../../../commands/codegen/generate.js";
+
+export type HistoryEntryPageFile = {
+  original: string | undefined;
+  generated: string;
+  diffHtml: string;
+};
+
+export type HistoryEntryPageArgs = {
+  entry: FullHistoryEntry;
+  files: {
+    filePath: string;
+    fileInfo: HistoryEntryPageFile;
+  }[];
+  git: {
+    files: GitFileChange[];
+  };
+};
 
 export function HistoryEntry() {
   const args: HistoryEntryPageArgs = history.state;
@@ -18,10 +37,10 @@ export function HistoryEntry() {
   const [commitMessage, setCommitMessage] = useState<string>("");
   const [showCommitMessage, setShowCommitMessage] = useState<boolean>(false);
 
-  const gatherArgsForRegenerateCommand = (): RegeneratePageArgs => {
+  const gatherArgsForRegenerateCommand = (): RegenerateArgs => {
     const { userInput } = args.entry;
 
-    const regenerateArgs: RegeneratePageArgs = {
+    const regenerateArgs: RegenerateArgs = {
       model: userInput.model,
       codegenTargets: userInput.codegenTargets,
       prompt: args.entry.prompt,
@@ -34,17 +53,25 @@ export function HistoryEntry() {
   };
 
   const onEditClick = () => {
-    getVsCodeApi().postMessage({
+    const generateCommandEvent: GenerateCommandEvent = {
       type: "command:codespin-ai.generate",
       args: [undefined, gatherArgsForRegenerateCommand()],
-    });
-    getVsCodeApi().postMessage({
+    };
+    getVsCodeApi().postMessage(generateCommandEvent);
+
+    const cancelEvent: CancelEvent = {
       type: "cancel",
-    });
+    };
+    getVsCodeApi().postMessage(cancelEvent);
   };
 
   const onGenerateCommitMessage = () => {
-    getVsCodeApi().postMessage({ type: "generateCommitMessage" });
+    const message: GenerateCommitMessageEvent = {
+      type: "generateCommitMessage",
+      prompt: args.entry.userInput.prompt,
+      model: args.entry.userInput.model,
+    };
+    getVsCodeApi().postMessage(message);
   };
 
   useEffect(() => {
@@ -147,48 +174,72 @@ export function HistoryEntry() {
         </VSCodePanelView>
         <VSCodePanelView>
           <div style={{ display: "flex", flexDirection: "column" }}>
-            <div
-              style={{
-                padding: "1em",
-                background: "black",
-                fontFamily: "var(--vscode-editor-font-family)",
-                borderRadius: "4px",
-              }}
-            >
-              <pre style={{ margin: "0px", padding: "0px" }}>
-                {args.entry.prompt}
-              </pre>
-            </div>
-            {!showCommitMessage && (
-              <div style={{ marginTop: "1em" }}>
-                <VSCodeButton onClick={onGenerateCommitMessage}>
-                  Generate Commit Message
-                </VSCodeButton>
+            {args.git.files.length ? (
+              <div>
+                <div
+                  style={{
+                    padding: "1em",
+                    background: "black",
+                    fontFamily: "var(--vscode-editor-font-family)",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <pre style={{ margin: "0px", padding: "0px" }}>
+                    {args.entry.prompt}
+                  </pre>
+                </div>
+                {!showCommitMessage && (
+                  <div style={{ marginTop: "1em" }}>
+                    <VSCodeButton onClick={onGenerateCommitMessage}>
+                      Generate Commit Message
+                    </VSCodeButton>
+                  </div>
+                )}
+                {showCommitMessage && (
+                  <div style={{ marginTop: "1em" }}>
+                    <h3>Generated Commit Message</h3>
+                    <div
+                      style={{
+                        padding: "1em",
+                        background: "black",
+                        fontFamily: "var(--vscode-editor-font-family)",
+                        borderRadius: "4px",
+                      }}
+                    >
+                      {commitMessage}
+                    </div>
+                    <VSCodeButton style={{ marginTop: "1em" }}>
+                      Commit Files
+                    </VSCodeButton>
+                  </div>
+                )}
+                <div style={{ marginTop: "1em" }}>
+                  <h3>Files in commit:</h3>
+                  {
+                    <ul
+                      style={{
+                        padding: "0px",
+                        margin: "0px",
+                      }}
+                    >
+                      {args.git.files.map((file, i) => (
+                        <li key={`file-commit-${file.filePath}`}>
+                          {i + 1}. {file.filePath} ({file.change})
+                        </li>
+                      ))}
+                    </ul>
+                  }
+                </div>
               </div>
-            )}
-            {showCommitMessage && (
-              <div style={{ marginTop: "1em" }}>
-                <div>{commitMessage}</div>
-                <VSCodeButton style={{ marginTop: "1em" }}>
-                  Commit Files
-                </VSCodeButton>
-              </div>
-            )}
-            <div style={{ marginTop: "1em" }}>
-              <h3>Files in commit:</h3>
-              <ul
+            ) : (
+              <div
                 style={{
-                  padding: "0px",
-                  margin: "0px",
+                  paddingTop: "1em",
                 }}
               >
-                {args.git.files.map((file, i) => (
-                  <li key={`file-commit-${file.filePath}`}>
-                    {i + 1}. {file.filePath} ({file.change})
-                  </li>
-                ))}
-              </ul>
-            </div>
+                There are no files to be committed.
+              </div>
+            )}
           </div>
         </VSCodePanelView>
       </VSCodePanels>

@@ -6,9 +6,12 @@ export async function initialize(force: boolean, workspaceRoot: string) {
   await init(
     {
       force,
+      debug: true,
     },
     { workingDir: workspaceRoot }
   );
-  await mkdir(await getCodingConventionsDir(workspaceRoot), { recursive: true });
+  await mkdir(await getCodingConventionsDir(workspaceRoot), {
+    recursive: true,
+  });
   await mkdir(await getHistoryDir(workspaceRoot), { recursive: true });
 }

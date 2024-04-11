@@ -4,10 +4,13 @@ import {
   VSCodeProgressRing,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { CSFormField } from "../../components/CSFormField.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 import { EventTemplate } from "../../../EventTemplate.js";
-import { PromptCreatedEventArgs, ResponseStreamEventArgs } from "../../../panels/generate/eventArgs.js";
+import {
+  PromptCreatedEvent,
+  ResponseStreamEvent,
+} from "../../../panels/generate/types.js";
+import { CSFormField } from "../../components/CSFormField.js";
 
 type GenerateStreamArgs = {
   api: string;
@@ -22,17 +25,15 @@ export function GenerateStream() {
   const [prompt, setPrompt] = React.useState("");
 
   React.useEffect(() => {
-    function listeners(event: MessageEvent<EventTemplate<unknown>>) {
+    function listeners(event: MessageEvent<EventTemplate>) {
       const incomingMessage = event.data;
       switch (incomingMessage.type) {
         case "promptCreated":
-          const { prompt } =
-            incomingMessage as EventTemplate<PromptCreatedEventArgs>;
+          const { prompt } = incomingMessage as PromptCreatedEvent;
           setPrompt(prompt);
           return;
         case "responseStream":
-          const { data: chunk } =
-            incomingMessage as EventTemplate<ResponseStreamEventArgs>;
+          const { data: chunk } = incomingMessage as ResponseStreamEvent;
           data = data + chunk;
           setData(data);
           setBytesReceived(data.length);

@@ -1,35 +1,39 @@
+import { dependencies as codespinDependencies } from "codespin/dist/commands/dependencies.js";
 import { generate as codespinGenerate } from "codespin/dist/commands/generate.js";
 import { promises as fs } from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
+import { pathExists } from "../../../fs/pathExists.js";
 import { getDefaultModel } from "../../../models/getDefaultModel.js";
 import { getModels } from "../../../models/getModels.js";
 import { setDefaultModel } from "../../../models/setDefaultModel.js";
+import { editAnthropicConfig } from "../../../settings/api/editAnthropicConfig.js";
+import { editOpenAIConfig } from "../../../settings/api/editOpenAIConfig.js";
 import {
-  AnthropicConfigArgs,
-  editAnthropicConfig,
-} from "../../../settings/api/editAnthropicConfig.js";
-import {
-  OpenAIConfigArgs,
-  editOpenAIConfig,
-} from "../../../settings/api/editOpenAIConfig.js";
+  EditAnthropicConfigEvent,
+  EditOpenAIConfigEvent,
+} from "../../../settings/api/types.js";
 import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
 import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFiles.js";
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
 import { writeUserInput } from "../../../settings/history/writeUserInput.js";
+import { initialize } from "../../../settings/initialize.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
-import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
-import { RegeneratePageArgs } from "../../html/pages/history/RegeneratePageArgs.js";
 import { UIPanel } from "../UIPanel.js";
-import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
-import { ModelChange } from "./ModelChange.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
-import { initialize } from "../../../settings/initialize.js";
-import { AddDepsEventArgs, IncludeFilesEventArgs } from "./eventArgs.js";
-import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
-import { deps as codespinDeps } from "codespin/dist/commands/deps.js"; // Import codespinDeps
-import { pathExists } from "../../../fs/pathExists.js";
+import {
+  AddDepsEvent,
+  ArgsFromGeneratePanel,
+  GenerateEvent,
+  IncludeFilesEvent,
+  ModelChangeEvent,
+  PromptCreatedEvent,
+  RegenerateArgs,
+  ResponseStreamEvent,
+} from "./types.js";
+import { GeneratePageArgs } from "../../html/pages/generate/Generate.js";
 
 let activePanel: GeneratePanel | undefined = undefined;
 
@@ -38,14 +42,14 @@ export function getActivePanel() {
 }
 
 export class GeneratePanel extends UIPanel {
-  generateArgs: EventTemplate<ArgsFromGeneratePanel> | undefined;
+  generateArgs: GenerateEvent | undefined;
   cancelGeneration: (() => void) | undefined;
 
   constructor(context: vscode.ExtensionContext) {
     super(context);
   }
 
-  async init(commandArgs: vscode.Uri[] | RegeneratePageArgs) {
+  async init(commandArgs: string[] | RegenerateArgs) {
     const workspaceRoot = getWorkspaceRoot(this.context);
     await this.onWebviewReady();
 
@@ -53,9 +57,7 @@ export class GeneratePanel extends UIPanel {
 
     const generatePageArgs: GeneratePageArgs = Array.isArray(commandArgs)
       ? await (async () => {
-          const allPaths = await getFilesRecursive(
-            commandArgs.map((x) => x.fsPath)
-          );
+          const allPaths = await getFilesRecursive(commandArgs);
 
           const fileDetails = (
             await Promise.all(
@@ -117,7 +119,7 @@ export class GeneratePanel extends UIPanel {
   async includeFiles(filePaths: string[]) {
     const allPaths = await getFilesRecursive(filePaths);
     const workspaceRoot = getWorkspaceRoot(this.context);
-    const message: EventTemplate<IncludeFilesEventArgs> = {
+    const message: IncludeFilesEvent = {
       type: "includeFiles",
       files: await Promise.all(
         allPaths.map(async (filePath) => ({
@@ -129,12 +131,12 @@ export class GeneratePanel extends UIPanel {
     this.postMessageToWebview(message);
   }
 
-  async onMessage(message: EventTemplate<unknown>) {
+  async onMessage(message: EventTemplate) {
     const workspaceRoot = getWorkspaceRoot(this.context);
 
     switch (message.type) {
       case "addDeps":
-        const incomingMessage = message as EventTemplate<AddDepsEventArgs>;
+        const incomingMessage = message as AddDepsEvent;
         const [vendor, model] = incomingMessage.model.split(":");
         const dependenciesArgs = {
           file: incomingMessage.file,
@@ -144,14 +146,17 @@ export class GeneratePanel extends UIPanel {
           maxTokens: undefined,
           debug: true,
         };
-        const dependencies = await codespinDeps(dependenciesArgs, {
-          workingDir: workspaceRoot,
-        });
+        const dependenciesResult = await codespinDependencies(
+          dependenciesArgs,
+          {
+            workingDir: workspaceRoot,
+          }
+        );
 
         this.includeFiles(
           (
             await Promise.all(
-              dependencies
+              dependenciesResult.dependencies
                 .filter((x) => x.isProjectFile)
                 .map(async (x) => {
                   const fullPath = path.resolve(workspaceRoot, x.filePath);
@@ -163,8 +168,7 @@ export class GeneratePanel extends UIPanel {
         );
         break;
       case "generate":
-        this.generateArgs = message as EventTemplate<ArgsFromGeneratePanel>;
-
+        this.generateArgs = message as GenerateEvent;
         const result = await getGenerateArgs(
           this.generateArgs!,
           this.setCancelGeneration.bind(this),
@@ -200,7 +204,7 @@ export class GeneratePanel extends UIPanel {
             );
 
             const { type: unused1, ...messageSansType } =
-              message as EventTemplate<ArgsFromGeneratePanel>;
+              message as GenerateEvent;
 
             await writeUserInput(
               result.dirName,
@@ -209,15 +213,15 @@ export class GeneratePanel extends UIPanel {
             );
 
             await this.navigateTo(`/generate/invoke`, {
-              api: result.args.api,
               model: result.args.model,
             });
 
             result.args.promptCallback = async (prompt) => {
-              this.postMessageToWebview({
+              const promptCreated: PromptCreatedEvent = {
                 type: "promptCreated",
                 prompt,
-              });
+              };
+              this.postMessageToWebview(promptCreated);
 
               await writeHistoryItem(
                 prompt,
@@ -228,10 +232,11 @@ export class GeneratePanel extends UIPanel {
             };
 
             result.args.responseStreamCallback = (text) => {
-              this.postMessageToWebview({
+              const responseStreamEvent: ResponseStreamEvent = {
                 type: "responseStream",
                 data: text,
-              });
+              };
+              this.postMessageToWebview(responseStreamEvent);
             };
 
             result.args.responseCallback = (text) => {
@@ -255,18 +260,16 @@ export class GeneratePanel extends UIPanel {
         }
         break;
       case "editAnthropicConfig":
-        await editAnthropicConfig(
-          message as EventTemplate<AnthropicConfigArgs>
-        );
+        await editAnthropicConfig(message as EditAnthropicConfigEvent);
         await this.onMessage(this.generateArgs!);
         break;
       case "editOpenAIConfig":
-        await editOpenAIConfig(message as EventTemplate<OpenAIConfigArgs>);
+        await editOpenAIConfig(message as EditOpenAIConfigEvent);
         await this.onMessage(this.generateArgs!);
         break;
       case "modelChange":
         await setDefaultModel(
-          (message as EventTemplate<ModelChange>).model,
+          (message as ModelChangeEvent).model,
           workspaceRoot
         );
         break;

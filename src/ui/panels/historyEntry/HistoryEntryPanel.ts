@@ -1,3 +1,7 @@
+import {
+  UnparsedResult,
+  generate as codespinGenerate,
+} from "codespin/dist/commands/generate.js";
 import * as vscode from "vscode";
 import { diffContent } from "../../../git/diffContent.js";
 import { getChanges } from "../../../git/getChanges.js";
@@ -6,13 +10,15 @@ import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
-import {
-  HistoryEntryPageArgs,
-  HistoryEntryPageFile,
-} from "../../html/pages/history/HistoryEntryPageArgs.js";
 import { GeneratedSourceFileWithHistory } from "../../viewProviders/history/types.js";
 import { UIPanel } from "../UIPanel.js";
-import { SelectHistoryEntryArgs } from "./eventArgs.js";
+import { getGenCommitMessageArgs } from "./getGenCommitMessageArgs.js";
+import {
+  GenerateCommitMessageEvent,
+  GeneratedCommitMessageEvent,
+} from "./types.js";
+import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntry.js";
+import { SelectHistoryEntryArgs } from "../../../commands/history/command.js";
 
 export class HistoryEntryPanel extends UIPanel {
   constructor(context: vscode.ExtensionContext) {
@@ -87,8 +93,24 @@ export class HistoryEntryPanel extends UIPanel {
     }
   }
 
-  async onMessage(message: EventTemplate<unknown>) {
+  async onMessage(message: EventTemplate) {
     switch (message.type) {
+      case "generateCommitMessage":
+        const incomingMessage = message as GenerateCommitMessageEvent;
+        const generateArgs = await getGenCommitMessageArgs(incomingMessage);
+        const result = await codespinGenerate(generateArgs, {
+          workingDir: getWorkspaceRoot(this.context),
+        });
+        const commitMessage = (result as UnparsedResult).text;
+
+        // Post an event back to the page.
+        const generatedMessage: GeneratedCommitMessageEvent = {
+          type: "generatedCommitMessage",
+          message: commitMessage,
+        };
+        this.postMessageToWebview(generatedMessage);
+
+        break;
       case "cancel":
         this.dispose();
         break;

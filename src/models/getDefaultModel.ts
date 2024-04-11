@@ -10,5 +10,5 @@ export async function getDefaultModel(workspaceRoot: string): Promise<string> {
     (await readFile(configFilePath)).toString()
   ) as CodespinConfig;
 
-  return config.api && config.model ? `${config.api}:${config.model}` : "";
+  return config.model ?? "";
 }

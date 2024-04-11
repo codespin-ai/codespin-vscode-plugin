@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { getWebviewContent } from "../getWebviewContent.js";
 import { EventTemplate } from "../EventTemplate.js";
-import { NavigateEventArgs } from "../webviewEventArgs.js";
+import { NavigateEvent } from "../types.js";
 
 export abstract class ViewProvider implements vscode.WebviewViewProvider {
   private webviewView?: vscode.WebviewView;
@@ -63,10 +63,10 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     this.resolveInitialize();
   }
 
-  onDidReceiveMessageBase(message: EventTemplate<unknown>) {
+  onDidReceiveMessageBase(message: EventTemplate) {
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
-      const args = (message as EventTemplate<{ args: unknown[] }>).args;
+      const args = (message as EventTemplate<string, { args: unknown[] }>).args;
       vscode.commands.executeCommand(command, ...args);
     } else {
       switch (message.type) {
@@ -74,7 +74,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
           this.resolveWebviewReady();
           break;
         case "navigated":
-          const { url } = message as EventTemplate<NavigateEventArgs>;
+          const { url } = message as NavigateEvent;
           const resolver = this.navigationPromiseResolvers.get(url);
           if (resolver) {
             resolver();
@@ -99,7 +99,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     return this.webviewReadyPromise;
   }
 
-  postMessageToWebview<T>(message: EventTemplate<T>) {
+  postMessageToWebview<T>(message: EventTemplate) {
     if (!this.isDisposed) {
       this.webviewView?.webview.postMessage(message);
     }
@@ -108,11 +108,12 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   navigateTo<T>(url: string, args?: T) {
     return new Promise<void>((resolve) => {
       this.navigationPromiseResolvers.set(url, resolve);
-      this.postMessageToWebview({
+      const navigateEvent: NavigateEvent = {
         type: "navigate",
         url,
         state: args,
-      });
+      };
+      this.postMessageToWebview(navigateEvent);
     });
   }
 
@@ -131,6 +132,6 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   }
 
   // These will be overridden
-  onMessage(message: EventTemplate<unknown>): void {}
+  onMessage(message: EventTemplate): void {}
   onDispose(): void {}
 }

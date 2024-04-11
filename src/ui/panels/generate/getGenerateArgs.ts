@@ -8,8 +8,7 @@ import { pathExists } from "../../../fs/pathExists.js";
 import { getAPIConfigPath } from "../../../settings/api/getAPIConfigPath.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
-import { EventTemplate } from "../../EventTemplate.js";
-import { ArgsFromGeneratePanel } from "./ArgsFromGeneratePanel.js";
+import { ArgsFromGeneratePanel } from "./types.js";
 
 type GetGenerateArgsResult =
   | {
@@ -26,7 +25,7 @@ type GetGenerateArgsResult =
     };
 
 export async function getGenerateArgs(
-  argsFromPanel: EventTemplate<ArgsFromGeneratePanel>,
+  argsFromPanel: ArgsFromGeneratePanel,
   cancelCallback: (cancel: () => void) => void,
   workspaceRoot: string
 ): Promise<GetGenerateArgsResult> {
@@ -34,10 +33,11 @@ export async function getGenerateArgs(
   if (!isInitialized(workspaceRoot)) {
     return { status: "not_initialized" };
   } else {
-    const api = argsFromPanel.model.split(":")[0];
+    const [api] = argsFromPanel.model.split(":");
+    
     const configFilePath = await getAPIConfigPath(api, workspaceRoot);
     const dirName = Date.now().toString();
-    
+
     if (configFilePath) {
       const historyDirPath = path.join(
         workspaceRoot,
@@ -67,7 +67,6 @@ export async function getGenerateArgs(
           .map((f) =>
             argsFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
           ),
-        exclude: undefined,
         declare: argsFromPanel.includedFiles
           .filter((f) => f.includeOption === "declaration")
           .map((f) => f.path),
@@ -77,21 +76,7 @@ export async function getGenerateArgs(
               workspaceRoot
             )
           : undefined,
-        prompt: undefined,
-        api: vendor,
-        maxTokens: undefined,
-        printPrompt: undefined,
-        writePrompt: undefined,
-        template: undefined,
-        templateArgs: undefined,
         debug: true,
-        exec: undefined,
-        config: undefined,
-        outDir: undefined,
-        parser: undefined,
-        parse: undefined,
-        go: undefined,
-        maxDeclare: undefined,
         cancelCallback,
       };
 

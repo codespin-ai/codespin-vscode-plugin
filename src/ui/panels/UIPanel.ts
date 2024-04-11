@@ -2,7 +2,7 @@ import { randomInt } from "crypto";
 import * as vscode from "vscode";
 import { getWebviewContent } from "../getWebviewContent.js";
 import { EventTemplate } from "../EventTemplate.js";
-import { NavigateEventArgs } from "../webviewEventArgs.js";
+import { NavigateEvent } from "../types.js";
 
 export abstract class UIPanel {
   context: vscode.ExtensionContext;
@@ -70,10 +70,10 @@ export abstract class UIPanel {
     return this.webviewReadyPromise;
   }
 
-  onDidReceiveMessageBase(message: EventTemplate<unknown>) {
+  onDidReceiveMessageBase(message: EventTemplate) {
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
-      const args = (message as EventTemplate<{ args: unknown[] }>).args;
+      const args = (message as EventTemplate<string, { args: unknown[] }>).args;
       vscode.commands.executeCommand(command, ...args);
     } else {
       switch (message.type) {
@@ -81,7 +81,7 @@ export abstract class UIPanel {
           this.resolveWebviewReady();
           break;
         case "navigated":
-          const incomingMessage = message as EventTemplate<NavigateEventArgs>;
+          const incomingMessage = message as NavigateEvent;
           const resolver = this.navigationPromiseResolvers.get(
             incomingMessage.url
           );
@@ -96,7 +96,7 @@ export abstract class UIPanel {
     this.onMessage(message);
   }
 
-  postMessageToWebview<T>(message: EventTemplate<T>) {
+  postMessageToWebview(message: EventTemplate) {
     if (!this.isDisposed) {
       this.panel.webview.postMessage(message);
     }
@@ -105,11 +105,12 @@ export abstract class UIPanel {
   navigateTo(url: string, args?: unknown) {
     return new Promise<void>((resolve) => {
       this.navigationPromiseResolvers.set(url, resolve);
-      this.postMessageToWebview({
+      const navigateEvent: NavigateEvent = {
         type: "navigate",
         url,
         state: args,
-      });
+      };
+      this.postMessageToWebview(navigateEvent);
     });
   }
 
@@ -128,7 +129,7 @@ export abstract class UIPanel {
   }
 
   // These will be overridden
-  onMessage(message: EventTemplate<unknown>): void {}
+  onMessage(message: EventTemplate): void {}
   onDispose(): void {}
   onDidChangeViewState(e: vscode.WebviewPanelOnDidChangeViewStateEvent): void {}
 }

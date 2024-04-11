@@ -1,11 +1,13 @@
 import * as React from "react";
-import { HistoryPageArgs } from "./HistoryPageArgs.js";
-import { HistoryEntry } from "../../../viewProviders/history/types.js";
-import { EventTemplate } from "../../../EventTemplate.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
-import { SelectHistoryEntryArgs } from "../../../panels/historyEntry/eventArgs.js";
+import { HistoryEntry } from "../../../viewProviders/history/types.js";
+import { SelectHistoryEntryCommandEvent } from "../../../../commands/history/command.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
+
+export type HistoryPageArgs = {
+  entries: HistoryEntry[];
+};
 
 const truncatePrompt = (prompt: string): string => {
   if (prompt.length <= 100) {
@@ -68,7 +70,7 @@ export function History() {
 
   const onItemClick = (timestamp: number) => {
     const vsCodeApi = getVsCodeApi();
-    const message: EventTemplate<{ args: [SelectHistoryEntryArgs] }> = {
+    const message: SelectHistoryEntryCommandEvent = {
       type: "command:codespin-ai.selectHistoryEntry",
       args: [
         {

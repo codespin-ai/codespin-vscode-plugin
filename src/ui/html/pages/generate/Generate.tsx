@@ -1,3 +1,4 @@
+import { Dropdown, TextArea } from "@vscode/webview-ui-toolkit";
 import {
   VSCodeButton,
   VSCodeDivider,
@@ -7,21 +8,34 @@ import {
   VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { useState, useEffect, useRef } from "react"; // Import useRef
-import { CSFormField } from "../../components/CSFormField.js";
-import { GeneratePageArgs } from "./GeneratePageArgs.js";
-import { Dropdown, TextArea } from "@vscode/webview-ui-toolkit";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
-import { ArgsFromGeneratePanel } from "../../../panels/generate/ArgsFromGeneratePanel.js";
-import { EventTemplate } from "../../../EventTemplate.js";
-import { ModelChange } from "../../../panels/generate/ModelChange.js";
+import { useEffect, useRef, useState } from "react"; // Import useRef
 import { formatFileSize } from "../../../../text/formatFileSize.js";
+import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
 import {
-  AddDepsEventArgs,
+  AddDepsEvent,
   FileVersions,
-  IncludeFilesEventArgs,
+  GenerateEvent,
+  IncludeFilesEvent,
   IncludeOptions,
-} from "../../../panels/generate/eventArgs.js";
+  ModelChangeEvent,
+} from "../../../panels/generate/types.js";
+import { CSFormField } from "../../components/CSFormField.js";
+import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
+
+export type GeneratePageArgs = {
+  files: {
+    path: string;
+    size: number;
+    includeOption: IncludeOptions;
+  }[];
+  models: { [key: string]: string };
+  codingConventions: Array<CodingConvention>;
+  selectedModel: string;
+  codingConvention: string | undefined;
+  prompt: string;
+  codegenTargets: string;
+  fileVersion: FileVersions;
+};
 
 export function Generate() {
   const vsCodeApi = getVsCodeApi();
@@ -73,7 +87,7 @@ export function Generate() {
       switch (message.type) {
         case "includeFiles":
           setFiles((files) => {
-            const includeFilesMessage: IncludeFilesEventArgs = message;
+            const includeFilesMessage: IncludeFilesEvent = message;
 
             const newFiles = includeFilesMessage.files.filter((x) =>
               files.every((file) => file.path !== x.path)
@@ -122,7 +136,7 @@ export function Generate() {
 
   function onModelChange(e: React.ChangeEvent<Dropdown>) {
     setModel(e.target.value);
-    const message: EventTemplate<ModelChange> = {
+    const message: ModelChangeEvent = {
       type: "modelChange",
       model,
     };
@@ -130,7 +144,7 @@ export function Generate() {
   }
 
   function onGenerateButtonClick() {
-    const message: EventTemplate<ArgsFromGeneratePanel> = {
+    const message: GenerateEvent = {
       type: "generate",
       model,
       includedFiles: files,
@@ -147,7 +161,7 @@ export function Generate() {
       e.preventDefault(); // Stop the textarea from causing form submission or other default actions
       e.stopPropagation(); // Prevent the event from propagating further
 
-      const message: EventTemplate<ArgsFromGeneratePanel> = {
+      const message: GenerateEvent = {
         type: "generate",
         includedFiles: files.map((x) => ({
           path: x.path,
@@ -168,7 +182,7 @@ export function Generate() {
   }
 
   function onAddDeps(filePath: string) {
-    const message: EventTemplate<AddDepsEventArgs> = {
+    const message: AddDepsEvent = {
       type: "addDeps",
       file: filePath,
       model,
@@ -187,7 +201,7 @@ export function Generate() {
               value: args.models[x],
             }))}
             currentValue={model}
-            style={{ width: "180px" }}
+            style={{ width: "320px" }}
             onChange={onModelChange}
           >
             {Object.keys(args.models).map((x) => (
@@ -220,7 +234,7 @@ export function Generate() {
         <CSFormField label={{ text: "Files to generate:" }}>
           <VSCodeDropdown
             currentValue={codegenTargets}
-            style={{ width: "180px" }}
+            style={{ width: "320px" }}
             onChange={(e: React.ChangeEvent<Dropdown>) =>
               setCodegenTargets(e.target.value)
             }
@@ -241,7 +255,7 @@ export function Generate() {
         </CSFormField>
         <CSFormField label={{ text: "Coding Conventions:" }}>
           <VSCodeDropdown
-            style={{ width: "180px" }}
+            style={{ width: "320px" }}
             onChange={(e: React.FormEvent<Dropdown>) =>
               setCodingConvention(
                 e.currentTarget.value === "None"
@@ -264,7 +278,7 @@ export function Generate() {
         <CSFormField label={{ text: "File Version:" }}>
           <VSCodeDropdown
             currentValue="current"
-            style={{ width: "180px" }}
+            style={{ width: "320px" }}
             onChange={(e: React.ChangeEvent<Dropdown>) =>
               setFileVersion(e.target.value as FileVersions)
             }

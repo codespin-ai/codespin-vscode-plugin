@@ -1,25 +1,21 @@
+import { Dropdown } from "@vscode/webview-ui-toolkit";
 import {
   VSCodeButton,
   VSCodeTextField,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useState } from "react";
-import { CSFormField } from "../../components/CSFormField.js";
+import { EditOpenAIConfigEvent } from "../../../../settings/api/types.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
-import { EventTemplate } from "../../../EventTemplate.js";
+import { CSFormField } from "../../components/CSFormField.js";
 import { OpenAIConfigArgs } from "../../../../settings/api/editOpenAIConfig.js";
-import { Dropdown } from "@vscode/webview-ui-toolkit";
 
-interface EditOpenAIConfigProps {
-  apiKey: string;
-}
-
-export function EditOpenAIConfig(props: EditOpenAIConfigProps) {
+export function EditOpenAIConfig(props: OpenAIConfigArgs) {
   const vsCodeApi = getVsCodeApi();
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
 
   function onSave() {
-    const message: EventTemplate<OpenAIConfigArgs> = {
+    const message: EditOpenAIConfigEvent = {
       type: "editOpenAIConfig",
       apiKey,
     };

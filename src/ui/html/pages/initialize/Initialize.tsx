@@ -7,7 +7,7 @@ export function Initialize() {
   const vsCodeApi = getVsCodeApi();
 
   function initializeProject() {
-    const message: EventTemplate<{}> = {
+    const message: EventTemplate<"initialize"> = {
       type: "initialize",
     };
     vsCodeApi.postMessage(message);

@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import * as path from "path";
+import { ArgsFromGeneratePanel } from "../../ui/panels/generate/types.js";
 import { getHistoryDir } from "../codespinDirs.js";
-import { ArgsFromGeneratePanel } from "../../ui/panels/generate/ArgsFromGeneratePanel.js";
 
 export async function writeUserInput(
   dirName: string,

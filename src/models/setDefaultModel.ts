@@ -4,10 +4,9 @@ import * as path from "path";
 import { getCodespinDir } from "../settings/codespinDirs.js";
 
 export async function setDefaultModel(
-  apiAndModel: string,
+  model: string,
   workspaceRoot: string
 ): Promise<void> {
-  const [api, model] = apiAndModel.split(":");
   const projectConfigDir = await getCodespinDir(workspaceRoot);
   const configFilePath = path.join(projectConfigDir, `codespin.json`);
 
@@ -16,7 +15,6 @@ export async function setDefaultModel(
   const config = JSON.parse(configContent) as CodespinConfig;
 
   // Update the api and model properties
-  config.api = api;
   config.model = model;
 
   // Write the updated configuration back to the file

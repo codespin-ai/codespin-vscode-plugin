@@ -9,7 +9,7 @@ import { EditConfig } from "./html/pages/api/EditConfig.js";
 import { HistoryEntry } from "./html/pages/history/HistoryEntry.js";
 import { Initialize } from "./html/pages/initialize/Initialize.js";
 import { History } from "./html/pages/history/History.js";
-import { NavigateEventArgs } from "./webviewEventArgs.js";
+import { NavigateEvent } from "./types.js";
 
 function App() {
   React.useEffect(() => {
@@ -17,7 +17,7 @@ function App() {
       const incomingMessage = (event as any).data;
       switch (incomingMessage.type) {
         case "navigate":
-          const eventArgs = incomingMessage as NavigateEventArgs;
+          const eventArgs = incomingMessage as NavigateEvent;
           navigate(eventArgs.url, { state: eventArgs.state });
           getVsCodeApi().postMessage({
             type: "navigated",
