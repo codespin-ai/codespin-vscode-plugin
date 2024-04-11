@@ -6,12 +6,12 @@ import {
 import * as React from "react";
 import { useState } from "react";
 import { EditOpenAIConfigEvent } from "../../../../settings/api/types.js";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { OpenAIConfigArgs } from "../../../../settings/api/editOpenAIConfig.js";
 
 export function EditOpenAIConfig(props: OpenAIConfigArgs) {
-  const vsCodeApi = getVsCodeApi();
+  const vsCodeApi = getVSCodeApi();
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
 
   function onSave() {

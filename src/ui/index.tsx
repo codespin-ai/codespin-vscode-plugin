@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
-import { getVsCodeApi } from "../vscode/getVsCodeApi.js";
+import { getVSCodeApi } from "../vscode/getVSCodeApi.js";
 import { Generate } from "./html/pages/generate/Generate.js";
 import { GenerateStream } from "./html/pages/generate/GenerateStream.js";
 import { EditConfig } from "./html/pages/api/EditConfig.js";
@@ -19,14 +19,14 @@ function App() {
         case "navigate":
           const eventArgs = incomingMessage as NavigateEvent;
           navigate(eventArgs.url, { state: eventArgs.state });
-          getVsCodeApi().postMessage({
+          getVSCodeApi().postMessage({
             type: "navigated",
             url: eventArgs.url,
           });
       }
     }
     window.addEventListener("message", listeners);
-    getVsCodeApi().postMessage({ type: "webviewReady" });
+    getVSCodeApi().postMessage({ type: "webviewReady" });
     return () => window.removeEventListener("click", listeners);
   }, []);
 

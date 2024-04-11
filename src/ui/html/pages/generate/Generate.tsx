@@ -10,7 +10,7 @@ import {
 import * as React from "react";
 import { useEffect, useRef, useState } from "react"; // Import useRef
 import { formatFileSize } from "../../../../text/formatFileSize.js";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import {
   AddDepsEvent,
   FileVersions,
@@ -39,7 +39,7 @@ export type GeneratePageArgs = {
 };
 
 export function Generate() {
-  const vsCodeApi = getVsCodeApi();
+  const vsCodeApi = getVSCodeApi();
   const args: GeneratePageArgs = history.state;
   const promptRef = useRef<TextArea>(null);
 

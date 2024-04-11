@@ -6,11 +6,11 @@ import * as React from "react";
 import { useState } from "react";
 import { AnthropicConfigArgs } from "../../../../settings/api/editAnthropicConfig.js";
 import { EditAnthropicConfigEvent } from "../../../../settings/api/types.js";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 
 export function EditAnthropicConfig(props: AnthropicConfigArgs) {
-  const vsCodeApi = getVsCodeApi();
+  const vsCodeApi = getVSCodeApi();
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
 
   function onSave() {

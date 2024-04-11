@@ -7,7 +7,7 @@ import {
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { GenerateCommandEvent } from "../../../../commands/codegen/generate.js";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import {
   CommitEvent,
   GenerateCommitMessageEvent,
@@ -63,12 +63,12 @@ export function HistoryEntry() {
       type: "command:codespin-ai.generate",
       args: [undefined, gatherArgsForRegenerateCommand()],
     };
-    getVsCodeApi().postMessage(generateCommandEvent);
+    getVSCodeApi().postMessage(generateCommandEvent);
 
     const cancelEvent: CancelEvent = {
       type: "cancel",
     };
-    getVsCodeApi().postMessage(cancelEvent);
+    getVSCodeApi().postMessage(cancelEvent);
   };
 
   const onGenerateCommitMessage = () => {
@@ -77,7 +77,7 @@ export function HistoryEntry() {
       prompt: args.entry.userInput.prompt,
       model: args.entry.userInput.model,
     };
-    getVsCodeApi().postMessage(message);
+    getVSCodeApi().postMessage(message);
   };
 
   const onCommitClick = () => {
@@ -85,7 +85,7 @@ export function HistoryEntry() {
       type: "commit",
       message: commitMessage,
     };
-    getVsCodeApi().postMessage(message);
+    getVSCodeApi().postMessage(message);
   };
 
   useEffect(() => {

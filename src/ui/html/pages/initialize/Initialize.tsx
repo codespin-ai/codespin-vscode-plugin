@@ -1,10 +1,10 @@
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { EventTemplate } from "../../../EventTemplate.js";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 
 export function Initialize() {
-  const vsCodeApi = getVsCodeApi();
+  const vsCodeApi = getVSCodeApi();
 
   function initializeProject() {
     const message: EventTemplate<"initialize"> = {

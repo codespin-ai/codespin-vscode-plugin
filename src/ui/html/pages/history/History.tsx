@@ -1,5 +1,5 @@
 import * as React from "react";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import { HistoryEntry } from "../../../viewProviders/history/types.js";
 import { SelectHistoryEntryCommandEvent } from "../../../../commands/history/command.js";
 
@@ -69,7 +69,7 @@ export function History() {
   const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
 
   const onItemClick = (timestamp: number) => {
-    const vsCodeApi = getVsCodeApi();
+    const vsCodeApi = getVSCodeApi();
     const message: SelectHistoryEntryCommandEvent = {
       type: "command:codespin-ai.selectHistoryEntry",
       args: [

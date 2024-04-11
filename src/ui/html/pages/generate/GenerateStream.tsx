@@ -4,7 +4,7 @@ import {
   VSCodeProgressRing,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
+import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import { EventTemplate } from "../../../EventTemplate.js";
 import {
   PromptCreatedEvent,
@@ -41,12 +41,12 @@ export function GenerateStream() {
       }
     }
     window.addEventListener("message", listeners);
-    getVsCodeApi().postMessage({ type: "webviewReady" });
+    getVSCodeApi().postMessage({ type: "webviewReady" });
     return () => window.removeEventListener("message", listeners);
   }, []);
 
   function cancel() {
-    getVsCodeApi().postMessage({ type: "cancel" });
+    getVSCodeApi().postMessage({ type: "cancel" });
   }
 
   return (
