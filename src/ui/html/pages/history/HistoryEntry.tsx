@@ -8,7 +8,6 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { GenerateCommandEvent } from "../../../../commands/codegen/generate.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
-import { RegenerateArgs } from "../../../panels/generate/types.js";
 import {
   CommitEvent,
   GenerateCommitMessageEvent,
@@ -17,7 +16,7 @@ import {
 import { CancelEvent } from "../../../types.js";
 import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { EventTemplate } from "../../../EventTemplate.js";
+import { GenerationUserInput } from "../../../panels/generate/types.js";
 
 export type HistoryEntryPageFile = {
   original: string | undefined;
@@ -43,16 +42,17 @@ export function HistoryEntry() {
   const [showCommitMessage, setShowCommitMessage] = useState<boolean>(false);
   const [isCommitted, setIsCommitted] = useState<boolean>(false);
 
-  const gatherArgsForRegenerateCommand = (): RegenerateArgs => {
+  const gatherArgsForRegenerateCommand = (): GenerationUserInput => {
     const { userInput } = args.entry;
 
-    const regenerateArgs: RegenerateArgs = {
+    const regenerateArgs: GenerationUserInput = {
       model: userInput.model,
       codegenTargets: userInput.codegenTargets,
       prompt: args.entry.prompt,
       codingConvention: userInput.codingConvention,
       fileVersion: userInput.fileVersion,
       includedFiles: userInput.includedFiles,
+      outputKind: userInput.outputKind,
     };
 
     return regenerateArgs;

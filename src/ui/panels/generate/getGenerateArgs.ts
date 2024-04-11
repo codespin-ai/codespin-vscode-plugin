@@ -8,7 +8,7 @@ import { pathExists } from "../../../fs/pathExists.js";
 import { getAPIConfigPath } from "../../../settings/api/getAPIConfigPath.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
-import { ArgsFromGeneratePanel } from "./types.js";
+import { GenerationUserInput } from "./types.js";
 
 type GetGenerateArgsResult =
   | {
@@ -25,7 +25,7 @@ type GetGenerateArgsResult =
     };
 
 export async function getGenerateArgs(
-  argsFromPanel: ArgsFromGeneratePanel,
+  argsFromPanel: GenerationUserInput,
   cancelCallback: (cancel: () => void) => void,
   workspaceRoot: string
 ): Promise<GetGenerateArgsResult> {
@@ -75,6 +75,7 @@ export async function getGenerateArgs(
             )
           : undefined,
         debug: true,
+        diff: argsFromPanel.outputKind === "diff",
         cancelCallback,
       };
 

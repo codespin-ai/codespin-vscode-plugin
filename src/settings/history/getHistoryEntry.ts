@@ -3,7 +3,11 @@ import * as path from "path";
 
 import { getHistoryDir } from "../codespinDirs.js";
 import { readGeneratedFiles } from "./readGeneratedFiles.js";
-import { FullHistoryEntry, HistoryEntry, UserInput } from "../../ui/viewProviders/history/types.js";
+import {
+  FullHistoryEntry,
+  HistoryEntry,
+} from "../../ui/viewProviders/history/types.js";
+import { GenerationUserInput } from "../../ui/panels/generate/types.js";
 
 // Functional style utility functions
 async function readJsonFile<T>(filePath: string): Promise<T> {
@@ -48,7 +52,7 @@ export async function getHistoryEntry(
     ]);
 
     if (userInputExists && promptExists) {
-      const userInput = await readJsonFile<UserInput>(userInputPath);
+      const userInput = await readJsonFile<GenerationUserInput>(userInputPath);
       const prompt = await readTextFile(promptPath);
       const rawPrompt = await readTextFile(rawPromptPath);
       return { timestamp, userInput, prompt, rawPrompt };

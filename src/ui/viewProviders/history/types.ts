@@ -1,22 +1,9 @@
 import { GeneratedSourceFile } from "codespin/dist/sourceCode/GeneratedSourceFile.js";
-import { CodingConvention } from "../../../settings/conventions/CodingConvention.js";
-
-export type UserInput = {
-  type: string;
-  model: string;
-  prompt: string;
-  codegenTargets: string;
-  codingConvention: CodingConvention | undefined;
-  fileVersion: "current" | "HEAD";
-  includedFiles: Array<{
-    path: string;
-    includeOption: "source" | "declaration";
-  }>;
-};
+import { GenerationUserInput } from "../../panels/generate/types.js";
 
 export type HistoryEntry = {
   timestamp: number;
-  userInput: UserInput;
+  userInput: GenerationUserInput;
   prompt: string;
   rawPrompt: string;
 };

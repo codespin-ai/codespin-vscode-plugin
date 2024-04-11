@@ -49,28 +49,17 @@ export type ModelChangeEvent = {
 
 export type GenerateEvent = {
   type: "generate";
-} & ArgsFromGeneratePanel;
+} & GenerationUserInput;
 
-export type ArgsFromGeneratePanel = {
+export type GenerationUserInput = {
   model: string;
   prompt: string;
   codegenTargets: string;
   codingConvention: string | undefined;
   fileVersion: FileVersions;
+  outputKind: "full" | "diff";
   includedFiles: {
     path: string;
     includeOption: IncludeOptions;
-  }[];
-};
-
-export type RegenerateArgs = {
-  model: string;
-  codegenTargets: string;
-  prompt: string;
-  codingConvention: CodingConvention | undefined;
-  fileVersion: "current" | "HEAD";
-  includedFiles: {
-    path: string;
-    includeOption: "source" | "declaration";
   }[];
 };

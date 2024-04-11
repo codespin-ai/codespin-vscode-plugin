@@ -21,19 +21,18 @@ import { writeUserInput } from "../../../settings/history/writeUserInput.js";
 import { initialize } from "../../../settings/initialize.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
+import { GeneratePageArgs } from "../../html/pages/generate/Generate.js";
 import { UIPanel } from "../UIPanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import {
   AddDepsEvent,
-  ArgsFromGeneratePanel,
   GenerateEvent,
+  GenerationUserInput,
   IncludeFilesEvent,
   ModelChangeEvent,
   PromptCreatedEvent,
-  RegenerateArgs,
   ResponseStreamEvent,
 } from "./types.js";
-import { GeneratePageArgs } from "../../html/pages/generate/Generate.js";
 
 let activePanel: GeneratePanel | undefined = undefined;
 
@@ -49,7 +48,7 @@ export class GeneratePanel extends UIPanel {
     super(context);
   }
 
-  async init(commandArgs: string[] | RegenerateArgs) {
+  async init(commandArgs: string[] | GenerationUserInput) {
     const workspaceRoot = getWorkspaceRoot(this.context);
     await this.onWebviewReady();
 
@@ -81,6 +80,7 @@ export class GeneratePanel extends UIPanel {
             fileVersion: "current",
             prompt: "",
             codingConvention: undefined,
+            outputKind: "full",
           };
         })()
       : await (async () => {
@@ -107,7 +107,8 @@ export class GeneratePanel extends UIPanel {
             codegenTargets: commandArgs.codegenTargets,
             fileVersion: commandArgs.fileVersion,
             prompt: commandArgs.prompt,
-            codingConvention: commandArgs.codingConvention?.filename,
+            codingConvention: commandArgs.codingConvention,
+            outputKind: commandArgs.outputKind,
           };
           return args;
         })();
@@ -206,7 +207,7 @@ export class GeneratePanel extends UIPanel {
 
             await writeUserInput(
               result.dirName,
-              messageSansType as ArgsFromGeneratePanel,
+              messageSansType as GenerationUserInput,
               workspaceRoot
             );
 

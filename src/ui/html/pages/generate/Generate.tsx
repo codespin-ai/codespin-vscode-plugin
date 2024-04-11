@@ -35,6 +35,7 @@ export type GeneratePageArgs = {
   prompt: string;
   codegenTargets: string;
   fileVersion: FileVersions;
+  outputKind: "full" | "diff";
 };
 
 export function Generate() {
@@ -56,6 +57,14 @@ export function Generate() {
   const [files, setFiles] = useState<
     { path: string; size: number; includeOption: IncludeOptions }[]
   >(args.files);
+
+  const [outputKind, setOutputKind] = useState<"full" | "diff">(
+    args.outputKind
+  );
+
+  function onOutputKindChange(e: React.ChangeEvent<Dropdown>) {
+    setOutputKind(e.target.value as "full" | "diff");
+  }
 
   useEffect(() => {
     if (files.length === 1) {
@@ -152,6 +161,7 @@ export function Generate() {
       codegenTargets,
       codingConvention,
       fileVersion,
+      outputKind,
     };
     vsCodeApi.postMessage(message);
   }
@@ -163,15 +173,13 @@ export function Generate() {
 
       const message: GenerateEvent = {
         type: "generate",
-        includedFiles: files.map((x) => ({
-          path: x.path,
-          includeOption: x.includeOption,
-        })),
+        includedFiles: files,
         model,
         prompt: (e.currentTarget as any).value,
         codegenTargets,
         codingConvention,
         fileVersion,
+        outputKind,
       };
       vsCodeApi.postMessage(message);
     }
@@ -251,6 +259,16 @@ export function Generate() {
                   {item.text}
                 </VSCodeOption>
               ))}
+          </VSCodeDropdown>
+        </CSFormField>
+        <CSFormField label={{ text: "Output Kind:" }}>
+          <VSCodeDropdown
+            currentValue={outputKind || "full"} // Fallback to 'full' if undefined
+            style={{ width: "320px" }}
+            onChange={onOutputKindChange}
+          >
+            <VSCodeOption value="full">Full Content</VSCodeOption>
+            <VSCodeOption value="diff">Diff</VSCodeOption>
           </VSCodeDropdown>
         </CSFormField>
         <CSFormField label={{ text: "Coding Conventions:" }}>
