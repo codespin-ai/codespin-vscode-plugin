@@ -2,7 +2,7 @@
   "name": "codespin-ai",
   "displayName": "CodeSpin.AI",
   "description": "AI-assisted Code Generation",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "publisher": "CodespinAI",
   "license": "MIT",
   "repository": {
@@ -118,7 +118,7 @@
     "@types/react-dom": "^18.2.24",
     "@types/react-router-dom": "^5.3.3",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.177",
+    "codespin": "^0.0.178",
     "diff2html": "^3.4.48",
     "gray-matter": "^4.0.3",
     "react": "^18.2.0",
