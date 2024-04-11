@@ -2,7 +2,7 @@
   "name": "codespin-ai",
   "displayName": "CodeSpin.AI",
   "description": "AI-assisted Code Generation",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "CodespinAI",
   "license": "MIT",
   "repository": {
