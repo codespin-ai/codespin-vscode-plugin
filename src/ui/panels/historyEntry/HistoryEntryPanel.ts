@@ -14,11 +14,14 @@ import { GeneratedSourceFileWithHistory } from "../../viewProviders/history/type
 import { UIPanel } from "../UIPanel.js";
 import { getGenCommitMessageArgs } from "./getGenCommitMessageArgs.js";
 import {
+  CommitEvent,
+  CommittedEvent,
   GenerateCommitMessageEvent,
   GeneratedCommitMessageEvent,
 } from "./types.js";
 import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntry.js";
 import { SelectHistoryEntryArgs } from "../../../commands/history/command.js";
+import { commitFiles } from "../../../git/commitFiles.js";
 
 export class HistoryEntryPanel extends UIPanel {
   constructor(context: vscode.ExtensionContext) {
@@ -95,7 +98,7 @@ export class HistoryEntryPanel extends UIPanel {
 
   async onMessage(message: EventTemplate) {
     switch (message.type) {
-      case "generateCommitMessage":
+      case "generateCommitMessage": {
         const incomingMessage = message as GenerateCommitMessageEvent;
         const generateArgs = await getGenCommitMessageArgs(incomingMessage);
         const result = await codespinGenerate(generateArgs, {
@@ -111,6 +114,20 @@ export class HistoryEntryPanel extends UIPanel {
         this.postMessageToWebview(generatedMessage);
 
         break;
+      }
+      case "commit": {
+        const incomingMessage = message as CommitEvent;
+        await commitFiles(
+          incomingMessage.message,
+          getWorkspaceRoot(this.context)
+        );
+        // Post an event back to the page.
+        const committedMessage: CommittedEvent = {
+          type: "committed",
+        };
+        this.postMessageToWebview(committedMessage);
+        break;
+      }
       case "cancel":
         this.dispose();
         break;

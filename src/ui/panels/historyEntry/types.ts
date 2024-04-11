@@ -14,3 +14,12 @@ export type GeneratedCommitMessageArgs = {
 export type GeneratedCommitMessageEvent = {
   type: "generatedCommitMessage";
 } & GeneratedCommitMessageArgs;
+
+export type CommitEvent = {
+  type: "commit";
+  message: string;
+};
+
+export type CommittedEvent = {
+  type: "committed";
+};

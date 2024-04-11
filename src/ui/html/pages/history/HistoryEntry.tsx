@@ -6,13 +6,18 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useEffect, useState } from "react";
+import { GenerateCommandEvent } from "../../../../commands/codegen/generate.js";
 import { getVsCodeApi } from "../../../../vscode/getVsCodeApi.js";
-import { GenerateCommitMessageEvent } from "../../../panels/historyEntry/types.js";
+import { RegenerateArgs } from "../../../panels/generate/types.js";
+import {
+  CommitEvent,
+  GenerateCommitMessageEvent,
+  GeneratedCommitMessageEvent,
+} from "../../../panels/historyEntry/types.js";
+import { CancelEvent } from "../../../types.js";
 import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { RegenerateArgs } from "../../../panels/generate/types.js";
-import { CancelEvent } from "../../../types.js";
-import { GenerateCommandEvent } from "../../../../commands/codegen/generate.js";
+import { EventTemplate } from "../../../EventTemplate.js";
 
 export type HistoryEntryPageFile = {
   original: string | undefined;
@@ -36,6 +41,7 @@ export function HistoryEntry() {
 
   const [commitMessage, setCommitMessage] = useState<string>("");
   const [showCommitMessage, setShowCommitMessage] = useState<boolean>(false);
+  const [isCommitted, setIsCommitted] = useState<boolean>(false);
 
   const gatherArgsForRegenerateCommand = (): RegenerateArgs => {
     const { userInput } = args.entry;
@@ -74,11 +80,22 @@ export function HistoryEntry() {
     getVsCodeApi().postMessage(message);
   };
 
+  const onCommitClick = () => {
+    const message: CommitEvent = {
+      type: "commit",
+      message: commitMessage,
+    };
+    getVsCodeApi().postMessage(message);
+  };
+
   useEffect(() => {
     const messageListener = (event: any) => {
       if (event.data.type === "generatedCommitMessage") {
-        setCommitMessage(event.data.message);
+        const incomingMessage: GeneratedCommitMessageEvent = event.data;
+        setCommitMessage(incomingMessage.message);
         setShowCommitMessage(true);
+      } else if (event.data.type === "committed") {
+        setIsCommitted(true);
       }
     };
 
@@ -208,13 +225,24 @@ export function HistoryEntry() {
                     >
                       {commitMessage}
                     </div>
-                    <VSCodeButton style={{ marginTop: "1em" }}>
-                      Commit Files
-                    </VSCodeButton>
+                    {!isCommitted ? (
+                      <VSCodeButton
+                        onClick={onCommitClick}
+                        style={{ marginTop: "1em" }}
+                      >
+                        Commit Files
+                      </VSCodeButton>
+                    ) : (
+                      <></>
+                    )}
                   </div>
                 )}
                 <div style={{ marginTop: "1em" }}>
-                  <h3>Files in commit:</h3>
+                  <h3>
+                    {isCommitted
+                      ? "✅ The following files were committed"
+                      : "Files in commit:"}
+                  </h3>
                   {
                     <ul
                       style={{
