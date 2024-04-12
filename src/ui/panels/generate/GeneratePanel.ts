@@ -33,6 +33,7 @@ import {
   PromptCreatedEvent,
   ResponseStreamEvent,
 } from "./types.js";
+import { isInitialized } from "../../../settings/isInitialized.js";
 
 let activePanel: GeneratePanel | undefined = undefined;
 
@@ -50,6 +51,26 @@ export class GeneratePanel extends UIPanel {
 
   async init(commandArgs: string[] | GenerationUserInput) {
     const workspaceRoot = getWorkspaceRoot(this.context);
+
+    const initialized = await isInitialized(workspaceRoot);
+    if (!initialized) {
+      // Ask the user if they want to force initialize
+      const userChoice = await vscode.window.showWarningMessage(
+        "Codespin configuration is not initialized for this project. Create?",
+        "Yes",
+        "No"
+      );
+
+      if (userChoice === "Yes") {
+        await initialize(false, workspaceRoot);
+      }
+      // If the user chooses No, we must exit.
+      else {
+        this.dispose();
+        return;
+      }
+    }
+
     await this.onWebviewReady();
 
     const conventions = await getConventions(workspaceRoot);
@@ -175,25 +196,6 @@ export class GeneratePanel extends UIPanel {
         );
 
         switch (result.status) {
-          case "not_initialized":
-            // Ask the user if they want to force initialize
-            const userChoice = await vscode.window.showWarningMessage(
-              "Codespin configuration is not initialized for this project. Create?",
-              "Yes",
-              "No"
-            );
-
-            if (userChoice === "Yes") {
-              await initialize(false, workspaceRoot);
-
-              // Now we can retry.
-              await this.onMessage(this.generateArgs!);
-            }
-            // If the user chooses No, we must exit.
-            else {
-              this.dispose();
-            }
-            break;
           case "can_generate":
             await writeHistoryItem(
               this.generateArgs.prompt,

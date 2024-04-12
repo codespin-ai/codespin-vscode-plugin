@@ -7,13 +7,9 @@ import * as path from "path";
 import { pathExists } from "../../../fs/pathExists.js";
 import { getAPIConfigPath } from "../../../settings/api/getAPIConfigPath.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
-import { isInitialized } from "../../../settings/isInitialized.js";
 import { GenerationUserInput } from "./types.js";
 
 type GetGenerateArgsResult =
-  | {
-      status: "not_initialized";
-    }
   | {
       status: "missing_config";
       api: string;
@@ -29,68 +25,63 @@ export async function getGenerateArgs(
   cancelCallback: (cancel: () => void) => void,
   workspaceRoot: string
 ): Promise<GetGenerateArgsResult> {
-  // Check if .codespin dir exists
-  if (!isInitialized(workspaceRoot)) {
-    return { status: "not_initialized" };
-  } else {
-    const [api] = argsFromPanel.model.split(":");
+  const [api] = argsFromPanel.model.split(":");
 
-    const configFilePath = await getAPIConfigPath(api, workspaceRoot);
-    const dirName = Date.now().toString();
+  const configFilePath = await getAPIConfigPath(api, workspaceRoot);
+  const dirName = Date.now().toString();
 
-    if (configFilePath) {
-      const historyDirPath = path.join(
-        workspaceRoot,
-        ".codespin",
-        "history",
-        dirName
-      );
+  if (configFilePath) {
+    const historyDirPath = path.join(
+      workspaceRoot,
+      ".codespin",
+      "history",
+      dirName
+    );
 
-      if (!(await pathExists(historyDirPath))) {
-        await mkdir(historyDirPath, { recursive: true });
-      }
+    if (!(await pathExists(historyDirPath))) {
+      await mkdir(historyDirPath, { recursive: true });
+    }
 
-      const promptFilePath = path.join(historyDirPath, "prompt.txt");
+    const promptFilePath = path.join(historyDirPath, "prompt.txt");
 
-      const codespinGenerateArgs: GenerateArgs = {
-        promptFile: promptFilePath,
-        out:
-          argsFromPanel.codegenTargets !== ":prompt"
-            ? argsFromPanel.codegenTargets
-            : undefined,
-        model: argsFromPanel.model,
-        write: true,
-        include: argsFromPanel.includedFiles
-          .filter((f) => f.includeOption === "source")
-          .map((f) =>
-            argsFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
-          ),
-        declare: argsFromPanel.includedFiles
-          .filter((f) => f.includeOption === "declaration")
-          .map((f) => f.path),
-        spec: argsFromPanel.codingConvention
-          ? await getCodingConventionPath(
-              argsFromPanel.codingConvention,
-              workspaceRoot
-            )
+    const codespinGenerateArgs: GenerateArgs = {
+      promptFile: promptFilePath,
+      out:
+        argsFromPanel.codegenTargets !== ":prompt"
+          ? argsFromPanel.codegenTargets
           : undefined,
-        debug: true,
-        diff: argsFromPanel.outputKind === "diff",
-        cancelCallback,
-      };
+      model: argsFromPanel.model,
+      write: true,
+      include: argsFromPanel.includedFiles
+        .filter((f) => f.includeOption === "source")
+        .map((f) =>
+          argsFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
+        ),
+      declare: argsFromPanel.includedFiles
+        .filter((f) => f.includeOption === "declaration")
+        .map((f) => f.path),
+      spec: argsFromPanel.codingConvention
+        ? await getCodingConventionPath(
+            argsFromPanel.codingConvention,
+            workspaceRoot
+          )
+        : undefined,
+      debug: true,
+      diff: argsFromPanel.outputKind === "diff",
+      cancelCallback,
+    };
 
-      return {
-        status: "can_generate",
-        args: codespinGenerateArgs,
-        dirName,
-      };
-    }
-    // config file doesn't exist.
-    else {
-      return {
-        status: "missing_config",
-        api,
-      };
-    }
+    return {
+      status: "can_generate",
+      args: codespinGenerateArgs,
+      dirName,
+    };
+  }
+  // config file doesn't exist.
+  else {
+    return {
+      status: "missing_config",
+      api,
+    };
   }
 }
