@@ -2,6 +2,7 @@ import * as React from "react";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import { HistoryEntry } from "../../../viewProviders/history/types.js";
 import { SelectHistoryEntryCommandEvent } from "../../../../commands/history/command.js";
+import { IncludeOptions } from "../../../panels/generate/types.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
 
@@ -81,6 +82,15 @@ export function History() {
     vsCodeApi.postMessage(message);
   };
 
+  function getFilePaths(
+    includedFiles: {
+      path: string;
+      includeOption: IncludeOptions;
+    }[]
+  ) {
+    return includedFiles.map((x) => x.path.split("/").slice(-1)[0]);
+  }
+
   return (
     <div>
       {Object.keys(groupedEntries).length > 0 ? (
@@ -105,6 +115,7 @@ export function History() {
                     }}
                   >
                     <div>{truncatePrompt(entry.prompt)}</div>
+
                     <div
                       style={{
                         fontStyle: "italic",
@@ -112,7 +123,24 @@ export function History() {
                         marginTop: "4px",
                       }}
                     >
-                      {formatRelativeTime(entry.timestamp)}
+                      <span>{formatRelativeTime(entry.timestamp)}</span>
+                      <span>
+                        {(() => {
+                          const filePaths = getFilePaths(
+                            entry.userInput.includedFiles
+                          );
+
+                          return filePaths.length > 0 ? (
+                            <span style={{ marginLeft: "1em"}}>
+                              {filePaths.length <= 3
+                                ? filePaths.join(", ")
+                                : filePaths.slice(0, 2).join(", ") + " etc"}
+                            </span>
+                          ) : (
+                            <></>
+                          );
+                        })()}
+                      </span>
                     </div>
                   </li>
                 );
