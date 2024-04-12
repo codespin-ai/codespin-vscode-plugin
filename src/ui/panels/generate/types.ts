@@ -43,6 +43,14 @@ export type AddDepsEvent = {
   type: "addDeps";
 } & AddDepsArgs;
 
+export type OpenFileArgs = {
+  file: string;
+};
+
+export type OpenFileEvent = {
+  type: "openFile";
+} & OpenFileArgs;
+
 export type ModelChangeEvent = {
   type: "modelChange";
 } & ModelChange;

@@ -18,6 +18,7 @@ import {
   IncludeFilesEvent,
   IncludeOptions,
   ModelChangeEvent,
+  OpenFileEvent,
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
@@ -198,6 +199,14 @@ export function Generate() {
     vsCodeApi.postMessage(message);
   }
 
+  function onFileClick(filePath: string) {
+    const message: OpenFileEvent = {
+      type: "openFile",
+      file: filePath,
+    };
+    vsCodeApi.postMessage(message);
+  }
+
   return (
     <div>
       <h1>Generate</h1>
@@ -355,8 +364,11 @@ export function Generate() {
                   </VSCodeOption>
                 ))}
               </VSCodeDropdown>
-              <span style={{ marginRight: "1em" }}>
-                {file.path} {file.size ? `(${formatFileSize(file.size)})` : ""}
+              <VSCodeLink onClick={() => onFileClick(file.path)}>
+                {file.path}
+              </VSCodeLink>
+              <span style={{ marginLeft: "4px", marginRight: "1em" }}>
+                {file.size ? `(${formatFileSize(file.size)})` : ""}
               </span>
               <VSCodeLink onClick={() => onAddDeps(file.path)}>
                 Add deps

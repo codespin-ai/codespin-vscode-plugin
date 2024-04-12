@@ -30,6 +30,7 @@ import {
   GenerationUserInput,
   IncludeFilesEvent,
   ModelChangeEvent,
+  OpenFileEvent,
   PromptCreatedEvent,
   ResponseStreamEvent,
 } from "./types.js";
@@ -273,6 +274,17 @@ export class GeneratePanel extends UIPanel {
           (message as ModelChangeEvent).model,
           workspaceRoot
         );
+        break;
+      case "openFile":
+        const filePath = path.resolve(
+          workspaceRoot,
+          (message as OpenFileEvent).file
+        );
+        const uri = vscode.Uri.file(filePath);
+        vscode.window.showTextDocument(uri, {
+          preview: false,
+          preserveFocus: false,
+        });
         break;
       case "cancel":
         if (this.cancelGeneration) {
