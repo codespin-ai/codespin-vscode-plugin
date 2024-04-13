@@ -17,19 +17,20 @@ import { CancelEvent } from "../../../types.js";
 import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { GenerationUserInput } from "../../../panels/generate/types.js";
+import { CodeSnippet } from "../../components/CodeSnippet.js";
 
 export type HistoryEntryPageFile = {
+  filePath: string;
   original: string | undefined;
   generated: string;
+  originalHtml: string | undefined;
+  generatedHtml: string;
   diffHtml: string;
 };
 
 export type HistoryEntryPageArgs = {
   entry: FullHistoryEntry;
-  files: {
-    filePath: string;
-    fileInfo: HistoryEntryPageFile;
-  }[];
+  files: HistoryEntryPageFile[];
   git: {
     files: GitFileChange[];
   };
@@ -119,8 +120,6 @@ export function HistoryEntry() {
               <CSFormField>
                 <div
                   style={{
-                    padding: "1em",
-                    background: "black",
                     fontFamily: "var(--vscode-editor-font-family)",
                     borderRadius: "4px",
                   }}
@@ -133,26 +132,16 @@ export function HistoryEntry() {
               <CSFormField>
                 <VSCodeButton onClick={onEditClick}>Edit Prompt</VSCodeButton>
               </CSFormField>
+              <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
+                Generated Files
+              </h2>
               {Array.from(
                 args.files.map((file) => (
-                  <div key={`file-gen-${file.filePath}`}>
-                    <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
-                      Generated Files
-                    </h2>
-                    <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
-                      {file.filePath}
-                    </h3>
-                    <div
-                      style={{
-                        padding: "0.5em 1em 0.5em 1em",
-                        background: "black",
-                        borderRadius: "4px",
-                      }}
-                      dangerouslySetInnerHTML={{
-                        __html: file.fileInfo.generated,
-                      }}
-                    />
-                  </div>
+                  <CodeSnippet
+                    filePath={file.filePath}
+                    code={file.generatedHtml}
+                    codeHtml={file.generatedHtml}
+                  />
                 ))
               )}
             </>
@@ -161,13 +150,13 @@ export function HistoryEntry() {
         <VSCodePanelView>
           <div
             style={{
-              padding: "1em",
-              background: "black",
               fontFamily: "var(--vscode-editor-font-family)",
-              borderRadius: "4px",
             }}
           >
+            <h3>Prompt</h3>
             <pre>{<div>{args.entry.rawPrompt}</div>}</pre>
+            <h3>Response</h3>
+            <pre>{<div>{args.entry.rawResponse}</div>}</pre>
           </div>
         </VSCodePanelView>
         <VSCodePanelView>
@@ -180,11 +169,10 @@ export function HistoryEntry() {
               <div
                 style={{
                   padding: "0.5em 1em 0.5em 1em",
-                  background: "black",
                   borderRadius: "4px",
                 }}
               >
-                <pre>{file.fileInfo.diffHtml}</pre>
+                <pre>{file.diffHtml}</pre>
               </div>
             </div>
           ))}
@@ -195,8 +183,6 @@ export function HistoryEntry() {
               <div>
                 <div
                   style={{
-                    padding: "1em",
-                    background: "black",
                     fontFamily: "var(--vscode-editor-font-family)",
                     borderRadius: "4px",
                   }}
@@ -217,8 +203,6 @@ export function HistoryEntry() {
                     <h3>Generated Commit Message</h3>
                     <div
                       style={{
-                        padding: "1em",
-                        background: "black",
                         fontFamily: "var(--vscode-editor-font-family)",
                         borderRadius: "4px",
                       }}
@@ -260,13 +244,7 @@ export function HistoryEntry() {
                 </div>
               </div>
             ) : (
-              <div
-                style={{
-                  paddingTop: "1em",
-                }}
-              >
-                There are no files to be committed.
-              </div>
+              <div>There are no files to be committed.</div>
             )}
           </div>
         </VSCodePanelView>

@@ -6,6 +6,7 @@ export type HistoryEntry = {
   userInput: GenerationUserInput;
   prompt: string;
   rawPrompt: string;
+  rawResponse: string;
 };
 
 export type GeneratedSourceFileWithHistory = GeneratedSourceFile & {

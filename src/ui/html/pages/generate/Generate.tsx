@@ -24,11 +24,6 @@ import { CSFormField } from "../../components/CSFormField.js";
 import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
 
 export type GeneratePageArgs = {
-  files: {
-    path: string;
-    size: number;
-    includeOption: IncludeOptions;
-  }[];
   models: { [key: string]: string };
   codingConventions: Array<CodingConvention>;
   selectedModel: string;
@@ -37,6 +32,11 @@ export type GeneratePageArgs = {
   codegenTargets: string;
   fileVersion: FileVersions;
   outputKind: "full" | "diff";
+  includedFiles: {
+    path: string;
+    size: number;
+    includeOption: IncludeOptions;
+  }[];
 };
 
 export function Generate() {
@@ -57,7 +57,7 @@ export function Generate() {
   );
   const [files, setFiles] = useState<
     { path: string; size: number; includeOption: IncludeOptions }[]
-  >(args.files);
+  >(args.includedFiles);
 
   const [outputKind, setOutputKind] = useState<"full" | "diff">(
     args.outputKind

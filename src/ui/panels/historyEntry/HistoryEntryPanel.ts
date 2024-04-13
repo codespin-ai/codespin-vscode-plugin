@@ -48,7 +48,7 @@ export class HistoryEntryPanel extends UIPanel {
         getLangFromFilename(file.path)
       );
       return {
-        path: file.path,
+        filePath: file.path,
         original: file.original,
         generated: file.generated,
         originalHtml: originalHtml,
@@ -62,24 +62,7 @@ export class HistoryEntryPanel extends UIPanel {
     };
 
     const files = historyEntryDetails
-      ? await (async () => {
-          // Map each file to a Promise of its formatted content, then resolve all promises concurrently
-          const formattedFilesPromises =
-            historyEntryDetails.files.map(formatFileContent);
-
-          // Use Promise.all to wait for all formatting operations to complete
-          const formattedFilesArray = await Promise.all(formattedFilesPromises);
-
-          // Convert the array of formatted file objects into an Object
-          return formattedFilesArray.map((file) => ({
-            filePath: file.path,
-            fileInfo: {
-              original: file.originalHtml,
-              generated: file.generatedHtml,
-              diffHtml: file.diffHtml,
-            },
-          }));
-        })()
+      ? await Promise.all(historyEntryDetails.files.map(formatFileContent))
       : [];
 
     if (historyEntryDetails && files) {

@@ -94,7 +94,7 @@ export class GeneratePanel extends UIPanel {
           ).sort((a, b) => a.path.localeCompare(b.path));
 
           return {
-            files: fileDetails,
+            includedFiles: fileDetails,
             codingConventions: conventions,
             models: await getModels(workspaceRoot),
             selectedModel: await getDefaultModel(workspaceRoot),
@@ -122,7 +122,7 @@ export class GeneratePanel extends UIPanel {
           ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
 
           const args: GeneratePageArgs = {
-            files: fileDetails,
+            includedFiles: fileDetails,
             codingConventions: conventions,
             models: await getModels(workspaceRoot),
             selectedModel: commandArgs.model,
@@ -241,7 +241,13 @@ export class GeneratePanel extends UIPanel {
               this.postMessageToWebview(responseStreamEvent);
             };
 
-            result.args.responseCallback = (text) => {
+            result.args.responseCallback = async (text) => {
+              await writeHistoryItem(
+                text,
+                "raw-response.txt",
+                result.dirName,
+                workspaceRoot
+              );
               this.dispose();
             };
 
