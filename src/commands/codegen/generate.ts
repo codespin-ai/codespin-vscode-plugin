@@ -1,26 +1,25 @@
 import * as vscode from "vscode";
 import { GeneratePanel } from "../../ui/panels/generate/GeneratePanel.js";
-import { GenerationUserInput } from "../../ui/panels/generate/types.js";
-
-export type GenerateCommandEvent = {
-  type: "command:codespin-ai.generate";
-  args: [undefined, GenerationUserInput];
-};
 
 export function getGenerateCommand(context: vscode.ExtensionContext) {
   return async function generateCommand(
     _: unknown,
-    args: vscode.Uri[] | GenerationUserInput
+    args: vscode.Uri[]
   ): Promise<void> {
-    const filePaths: string[] | GenerationUserInput = !args
+    const filePaths: string[] = !args
       ? !vscode.window.activeTextEditor
         ? []
         : [vscode.window.activeTextEditor.document.fileName]
-      : Array.isArray(args)
-      ? args.map((x) => x.fsPath)
-      : args;
+      : args.map((x) => x.fsPath);
+
+    const prompt =
+      vscode.window.activeTextEditor && vscode.window.activeTextEditor.selection
+        ? vscode.window.activeTextEditor.document.getText(
+            vscode.window.activeTextEditor.selection
+          )
+        : undefined;
 
     const panel = new GeneratePanel(context);
-    await panel.init(filePaths);
+    await panel.init({ type: "files", prompt, args: filePaths });
   };
 }

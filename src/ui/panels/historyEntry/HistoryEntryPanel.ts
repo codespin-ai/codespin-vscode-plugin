@@ -18,10 +18,12 @@ import {
   CommittedEvent,
   GenerateCommitMessageEvent,
   GeneratedCommitMessageEvent,
+  RegenerateEvent,
 } from "./types.js";
 import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntry.js";
 import { SelectHistoryEntryArgs } from "../../../commands/history/command.js";
 import { commitFiles } from "../../../git/commitFiles.js";
+import { GeneratePanel } from "../generate/GeneratePanel.js";
 
 export class HistoryEntryPanel extends UIPanel {
   constructor(context: vscode.ExtensionContext) {
@@ -98,6 +100,11 @@ export class HistoryEntryPanel extends UIPanel {
 
         break;
       }
+      case "regenerate":
+        const event = message as RegenerateEvent;
+        const panel = new GeneratePanel(this.context);
+        await panel.init({ type: "regenerate", args: event.args });
+        break;
       case "commit": {
         const incomingMessage = message as CommitEvent;
         await commitFiles(

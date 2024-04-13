@@ -54,6 +54,14 @@
           "group": "codespin-ai"
         }
       ],
+      "editor/context": [
+        {
+          "when": "editorHasSelection",
+          "command": "codespin-ai.generate",
+          "group": "codespin-ai"
+
+        }
+      ],
       "codespin-ai.more": [
         {
           "command": "codespin-ai.generate",

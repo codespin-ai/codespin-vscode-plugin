@@ -36,6 +36,10 @@ import {
 } from "./types.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
 
+type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
+type RegenerateArgs = { type: "regenerate"; args: GenerationUserInput };
+export type InitArgs = JustFiles | RegenerateArgs;
+
 let activePanel: GeneratePanel | undefined = undefined;
 
 export function getActivePanel() {
@@ -50,7 +54,7 @@ export class GeneratePanel extends UIPanel {
     super(context);
   }
 
-  async init(commandArgs: string[] | GenerationUserInput) {
+  async init(initArgs: InitArgs) {
     const workspaceRoot = getWorkspaceRoot(this.context);
 
     const initialized = await isInitialized(workspaceRoot);
@@ -76,64 +80,65 @@ export class GeneratePanel extends UIPanel {
 
     const conventions = await getConventions(workspaceRoot);
 
-    const generatePageArgs: GeneratePageArgs = Array.isArray(commandArgs)
-      ? await (async () => {
-          const allPaths = await getFilesRecursive(commandArgs);
+    const generatePageArgs: GeneratePageArgs =
+      initArgs.type === "files"
+        ? await (async () => {
+            const allPaths = await getFilesRecursive(initArgs.args);
 
-          const fileDetails = (
-            await Promise.all(
-              allPaths.map(async (filePath) => {
-                const size = (await fs.stat(filePath)).size;
-                return {
-                  path: path.relative(workspaceRoot, filePath),
-                  size,
-                  includeOption: "source" as "source",
-                };
-              })
-            )
-          ).sort((a, b) => a.path.localeCompare(b.path));
+            const fileDetails = (
+              await Promise.all(
+                allPaths.map(async (filePath) => {
+                  const size = (await fs.stat(filePath)).size;
+                  return {
+                    path: path.relative(workspaceRoot, filePath),
+                    size,
+                    includeOption: "source" as "source",
+                  };
+                })
+              )
+            ).sort((a, b) => a.path.localeCompare(b.path));
 
-          return {
-            includedFiles: fileDetails,
-            codingConventions: conventions,
-            models: await getModels(workspaceRoot),
-            selectedModel: await getDefaultModel(workspaceRoot),
-            codegenTargets: ":prompt",
-            fileVersion: "current",
-            prompt: "",
-            codingConvention: undefined,
-            outputKind: "full",
-          };
-        })()
-      : await (async () => {
-          const fileDetails = (
-            await Promise.all(
-              commandArgs.includedFiles.map(async (x) => {
-                const filePath = path.resolve(workspaceRoot, x.path);
-                const size = (await fs.stat(filePath)).size;
-                const relativePath = path.relative(workspaceRoot, filePath);
-                return {
-                  path: relativePath,
-                  size,
-                  includeOption: "source" as "source",
-                };
-              })
-            )
-          ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
+            return {
+              includedFiles: fileDetails,
+              codingConventions: conventions,
+              models: await getModels(workspaceRoot),
+              selectedModel: await getDefaultModel(workspaceRoot),
+              codegenTargets: ":prompt",
+              fileVersion: "current",
+              prompt: initArgs.prompt ?? "",
+              codingConvention: undefined,
+              outputKind: "full",
+            };
+          })()
+        : await (async () => {
+            const fileDetails = (
+              await Promise.all(
+                initArgs.args.includedFiles.map(async (x) => {
+                  const filePath = path.resolve(workspaceRoot, x.path);
+                  const size = (await fs.stat(filePath)).size;
+                  const relativePath = path.relative(workspaceRoot, filePath);
+                  return {
+                    path: relativePath,
+                    size,
+                    includeOption: "source" as "source",
+                  };
+                })
+              )
+            ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
 
-          const args: GeneratePageArgs = {
-            includedFiles: fileDetails,
-            codingConventions: conventions,
-            models: await getModels(workspaceRoot),
-            selectedModel: commandArgs.model,
-            codegenTargets: commandArgs.codegenTargets,
-            fileVersion: commandArgs.fileVersion,
-            prompt: commandArgs.prompt,
-            codingConvention: commandArgs.codingConvention,
-            outputKind: commandArgs.outputKind,
-          };
-          return args;
-        })();
+            const args: GeneratePageArgs = {
+              includedFiles: fileDetails,
+              codingConventions: conventions,
+              models: await getModels(workspaceRoot),
+              selectedModel: initArgs.args.model,
+              codegenTargets: initArgs.args.codegenTargets,
+              fileVersion: initArgs.args.fileVersion,
+              prompt: initArgs.args.prompt,
+              codingConvention: initArgs.args.codingConvention,
+              outputKind: initArgs.args.outputKind,
+            };
+            return args;
+          })();
 
     await this.navigateTo("/generate", generatePageArgs);
   }

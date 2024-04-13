@@ -1,3 +1,5 @@
+import { GenerationUserInput } from "../generate/types.js";
+
 export type GenerateCommitMessageArgs = {
   model: string;
 };
@@ -22,4 +24,9 @@ export type CommitEvent = {
 
 export type CommittedEvent = {
   type: "committed";
+};
+
+export type RegenerateEvent = {
+  type: "regenerate";
+  args: GenerationUserInput;
 };

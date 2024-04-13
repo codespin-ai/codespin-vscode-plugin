@@ -6,12 +6,12 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { GenerateCommandEvent } from "../../../../commands/codegen/generate.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import {
   CommitEvent,
   GenerateCommitMessageEvent,
   GeneratedCommitMessageEvent,
+  RegenerateEvent,
 } from "../../../panels/historyEntry/types.js";
 import { CancelEvent } from "../../../types.js";
 import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
@@ -60,9 +60,9 @@ export function HistoryEntry() {
   };
 
   const onEditClick = () => {
-    const generateCommandEvent: GenerateCommandEvent = {
-      type: "command:codespin-ai.generate",
-      args: [undefined, gatherArgsForRegenerateCommand()],
+    const generateCommandEvent: RegenerateEvent = {
+      type: "regenerate",
+      args: gatherArgsForRegenerateCommand(),
     };
     getVSCodeApi().postMessage(generateCommandEvent);
 
