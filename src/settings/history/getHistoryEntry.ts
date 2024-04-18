@@ -77,8 +77,8 @@ export async function getFullHistoryEntry(
 
   // Construct and return the full history entry
   const fullHistoryEntry: FullHistoryEntry = {
-    ...historyEntry, // Spread operator to include all properties from historyEntry
-    files, // Add the files array to the full history entry
+    ...historyEntry,
+    files, 
   };
 
   return fullHistoryEntry;
