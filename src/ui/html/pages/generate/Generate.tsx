@@ -148,7 +148,7 @@ export function Generate() {
     setModel(e.target.value);
     const message: ModelChangeEvent = {
       type: "modelChange",
-      model,
+      model: e.target.value,
     };
     vsCodeApi.postMessage(message);
   }
