@@ -15,9 +15,15 @@ async function readJsonFile<T>(filePath: string): Promise<T> {
   return JSON.parse(fileContents) as T;
 }
 
-// Convert readTextFile to async function
+// Convert readTextFile to also check if the file exists before reading
 async function readTextFile(filePath: string): Promise<string> {
-  return fs.readFile(filePath, "utf8");
+  try {
+    await fs.access(filePath);
+    return fs.readFile(filePath, "utf8");
+  } catch {
+    // If the file does not exist, return an empty string
+    return "";
+  }
 }
 
 // Update getHistoryEntry to async function
@@ -41,26 +47,12 @@ export async function getHistoryEntry(
       return null;
     }
 
-    const [userInputExists, promptExists] = await Promise.all([
-      fs
-        .access(userInputPath)
-        .then(() => true)
-        .catch(() => false),
-      fs
-        .access(promptPath)
-        .then(() => true)
-        .catch(() => false),
-    ]);
+    const userInput = await readJsonFile<GenerationUserInput>(userInputPath);
+    const prompt = await readTextFile(promptPath);
+    const rawPrompt = await readTextFile(rawPromptPath);
+    const rawResponse = await readTextFile(rawResponsePath);
 
-    if (userInputExists && promptExists) {
-      const userInput = await readJsonFile<GenerationUserInput>(userInputPath);
-      const prompt = await readTextFile(promptPath);
-      const rawPrompt = await readTextFile(rawPromptPath);
-      const rawResponse = await readTextFile(rawResponsePath);
-      return { timestamp, userInput, prompt, rawPrompt, rawResponse };
-    } else {
-      return null;
-    }
+    return { timestamp, userInput, prompt, rawPrompt, rawResponse };
   } catch (ex: any) {
     console.error(
       `Could not process ${entryDirName}: ${ex.message || "unknown error"}`
