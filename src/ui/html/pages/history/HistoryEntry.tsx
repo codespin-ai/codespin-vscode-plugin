@@ -132,17 +132,22 @@ export function HistoryEntry() {
               <CSFormField>
                 <VSCodeButton onClick={onEditClick}>Edit Prompt</VSCodeButton>
               </CSFormField>
+
               <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
                 Generated Files
               </h2>
-              {Array.from(
-                args.files.map((file) => (
-                  <CodeSnippet
-                    filePath={file.filePath}
-                    code={file.generatedHtml}
-                    codeHtml={file.generatedHtml}
-                  />
-                ))
+              {args.files.length ? (
+                Array.from(
+                  args.files.map((file) => (
+                    <CodeSnippet
+                      filePath={file.filePath}
+                      code={file.generatedHtml}
+                      codeHtml={file.generatedHtml}
+                    />
+                  ))
+                )
+              ) : (
+                <p>No files were generated.</p>
               )}
             </>
           </div>

@@ -6,11 +6,15 @@ import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
 import { ViewProvider } from "../ViewProvider.js";
 import { HistoryPageArgs } from "../../html/pages/history/History.js";
-
+import { UpdateHistoryEvent } from "./types.js";
+import { EventEmitter } from "events";
 
 export class HistoryViewProvider extends ViewProvider {
-  constructor(context: vscode.ExtensionContext) {
-    super(context);
+  constructor(
+    context: vscode.ExtensionContext,
+    globalEventEmitter: EventEmitter
+  ) {
+    super(context, globalEventEmitter);
   }
 
   async init() {
@@ -21,7 +25,7 @@ export class HistoryViewProvider extends ViewProvider {
   async onMessage(data: EventTemplate) {
     const workspaceRoot = getWorkspaceRoot(this.context);
     switch (data.type) {
-      case "webviewReady":
+      case "webviewReady": {
         const initialized = await isInitialized(workspaceRoot);
 
         if (initialized) {
@@ -34,7 +38,17 @@ export class HistoryViewProvider extends ViewProvider {
           this.navigateTo("/initialize");
         }
         break;
-      case "initialize":
+      }
+      case "generate": {
+        const updateHistoryEvent: UpdateHistoryEvent = {
+          type: "updateHistory",
+          entries: await getHistory(workspaceRoot),
+        };
+
+        this.postMessageToWebview(updateHistoryEvent);
+        break;
+      }
+      case "initialize": {
         await initialize(false, workspaceRoot);
 
         const historyPageArgs: HistoryPageArgs = {
@@ -44,6 +58,7 @@ export class HistoryViewProvider extends ViewProvider {
         this.navigateTo("/history", historyPageArgs);
 
         break;
+      }
     }
   }
 }

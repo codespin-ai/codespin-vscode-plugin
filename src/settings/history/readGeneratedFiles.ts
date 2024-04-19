@@ -1,26 +1,31 @@
 import { promises as fs } from "fs";
 import * as path from "path";
 import { getHistoryDir } from "../codespinDirs.js";
+import { pathExists } from "../../fs/pathExists.js";
 
 // Helper function to recursively get all file paths
 async function getAllFiles(
   dirPath: string,
   arrayOfFiles: string[] = []
 ): Promise<string[]> {
-  const files = await fs.readdir(dirPath, { withFileTypes: true });
+  if (await pathExists(dirPath)) {
+    const files = await fs.readdir(dirPath, { withFileTypes: true });
 
-  for (const file of files) {
-    if (file.isDirectory()) {
-      arrayOfFiles = await getAllFiles(
-        path.join(dirPath, file.name),
-        arrayOfFiles
-      );
-    } else {
-      arrayOfFiles.push(path.join(dirPath, file.name));
+    for (const file of files) {
+      if (file.isDirectory()) {
+        arrayOfFiles = await getAllFiles(
+          path.join(dirPath, file.name),
+          arrayOfFiles
+        );
+      } else {
+        arrayOfFiles.push(path.join(dirPath, file.name));
+      }
     }
-  }
 
-  return arrayOfFiles;
+    return arrayOfFiles;
+  } else {
+    return [];
+  }
 }
 
 export async function readGeneratedFiles(

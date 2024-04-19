@@ -3,6 +3,7 @@ import * as vscode from "vscode";
 import { getWebviewContent } from "../getWebviewContent.js";
 import { EventTemplate } from "../EventTemplate.js";
 import { NavigateEvent } from "../types.js";
+import { EventEmitter } from "events";
 
 export abstract class UIPanel {
   context: vscode.ExtensionContext;
@@ -12,10 +13,15 @@ export abstract class UIPanel {
   resolveWebviewReady: () => void = () => {};
   navigationPromiseResolvers: Map<string, () => void>;
   isDisposed: boolean;
+  globalEventEmitter: EventEmitter;
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(
+    context: vscode.ExtensionContext,
+    globalEventEmitter: EventEmitter
+  ) {
     this.navigationPromiseResolvers = new Map();
     this.context = context;
+    this.globalEventEmitter = globalEventEmitter;
     this.isDisposed = false;
     this.panel = vscode.window.createWebviewPanel(
       "codespin-panel",
@@ -60,6 +66,8 @@ export abstract class UIPanel {
     this.webviewReadyPromise = new Promise((resolve) => {
       this.resolveWebviewReady = resolve;
     });
+
+    this.globalEventEmitter.on("message", this.onDidReceiveMessageBase);
   }
 
   getStyle() {
@@ -70,7 +78,7 @@ export abstract class UIPanel {
     return this.webviewReadyPromise;
   }
 
-  onDidReceiveMessageBase(message: EventTemplate) {
+  onDidReceiveMessageBase = (message: EventTemplate) => {
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
       const args = (message as EventTemplate<string, { args: unknown[] }>).args;
@@ -94,7 +102,7 @@ export abstract class UIPanel {
     }
 
     this.onMessage(message);
-  }
+  };
 
   postMessageToWebview(message: EventTemplate) {
     if (!this.isDisposed) {
@@ -115,6 +123,11 @@ export abstract class UIPanel {
   }
 
   dispose() {
+    this.globalEventEmitter.removeListener(
+      "message",
+      this.onDidReceiveMessageBase
+    );
+
     this.isDisposed = true;
     this.panel.dispose();
 

@@ -35,6 +35,7 @@ import {
   ResponseStreamEvent,
 } from "./types.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
+import { EventEmitter } from "events";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerationUserInput };
@@ -50,8 +51,11 @@ export class GeneratePanel extends UIPanel {
   generateArgs: GenerateEvent | undefined;
   cancelGeneration: (() => void) | undefined;
 
-  constructor(context: vscode.ExtensionContext) {
-    super(context);
+  constructor(
+    context: vscode.ExtensionContext,
+    globalEventEmitter: EventEmitter
+  ) {
+    super(context, globalEventEmitter);
   }
 
   async init(initArgs: InitArgs) {
@@ -259,6 +263,10 @@ export class GeneratePanel extends UIPanel {
             result.args.parseCallback = async (files) => {
               await writeGeneratedFiles(result.dirName, files, workspaceRoot);
             };
+
+            this.globalEventEmitter.emit("message", {
+              type: "generate",
+            });
 
             await codespinGenerate(result.args, {
               workingDir: workspaceRoot,

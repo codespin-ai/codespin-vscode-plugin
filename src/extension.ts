@@ -7,11 +7,14 @@ import { getInitCommand } from "./commands/init/command.js";
 import { getSelectHistoryEntryCommand } from "./commands/history/command.js";
 import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvider.js";
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
+import { EventEmitter } from "events";
+
+const globalEventEmitter = new EventEmitter();
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  const historyProvider = new HistoryViewProvider(context);
+  const historyProvider = new HistoryViewProvider(context, globalEventEmitter);
   historyProvider.init();
 
   context.subscriptions.push(
@@ -23,7 +26,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   const generateCommand = vscode.commands.registerCommand(
     "codespin-ai.generate",
-    getGenerateCommand(context)
+    getGenerateCommand(context, globalEventEmitter)
   );
 
   context.subscriptions.push(generateCommand);
@@ -37,13 +40,13 @@ export function activate(context: vscode.ExtensionContext) {
 
   const selectHistoryEntryCommand = vscode.commands.registerCommand(
     "codespin-ai.selectHistoryEntry",
-    getSelectHistoryEntryCommand(context)
+    getSelectHistoryEntryCommand(context, globalEventEmitter)
   );
 
   context.subscriptions.push(selectHistoryEntryCommand);
 
   let includeFilesCommand = getIncludeFilesCommand(context);
-  
+
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "codespin-ai.includeFiles",

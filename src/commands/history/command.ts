@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { HistoryEntryPanel } from "../../ui/panels/historyEntry/HistoryEntryPanel.js";
+import { EventEmitter } from "events";
 
 export type SelectHistoryEntryArgs = {
   itemId: string;
@@ -10,7 +11,10 @@ export type SelectHistoryEntryCommandEvent = {
   args: SelectHistoryEntryArgs[];
 };
 
-export function getSelectHistoryEntryCommand(context: vscode.ExtensionContext) {
+export function getSelectHistoryEntryCommand(
+  context: vscode.ExtensionContext,
+  globalEventEmitter: EventEmitter
+) {
   return async function selectHistoryItemCommand(
     args: SelectHistoryEntryArgs
   ): Promise<void> {
@@ -19,7 +23,7 @@ export function getSelectHistoryEntryCommand(context: vscode.ExtensionContext) {
       return;
     }
 
-    const panel = new HistoryEntryPanel(context);
+    const panel = new HistoryEntryPanel(context, globalEventEmitter);
     await panel.init(args);
   };
 }

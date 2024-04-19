@@ -24,10 +24,14 @@ import { HistoryEntryPageArgs } from "../../html/pages/history/HistoryEntry.js";
 import { SelectHistoryEntryArgs } from "../../../commands/history/command.js";
 import { commitFiles } from "../../../git/commitFiles.js";
 import { GeneratePanel } from "../generate/GeneratePanel.js";
+import { EventEmitter } from "events";
 
 export class HistoryEntryPanel extends UIPanel {
-  constructor(context: vscode.ExtensionContext) {
-    super(context);
+  constructor(
+    context: vscode.ExtensionContext,
+    globalEventEmitter: EventEmitter
+  ) {
+    super(context, globalEventEmitter);
   }
 
   async init(commandArgs: SelectHistoryEntryArgs) {
@@ -102,7 +106,7 @@ export class HistoryEntryPanel extends UIPanel {
       }
       case "regenerate":
         const event = message as RegenerateEvent;
-        const panel = new GeneratePanel(this.context);
+        const panel = new GeneratePanel(this.context, this.globalEventEmitter);
         await panel.init({ type: "regenerate", args: event.args });
         break;
       case "commit": {

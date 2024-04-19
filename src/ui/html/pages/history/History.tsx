@@ -1,6 +1,9 @@
 import * as React from "react";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
-import { HistoryEntry } from "../../../viewProviders/history/types.js";
+import {
+  HistoryEntry,
+  UpdateHistoryEvent,
+} from "../../../viewProviders/history/types.js";
 import { SelectHistoryEntryCommandEvent } from "../../../../commands/history/command.js";
 import { IncludeOptions } from "../../../panels/generate/types.js";
 
@@ -31,6 +34,8 @@ const truncatePrompt = (prompt: string): string => {
 export function History() {
   const args: HistoryPageArgs = history.state;
 
+  const [entries, setEntries] = React.useState(args.entries);
+
   const formatRelativeTime = (timestamp: number): string => {
     const now = Date.now();
     const diffInSeconds = Math.round((now - timestamp) / 1000);
@@ -48,7 +53,8 @@ export function History() {
     }
   };
 
-  const sortedEntries = args.entries.sort((a, b) => b.timestamp - a.timestamp);
+  const sortedEntries = entries.sort((a, b) => b.timestamp - a.timestamp);
+
   const groupedEntries = sortedEntries.reduce(
     (groups: GroupedEntries, entry) => {
       const date = new Date(entry.timestamp).toDateString();
@@ -91,6 +97,24 @@ export function History() {
     return includedFiles.map((x) => x.path.split("/").slice(-1)[0]);
   }
 
+  React.useEffect(() => {
+    function listener(event: unknown) {
+      const message = (event as any).data;
+      switch (message.type) {
+        case "updateHistory":
+          const event = message as UpdateHistoryEvent;
+          setEntries(event.entries);
+          break;
+      }
+    }
+
+    window.addEventListener("message", listener);
+
+    return () => {
+      window.removeEventListener("message", listener);
+    };
+  }, []);
+
   return (
     <div>
       {Object.keys(groupedEntries).length > 0 ? (
@@ -131,7 +155,7 @@ export function History() {
                           );
 
                           return filePaths.length > 0 ? (
-                            <span style={{ marginLeft: "1em"}}>
+                            <span style={{ marginLeft: "1em" }}>
                               {filePaths.length <= 3
                                 ? filePaths.join(", ")
                                 : filePaths.slice(0, 2).join(", ") + " etc"}

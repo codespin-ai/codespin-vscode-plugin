@@ -1,7 +1,11 @@
 import * as vscode from "vscode";
 import { GeneratePanel } from "../../ui/panels/generate/GeneratePanel.js";
+import { EventEmitter } from "events";
 
-export function getGenerateCommand(context: vscode.ExtensionContext) {
+export function getGenerateCommand(
+  context: vscode.ExtensionContext,
+  globalEventEmitter: EventEmitter
+) {
   return async function generateCommand(
     _: unknown,
     args: vscode.Uri[]
@@ -19,7 +23,7 @@ export function getGenerateCommand(context: vscode.ExtensionContext) {
           )
         : undefined;
 
-    const panel = new GeneratePanel(context);
+    const panel = new GeneratePanel(context, globalEventEmitter);
     await panel.init({ type: "files", prompt, args: filePaths });
   };
 }

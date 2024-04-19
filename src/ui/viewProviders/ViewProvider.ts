@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { getWebviewContent } from "../getWebviewContent.js";
 import { EventTemplate } from "../EventTemplate.js";
 import { NavigateEvent } from "../types.js";
+import { EventEmitter } from "events";
 
 export abstract class ViewProvider implements vscode.WebviewViewProvider {
   private webviewView?: vscode.WebviewView;
@@ -13,10 +14,15 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   resolveInitialize: () => void = () => {};
   webviewReadyPromise: Promise<void>;
   resolveWebviewReady: () => void = () => {};
+  globalEventEmitter: EventEmitter;
 
-  constructor(context: vscode.ExtensionContext) {
+  constructor(
+    context: vscode.ExtensionContext,
+    globalEventEmitter: EventEmitter
+  ) {
     this.navigationPromiseResolvers = new Map();
     this.isDisposed = false;
+    this.globalEventEmitter = globalEventEmitter;
 
     this.initializePromise = new Promise((resolve) => {
       this.resolveInitialize = resolve;
@@ -30,6 +36,8 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     this.webviewReadyPromise = new Promise((resolve) => {
       this.resolveInitialize = resolve;
     });
+
+    this.globalEventEmitter.on("message", this.onDidReceiveMessageBase);
   }
 
   public resolveWebviewView(
@@ -63,7 +71,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     this.resolveInitialize();
   }
 
-  onDidReceiveMessageBase(message: EventTemplate) {
+  onDidReceiveMessageBase = (message: EventTemplate) => {
     if (message.type.startsWith("command:")) {
       const command = message.type.split(":")[1];
       const args = (message as EventTemplate<string, { args: unknown[] }>).args;
@@ -85,7 +93,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     }
 
     this.onMessage(message);
-  }
+  };
 
   getStyle() {
     return undefined;
@@ -118,6 +126,11 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   }
 
   dispose() {
+    this.globalEventEmitter.removeListener(
+      "message",
+      this.onDidReceiveMessageBase
+    );
+
     this.isDisposed = true;
     this.dispose();
 

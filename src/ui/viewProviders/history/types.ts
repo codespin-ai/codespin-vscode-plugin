@@ -19,3 +19,11 @@ export type GeneratedSourceFileWithHistory = GeneratedSourceFile & {
 export type FullHistoryEntry = {
   files: GeneratedSourceFileWithHistory[];
 } & HistoryEntry;
+
+export type UpdateHistoryArgs = {
+  entries: HistoryEntry[];
+};
+
+export type UpdateHistoryEvent = {
+  type: "updateHistory";
+} & UpdateHistoryArgs;
