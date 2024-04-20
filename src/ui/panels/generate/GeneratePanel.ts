@@ -180,7 +180,6 @@ export class GeneratePanel extends UIPanel {
           config: undefined,
           model: incomingMessage.model,
           maxTokens: undefined,
-          debug: true,
         };
         const dependenciesResult = await codespinDependencies(
           dependenciesArgs,

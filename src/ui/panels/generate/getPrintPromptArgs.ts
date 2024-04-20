@@ -25,7 +25,6 @@ export function getPrintPromptArgs(
       ? getCodingConventionPath(argsFromPanel.codingConvention, workspaceRoot)
       : undefined,
     template: "files",
-    debug: true,
   };
 
   return printPromptArgs;

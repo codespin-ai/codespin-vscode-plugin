@@ -8,7 +8,6 @@ export async function getGenCommitMessageArgs(
     model: args.model,
     prompt: `Convert the following prompt into a single line git commit message. Return just that single line and no other text.\n\nPrompt is as follows:\n${args.prompt}`,
     write: false,
-    debug: true,
     go: true,
   };
 

@@ -57,7 +57,6 @@ export async function getGenerateArgs(
             workspaceRoot
           )
         : undefined,
-      debug: true,
       template: argsFromPanel.outputKind === "diff" ? "diff" : "default",
       cancelCallback,
     };

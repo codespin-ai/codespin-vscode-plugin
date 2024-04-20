@@ -6,7 +6,6 @@ export async function initialize(force: boolean, workspaceRoot: string) {
   await init(
     {
       force,
-      debug: true,
     },
     { workingDir: workspaceRoot }
   );
