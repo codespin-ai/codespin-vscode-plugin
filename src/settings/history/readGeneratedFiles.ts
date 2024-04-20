@@ -32,7 +32,7 @@ export async function readGeneratedFiles(
   dirName: string,
   workspaceRoot: string
 ) {
-  const historyDir = await getHistoryDir(workspaceRoot);
+  const historyDir = getHistoryDir(workspaceRoot);
   const originalDirPath = path.join(historyDir, dirName, "original");
   const generatedDirPath = path.join(historyDir, dirName, "generated");
 

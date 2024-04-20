@@ -7,7 +7,7 @@ export async function getAPIConfigPath(
   api: string,
   workspaceRoot: string
 ): Promise<string | undefined> {
-  const projectConfigDir = await getCodespinDir(workspaceRoot);
+  const projectConfigDir = getCodespinDir(workspaceRoot);
   const configFilePath = path.join(projectConfigDir, `${api}.json`);
   if (await pathExists(configFilePath)) {
     return configFilePath;

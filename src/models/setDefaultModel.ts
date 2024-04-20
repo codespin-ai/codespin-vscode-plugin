@@ -7,7 +7,7 @@ export async function setDefaultModel(
   model: string,
   workspaceRoot: string
 ): Promise<void> {
-  const projectConfigDir = await getCodespinDir(workspaceRoot);
+  const projectConfigDir = getCodespinDir(workspaceRoot);
   const configFilePath = path.join(projectConfigDir, `codespin.json`);
 
   // Read the existing configuration

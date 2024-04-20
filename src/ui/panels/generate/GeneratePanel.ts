@@ -1,6 +1,11 @@
 import { dependencies as codespinDependencies } from "codespin/dist/commands/dependencies.js";
-import { generate as codespinGenerate } from "codespin/dist/commands/generate.js";
+import {
+  PromptResult,
+  generate as codespinGenerate,
+} from "codespin/dist/commands/generate.js";
+import { EventEmitter } from "events";
 import { promises as fs } from "fs";
+import { mkdir } from "fs/promises";
 import * as path from "path";
 import * as vscode from "vscode";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
@@ -19,6 +24,7 @@ import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFil
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
 import { writeUserInput } from "../../../settings/history/writeUserInput.js";
 import { initialize } from "../../../settings/initialize.js";
+import { isInitialized } from "../../../settings/isInitialized.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
 import { GeneratePageArgs } from "../../html/pages/generate/Generate.js";
@@ -26,6 +32,7 @@ import { UIPanel } from "../UIPanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import {
   AddDepsEvent,
+  CopyToClipboardEvent,
   GenerateEvent,
   GenerateUserInput,
   IncludeFilesEvent,
@@ -34,8 +41,7 @@ import {
   PromptCreatedEvent,
   ResponseStreamEvent,
 } from "./types.js";
-import { isInitialized } from "../../../settings/isInitialized.js";
-import { EventEmitter } from "events";
+import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
@@ -197,7 +203,20 @@ export class GeneratePanel extends UIPanel {
           ).filter(Boolean) as string[]
         );
         break;
-      case "generate":
+      case "copyToClipboard": {
+        const clipboardArgs = message as CopyToClipboardEvent;
+
+        const args = getPrintPromptArgs(clipboardArgs, workspaceRoot);
+
+        const result = await codespinGenerate(args, {
+          workingDir: workspaceRoot,
+        });
+
+        const prompt = (result as PromptResult).prompt;
+        vscode.env.clipboard.writeText(prompt);
+        break;
+      }
+      case "generate": {
         this.generateArgs = message as GenerateEvent;
         const result = await getGenerateArgs(
           this.generateArgs!,
@@ -207,6 +226,13 @@ export class GeneratePanel extends UIPanel {
 
         switch (result.status) {
           case "can_generate":
+            const historyDirPath = path.dirname(result.promptFilePath);
+
+            // The entry will not exist. Make.
+            if (!(await pathExists(historyDirPath))) {
+              await mkdir(historyDirPath, { recursive: true });
+            }
+
             await writeHistoryItem(
               this.generateArgs.prompt,
               "prompt.txt",
@@ -280,21 +306,25 @@ export class GeneratePanel extends UIPanel {
             break;
         }
         break;
-      case "editAnthropicConfig":
+      }
+      case "editAnthropicConfig": {
         await editAnthropicConfig(message as EditAnthropicConfigEvent);
         await this.onMessage(this.generateArgs!);
         break;
-      case "editOpenAIConfig":
+      }
+      case "editOpenAIConfig": {
         await editOpenAIConfig(message as EditOpenAIConfigEvent);
         await this.onMessage(this.generateArgs!);
         break;
-      case "modelChange":
+      }
+      case "modelChange": {
         await setDefaultModel(
           (message as ModelChangeEvent).model,
           workspaceRoot
         );
         break;
-      case "openFile":
+      }
+      case "openFile": {
         const filePath = path.resolve(
           workspaceRoot,
           (message as OpenFileEvent).file
@@ -305,12 +335,14 @@ export class GeneratePanel extends UIPanel {
           preserveFocus: false,
         });
         break;
-      case "cancel":
+      }
+      case "cancel": {
         if (this.cancelGeneration) {
           this.cancelGeneration();
         }
         this.dispose();
         break;
+      }
       default:
         break;
     }

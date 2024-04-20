@@ -13,5 +13,5 @@ export async function initialize(force: boolean, workspaceRoot: string) {
   await mkdir(await getCodingConventionsDir(workspaceRoot), {
     recursive: true,
   });
-  await mkdir(await getHistoryDir(workspaceRoot), { recursive: true });
+  await mkdir(getHistoryDir(workspaceRoot), { recursive: true });
 }

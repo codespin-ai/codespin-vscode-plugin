@@ -1,10 +1,10 @@
 import * as path from "path";
 import { getCodingConventionsDir } from "../codespinDirs.js";
 
-export async function getCodingConventionPath(
+export function getCodingConventionPath(
   filename: string,
   workspaceRoot: string
 ) {
-  const conventionsDir = await getCodingConventionsDir(workspaceRoot);
+  const conventionsDir = getCodingConventionsDir(workspaceRoot);
   return path.join(conventionsDir, filename);
 }

@@ -8,7 +8,7 @@ export async function writeHistoryItem(
   dirName: string,
   workspaceRoot: string
 ) {
-  const historyDir = await getHistoryDir(workspaceRoot);
+  const historyDir = getHistoryDir(workspaceRoot);
   const filePath = path.join(historyDir, dirName, filename);
 
   await fs.mkdir(path.dirname(filePath), {

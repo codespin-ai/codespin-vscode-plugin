@@ -2,12 +2,11 @@ import {
   GenerateArgs as CodespinGenerateArgs,
   GenerateArgs,
 } from "codespin/dist/commands/generate.js";
-import { mkdir } from "fs/promises";
 import * as path from "path";
-import { pathExists } from "../../../fs/pathExists.js";
 import { getAPIConfigPath } from "../../../settings/api/getAPIConfigPath.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 import { GenerateUserInput } from "./types.js";
+import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
 
 type GetGenerateArgsResult =
   | {
@@ -18,6 +17,7 @@ type GetGenerateArgsResult =
       status: "can_generate";
       args: CodespinGenerateArgs;
       dirName: string;
+      promptFilePath: string;
     };
 
 export async function getGenerateArgs(
@@ -31,16 +31,7 @@ export async function getGenerateArgs(
   const dirName = Date.now().toString();
 
   if (configFilePath) {
-    const historyDirPath = path.join(
-      workspaceRoot,
-      ".codespin",
-      "history",
-      dirName
-    );
-
-    if (!(await pathExists(historyDirPath))) {
-      await mkdir(historyDirPath, { recursive: true });
-    }
+    const historyDirPath = getHistoryItemDir(dirName, workspaceRoot);
 
     const promptFilePath = path.join(historyDirPath, "prompt.txt");
 
@@ -67,7 +58,7 @@ export async function getGenerateArgs(
           )
         : undefined,
       debug: true,
-      diff: argsFromPanel.outputKind === "diff",
+      template: argsFromPanel.outputKind === "diff" ? "diff" : "default",
       cancelCallback,
     };
 
@@ -75,6 +66,7 @@ export async function getGenerateArgs(
       status: "can_generate",
       args: codespinGenerateArgs,
       dirName,
+      promptFilePath,
     };
   }
   // config file doesn't exist.

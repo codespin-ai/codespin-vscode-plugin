@@ -8,7 +8,7 @@ export async function writeGeneratedFiles(
   files: GeneratedSourceFile[],
   workspaceRoot: string
 ) {
-  const historyDir = await getHistoryDir(workspaceRoot);
+  const historyDir = getHistoryDir(workspaceRoot);
 
   files.forEach(async (file) => {
     // Construct the full paths for the original and generated files

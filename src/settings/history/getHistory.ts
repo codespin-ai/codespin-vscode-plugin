@@ -7,7 +7,7 @@ import { HistoryEntry } from "../../ui/viewProviders/history/types.js";
 export async function getHistory(
   workspaceRoot: string
 ): Promise<HistoryEntry[]> {
-  const directoryPath = await getHistoryDir(workspaceRoot);
+  const directoryPath = getHistoryDir(workspaceRoot);
   const dirs = await fs.readdir(directoryPath, { withFileTypes: true });
   const historyDirs = dirs.filter((dir) => dir.isDirectory());
 

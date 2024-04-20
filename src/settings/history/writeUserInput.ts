@@ -8,7 +8,7 @@ export async function writeUserInput(
   userInput: GenerateUserInput,
   workspaceRoot: string
 ) {
-  const historyDir = await getHistoryDir(workspaceRoot);
+  const historyDir = getHistoryDir(workspaceRoot);
   const filePath = path.join(historyDir, dirName, "user-input.json");
 
   await fs.mkdir(path.dirname(filePath), {

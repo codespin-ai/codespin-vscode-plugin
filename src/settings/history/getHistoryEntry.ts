@@ -32,7 +32,7 @@ export async function getHistoryEntry(
   workspaceRoot: string
 ): Promise<HistoryEntry | null> {
   try {
-    const historyDir = await getHistoryDir(workspaceRoot);
+    const historyDir = getHistoryDir(workspaceRoot);
 
     const entryDirPath = path.join(historyDir, entryDirName);
 
@@ -78,7 +78,7 @@ export async function getFullHistoryEntry(
   // Construct and return the full history entry
   const fullHistoryEntry: FullHistoryEntry = {
     ...historyEntry,
-    files, 
+    files,
   };
 
   return fullHistoryEntry;
