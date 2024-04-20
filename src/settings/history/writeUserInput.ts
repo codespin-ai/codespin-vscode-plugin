@@ -1,11 +1,11 @@
 import { promises as fs } from "fs";
 import * as path from "path";
-import { GenerationUserInput } from "../../ui/panels/generate/types.js";
+import { GenerateUserInput } from "../../ui/panels/generate/types.js";
 import { getHistoryDir } from "../codespinDirs.js";
 
 export async function writeUserInput(
   dirName: string,
-  userInput: GenerationUserInput,
+  userInput: GenerateUserInput,
   workspaceRoot: string
 ) {
   const historyDir = await getHistoryDir(workspaceRoot);

@@ -1,9 +1,9 @@
 import { GeneratedSourceFile } from "codespin/dist/sourceCode/GeneratedSourceFile.js";
-import { GenerationUserInput } from "../../panels/generate/types.js";
+import { GenerateUserInput } from "../../panels/generate/types.js";
 
 export type HistoryEntry = {
   timestamp: number;
-  userInput: GenerationUserInput;
+  userInput: GenerateUserInput;
   prompt: string;
   rawPrompt: string;
   rawResponse: string;

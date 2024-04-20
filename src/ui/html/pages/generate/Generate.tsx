@@ -13,6 +13,7 @@ import { formatFileSize } from "../../../../text/formatFileSize.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import {
   AddDepsEvent,
+  CopyToClipboardEvent,
   FileVersions,
   GenerateEvent,
   IncludeFilesEvent,
@@ -166,6 +167,20 @@ export function Generate() {
     };
     vsCodeApi.postMessage(message);
   }
+  
+  function copyToClipboard() {
+    const message: CopyToClipboardEvent = {
+      type: "copyToClipboard",
+      model,
+      includedFiles: files,
+      prompt,
+      codegenTargets,
+      codingConvention,
+      fileVersion,
+      outputKind,
+    };
+    vsCodeApi.postMessage(message);
+  }
 
   function onPromptTextAreaKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
@@ -242,9 +257,20 @@ export function Generate() {
           ></VSCodeTextArea>
         </CSFormField>
         <CSFormField>
-          <VSCodeButton onClick={onGenerateButtonClick}>
-            Generate Code
-          </VSCodeButton>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+            }}
+          >
+            <VSCodeButton onClick={onGenerateButtonClick}>
+              Generate Code
+            </VSCodeButton>
+            <VSCodeLink style={{ marginLeft: "1em" }} onClick={copyToClipboard}>
+              Copy To Clipboard
+            </VSCodeLink>
+          </div>
         </CSFormField>
         <VSCodeDivider />
         <h3>Additional Options</h3>

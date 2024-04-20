@@ -16,7 +16,7 @@ import {
 import { CancelEvent } from "../../../types.js";
 import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { GenerationUserInput } from "../../../panels/generate/types.js";
+import { GenerateUserInput } from "../../../panels/generate/types.js";
 import { CodeSnippet } from "../../components/CodeSnippet.js";
 
 export type HistoryEntryPageFile = {
@@ -43,10 +43,10 @@ export function HistoryEntry() {
   const [showCommitMessage, setShowCommitMessage] = useState<boolean>(false);
   const [isCommitted, setIsCommitted] = useState<boolean>(false);
 
-  const gatherArgsForRegenerateCommand = (): GenerationUserInput => {
+  const gatherArgsForRegenerateCommand = (): GenerateUserInput => {
     const { userInput } = args.entry;
 
-    const regenerateArgs: GenerationUserInput = {
+    const regenerateArgs: GenerateUserInput = {
       model: userInput.model,
       codegenTargets: userInput.codegenTargets,
       prompt: args.entry.prompt,

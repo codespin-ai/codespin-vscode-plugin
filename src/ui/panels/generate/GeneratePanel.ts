@@ -27,7 +27,7 @@ import { getGenerateArgs } from "./getGenerateArgs.js";
 import {
   AddDepsEvent,
   GenerateEvent,
-  GenerationUserInput,
+  GenerateUserInput,
   IncludeFilesEvent,
   ModelChangeEvent,
   OpenFileEvent,
@@ -38,7 +38,7 @@ import { isInitialized } from "../../../settings/isInitialized.js";
 import { EventEmitter } from "events";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
-type RegenerateArgs = { type: "regenerate"; args: GenerationUserInput };
+type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
 export type InitArgs = JustFiles | RegenerateArgs;
 
 let activePanel: GeneratePanel | undefined = undefined;
@@ -219,7 +219,7 @@ export class GeneratePanel extends UIPanel {
 
             await writeUserInput(
               result.dirName,
-              messageSansType as GenerationUserInput,
+              messageSansType as GenerateUserInput,
               workspaceRoot
             );
 

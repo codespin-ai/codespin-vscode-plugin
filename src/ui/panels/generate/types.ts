@@ -57,9 +57,9 @@ export type ModelChangeEvent = {
 
 export type GenerateEvent = {
   type: "generate";
-} & GenerationUserInput;
+} & GenerateUserInput;
 
-export type GenerationUserInput = {
+export type GenerateUserInput = {
   model: string;
   prompt: string;
   codegenTargets: string;
@@ -71,3 +71,7 @@ export type GenerationUserInput = {
     includeOption: IncludeOptions;
   }[];
 };
+
+export type CopyToClipboardEvent = {
+  type: "copyToClipboard";
+} & GenerateUserInput;
