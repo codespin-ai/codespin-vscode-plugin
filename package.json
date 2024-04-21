@@ -5,6 +5,7 @@
   "version": "0.1.28",
   "publisher": "CodespinAI",
   "license": "MIT",
+  "icon": "resources/logo.png",
   "repository": {
     "url": "https://github.com/codespin-ai/codespin-vscode-plugin/"
   },
@@ -83,7 +84,7 @@
         {
           "id": "codespin-ai",
           "title": "CodeSpin.AI",
-          "icon": "resources/codespin-ai-icon.svg"
+          "icon": "resources/logo.svg"
         }
       ]
     },
