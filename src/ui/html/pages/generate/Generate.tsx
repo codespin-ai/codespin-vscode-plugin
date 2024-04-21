@@ -20,6 +20,7 @@ import {
   IncludeOptions,
   ModelChangeEvent,
   OpenFileEvent,
+  UIPropsUpdateEvent,
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
@@ -147,27 +148,17 @@ export function Generate() {
 
   function onModelChange(e: React.ChangeEvent<Dropdown>) {
     setModel(e.target.value);
-    const message: ModelChangeEvent = {
+    const modelChangeMessage: ModelChangeEvent = {
       type: "modelChange",
       model: e.target.value,
     };
-    vsCodeApi.postMessage(message);
+    vsCodeApi.postMessage(modelChangeMessage);
   }
 
   function onGenerateButtonClick() {
-    const message: GenerateEvent = {
-      type: "generate",
-      model,
-      includedFiles: files,
-      prompt,
-      codegenTargets,
-      codingConvention,
-      fileVersion,
-      outputKind,
-    };
-    vsCodeApi.postMessage(message);
+    generate({});
   }
-  
+
   function copyToClipboard() {
     const message: CopyToClipboardEvent = {
       type: "copyToClipboard",
@@ -187,18 +178,33 @@ export function Generate() {
       e.preventDefault(); // Stop the textarea from causing form submission or other default actions
       e.stopPropagation(); // Prevent the event from propagating further
 
-      const message: GenerateEvent = {
-        type: "generate",
-        includedFiles: files,
-        model,
-        prompt: (e.currentTarget as any).value,
-        codegenTargets,
-        codingConvention,
-        fileVersion,
-        outputKind,
-      };
-      vsCodeApi.postMessage(message);
+      generate({ prompt: (e.currentTarget as any).value });
     }
+  }
+
+  function generate(args: Partial<GenerateEvent>) {
+    const message: GenerateEvent = {
+      type: "generate",
+      includedFiles: files,
+      model,
+      prompt,
+      codegenTargets,
+      codingConvention,
+      fileVersion,
+      outputKind,
+      ...args,
+    };
+    vsCodeApi.postMessage(message);
+
+    const uiPropsUpdate: UIPropsUpdateEvent = {
+      type: "uiPropsUpdate",
+      promptTextAreaHeight:
+        document.getElementsByClassName("prompt-textarea")[0].clientHeight,
+      promptTextAreaWidth:
+        document.getElementsByClassName("prompt-textarea")[0].clientWidth,
+    };
+
+    vsCodeApi.postMessage(uiPropsUpdate);
   }
 
   function handleDeleteFile(filePath: string) {
@@ -253,6 +259,7 @@ export function Generate() {
             onChange={(e: React.FormEvent<HTMLTextAreaElement>) =>
               setPrompt(e.currentTarget.value)
             }
+            className="prompt-textarea"
             value={prompt}
           ></VSCodeTextArea>
         </CSFormField>

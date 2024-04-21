@@ -75,3 +75,12 @@ export type GenerateUserInput = {
 export type CopyToClipboardEvent = {
   type: "copyToClipboard";
 } & GenerateUserInput;
+
+export type UIPropsUpdateArgs = {
+  promptTextAreaWidth?: number;
+  promptTextAreaHeight?: number;
+};
+
+export type UIPropsUpdateEvent = {
+  type: "uiPropsUpdate";
+} & UIPropsUpdateArgs;

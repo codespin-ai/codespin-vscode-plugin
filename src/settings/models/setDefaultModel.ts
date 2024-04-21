@@ -1,7 +1,7 @@
 import { CodespinConfig } from "codespin/dist/settings/CodespinConfig.js";
 import { readFile, writeFile } from "fs/promises";
 import * as path from "path";
-import { getCodespinDir } from "../settings/codespinDirs.js";
+import { getCodespinDir } from "../codespinDirs.js";
 
 export async function setDefaultModel(
   model: string,

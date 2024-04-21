@@ -10,9 +10,6 @@ import * as path from "path";
 import * as vscode from "vscode";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
 import { pathExists } from "../../../fs/pathExists.js";
-import { getDefaultModel } from "../../../models/getDefaultModel.js";
-import { getModels } from "../../../models/getModels.js";
-import { setDefaultModel } from "../../../models/setDefaultModel.js";
 import { editAnthropicConfig } from "../../../settings/api/editAnthropicConfig.js";
 import { editOpenAIConfig } from "../../../settings/api/editOpenAIConfig.js";
 import {
@@ -42,6 +39,9 @@ import {
   ResponseStreamEvent,
 } from "./types.js";
 import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
+import { getDefaultModel } from "../../../settings/models/getDefaultModel.js";
+import { getModels } from "../../../settings/models/getModels.js";
+import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
