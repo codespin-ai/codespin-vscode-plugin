@@ -8,7 +8,7 @@ import {
   VSCodeTextArea,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { useEffect, useRef, useState } from "react"; // Import useRef
+import { useEffect, useRef, useState } from "react";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import {
@@ -69,9 +69,14 @@ export function Generate() {
     args.outputKind
   );
 
-  // Use provided UI props for initial textarea dimensions
-  const [initialHeight, setInitialHeight] = useState(args.uiProps?.promptTextAreaHeight || 0);
-  const [initialWidth, setInitialWidth] = useState(args.uiProps?.promptTextAreaWidth || 0);
+  const [initialHeight, setInitialHeight] = useState(
+    args.uiProps?.promptTextAreaHeight || 0
+  );
+  const [initialWidth, setInitialWidth] = useState(
+    args.uiProps?.promptTextAreaWidth || 0
+  );
+
+  const [showCopied, setShowCopied] = useState(false);
 
   function onOutputKindChange(e: React.ChangeEvent<Dropdown>) {
     setOutputKind(e.target.value as "full" | "diff");
@@ -97,11 +102,11 @@ export function Generate() {
       }
     }
 
-    const promptTextArea = promptRef.current!.shadowRoot!.querySelector("textarea")!;
+    const promptTextArea =
+      promptRef.current!.shadowRoot!.querySelector("textarea")!;
     promptTextArea.focus();
     promptTextArea.addEventListener("keydown", onPromptTextAreaKeyDown);
 
-    // Use provided UI props to set initial textarea dimensions if available
     if (args.uiProps?.promptTextAreaHeight) {
       promptTextArea.style.height = `${args.uiProps.promptTextAreaHeight}px`;
       setInitialHeight(promptTextArea.clientHeight);
@@ -189,12 +194,17 @@ export function Generate() {
       outputKind,
     };
     vsCodeApi.postMessage(message);
+
+    setShowCopied(true);
+    setTimeout(() => {
+      setShowCopied(false);
+    }, 3000);
   }
 
   function onPromptTextAreaKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-      e.preventDefault(); // Stop the textarea from causing form submission or other default actions
-      e.stopPropagation(); // Prevent the event from propagating further
+      e.preventDefault();
+      e.stopPropagation();
 
       generate({ prompt: (e.currentTarget as any).value });
     }
@@ -214,8 +224,8 @@ export function Generate() {
     };
     vsCodeApi.postMessage(message);
 
-    // Check if the textarea dimensions have changed
-    const promptTextArea = promptRef.current!.shadowRoot!.querySelector("textarea")!;
+    const promptTextArea =
+      promptRef.current!.shadowRoot!.querySelector("textarea")!;
     if (
       promptTextArea.clientHeight !== initialHeight ||
       promptTextArea.clientWidth !== initialWidth
@@ -297,9 +307,17 @@ export function Generate() {
             <VSCodeButton onClick={onGenerateButtonClick}>
               Generate Code
             </VSCodeButton>
-            <VSCodeLink style={{ marginLeft: "1em" }} onClick={copyToClipboard}>
-              Copy To Clipboard
-            </VSCodeLink>
+            {!showCopied && (
+              <VSCodeLink
+                style={{ marginLeft: "1em" }}
+                onClick={copyToClipboard}
+              >
+                Copy To Clipboard
+              </VSCodeLink>
+            )}
+            {showCopied && (
+              <span style={{ marginLeft: "1em", color: "white" }}>Copied</span>
+            )}
           </div>
         </CSFormField>
         <VSCodeDivider />
@@ -328,7 +346,7 @@ export function Generate() {
         </CSFormField>
         <CSFormField label={{ text: "Output Kind:" }}>
           <VSCodeDropdown
-            currentValue={outputKind || "full"} // Fallback to 'full' if undefined
+            currentValue={outputKind || "full"}
             style={{ width: "320px" }}
             onChange={onOutputKindChange}
           >
