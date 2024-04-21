@@ -25,7 +25,6 @@ import { isInitialized } from "../../../settings/isInitialized.js";
 import { getUIProps } from "../../../settings/ui/getUIProps.js"; // Added import for getUIProps
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
-import { GeneratePageArgs } from "../../html/pages/generate/Generate.js";
 import { UIPanel } from "../UIPanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import {
@@ -45,6 +44,7 @@ import { getDefaultModel } from "../../../settings/models/getDefaultModel.js";
 import { getModels } from "../../../settings/models/getModels.js";
 import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
 import { saveUIProps } from "../../../settings/ui/saveUIProps.js";
+import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };

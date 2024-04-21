@@ -23,27 +23,8 @@ import {
   UIPropsUpdateEvent,
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
+import { GeneratePageArgs } from "./GeneratePageArgs.js";
 
-export type GeneratePageArgs = {
-  models: { [key: string]: string };
-  codingConventions: Array<CodingConvention>;
-  selectedModel: string;
-  codingConvention: string | undefined;
-  prompt: string;
-  codegenTargets: string;
-  fileVersion: FileVersions;
-  outputKind: "full" | "diff";
-  includedFiles: {
-    path: string;
-    size: number;
-    includeOption: IncludeOptions;
-  }[];
-  uiProps?: {
-    promptTextAreaHeight?: number;
-    promptTextAreaWidth?: number;
-  };
-};
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
