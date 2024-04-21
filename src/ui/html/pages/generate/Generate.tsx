@@ -253,7 +253,7 @@ export function Generate() {
               value: args.models[x],
             }))}
             currentValue={model}
-            style={{ width: "320px" }}
+            style={{ width: "180px" }}
             onChange={onModelChange}
           >
             {Object.keys(args.models).map((x) => (
@@ -306,7 +306,7 @@ export function Generate() {
         <CSFormField label={{ text: "Files to generate:" }}>
           <VSCodeDropdown
             currentValue={codegenTargets}
-            style={{ width: "320px" }}
+            style={{ width: "420px" }}
             onChange={(e: React.ChangeEvent<Dropdown>) =>
               setCodegenTargets(e.target.value)
             }
@@ -328,7 +328,7 @@ export function Generate() {
         <CSFormField label={{ text: "Output Kind:" }}>
           <VSCodeDropdown
             currentValue={outputKind || "full"}
-            style={{ width: "320px" }}
+            style={{ width: "180px" }}
             onChange={onOutputKindChange}
           >
             <VSCodeOption value="full">Full Content</VSCodeOption>
@@ -337,7 +337,7 @@ export function Generate() {
         </CSFormField>
         <CSFormField label={{ text: "Coding Conventions:" }}>
           <VSCodeDropdown
-            style={{ width: "320px" }}
+            style={{ width: "180px" }}
             onChange={(e: React.FormEvent<Dropdown>) =>
               setCodingConvention(
                 e.currentTarget.value === "None"
@@ -360,7 +360,7 @@ export function Generate() {
         <CSFormField label={{ text: "File Version:" }}>
           <VSCodeDropdown
             currentValue="current"
-            style={{ width: "320px" }}
+            style={{ width: "180px" }}
             onChange={(e: React.ChangeEvent<Dropdown>) =>
               setFileVersion(e.target.value as FileVersions)
             }
