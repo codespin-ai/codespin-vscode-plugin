@@ -39,6 +39,10 @@ export type GeneratePageArgs = {
     size: number;
     includeOption: IncludeOptions;
   }[];
+  uiProps?: {
+    promptTextAreaHeight?: number;
+    promptTextAreaWidth?: number;
+  };
 };
 
 export function Generate() {
@@ -65,9 +69,9 @@ export function Generate() {
     args.outputKind
   );
 
-  // Track the initial textarea dimensions
-  const [initialHeight, setInitialHeight] = useState(0);
-  const [initialWidth, setInitialWidth] = useState(0);
+  // Use provided UI props for initial textarea dimensions
+  const [initialHeight, setInitialHeight] = useState(args.uiProps?.promptTextAreaHeight || 0);
+  const [initialWidth, setInitialWidth] = useState(args.uiProps?.promptTextAreaWidth || 0);
 
   function onOutputKindChange(e: React.ChangeEvent<Dropdown>) {
     setOutputKind(e.target.value as "full" | "diff");
@@ -94,13 +98,18 @@ export function Generate() {
     }
 
     const promptTextArea = promptRef.current!;
-
     promptTextArea.focus();
     promptTextArea.addEventListener("keydown", onPromptTextAreaKeyDown);
 
-    // Store the initial textarea dimensions
-    setInitialHeight(promptTextArea.clientHeight);
-    setInitialWidth(promptTextArea.clientWidth);
+    // Use provided UI props to set initial textarea dimensions if available
+    if (args.uiProps?.promptTextAreaHeight) {
+      promptTextArea.style.height = `${args.uiProps.promptTextAreaHeight}px`;
+    }
+
+    if (args.uiProps?.promptTextAreaWidth) {
+      promptTextArea.style.width = `${args.uiProps.promptTextAreaWidth}px`;
+    }
+
 
     function listener(event: unknown) {
       const message = (event as any).data;

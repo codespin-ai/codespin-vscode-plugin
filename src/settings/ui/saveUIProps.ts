@@ -1,21 +1,17 @@
-import { readFile, writeFile, access } from "fs/promises";
+import { readFile, writeFile } from "fs/promises";
 import * as path from "path";
 import { getCodespinDir } from "../codespinDirs.js";
 import { pathExists } from "../../fs/pathExists.js";
-
-export type UIProps = {
-  promptTextAreaWidth?: number;
-  promptTextAreaHeight?: number;
-};
+import { UIPropsUpdateArgs } from "../../ui/panels/generate/types.js";
 
 export async function saveUIProps(
-  props: UIProps,
+  props: UIPropsUpdateArgs,
   workspaceRoot: string
 ): Promise<void> {
   const projectConfigDir = getCodespinDir(workspaceRoot);
   const uiConfigPath = path.join(projectConfigDir, `ui.json`);
 
-  let existingProps: UIProps = {
+  let existingProps: UIPropsUpdateArgs = {
     promptTextAreaWidth: undefined,
     promptTextAreaHeight: undefined,
   };
@@ -27,9 +23,11 @@ export async function saveUIProps(
   }
 
   // Merge existing properties with new properties
-  const mergedProps: UIProps = {
-    promptTextAreaWidth: props.promptTextAreaWidth ?? existingProps.promptTextAreaWidth,
-    promptTextAreaHeight: props.promptTextAreaHeight ?? existingProps.promptTextAreaHeight,
+  const mergedProps: UIPropsUpdateArgs = {
+    promptTextAreaWidth:
+      props.promptTextAreaWidth ?? existingProps.promptTextAreaWidth,
+    promptTextAreaHeight:
+      props.promptTextAreaHeight ?? existingProps.promptTextAreaHeight,
   };
 
   // Compare merged properties with existing properties

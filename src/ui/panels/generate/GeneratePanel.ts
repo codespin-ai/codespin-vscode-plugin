@@ -22,6 +22,7 @@ import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js"
 import { writeUserInput } from "../../../settings/history/writeUserInput.js";
 import { initialize } from "../../../settings/initialize.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
+import { getUIProps } from "../../../settings/ui/getUIProps.js"; // Added import for getUIProps
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
 import { GeneratePageArgs } from "../../html/pages/generate/Generate.js";
@@ -92,6 +93,8 @@ export class GeneratePanel extends UIPanel {
 
     const conventions = await getConventions(workspaceRoot);
 
+    const uiProps = await getUIProps(workspaceRoot);
+
     const generatePageArgs: GeneratePageArgs =
       initArgs.type === "files"
         ? await (async () => {
@@ -120,6 +123,7 @@ export class GeneratePanel extends UIPanel {
               prompt: initArgs.prompt ?? "",
               codingConvention: undefined,
               outputKind: "full",
+              uiProps,
             };
           })()
         : await (async () => {
@@ -148,6 +152,7 @@ export class GeneratePanel extends UIPanel {
               prompt: initArgs.args.prompt,
               codingConvention: initArgs.args.codingConvention,
               outputKind: initArgs.args.outputKind,
+              uiProps,
             };
             return args;
           })();
