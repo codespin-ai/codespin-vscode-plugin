@@ -97,19 +97,20 @@ export function Generate() {
       }
     }
 
-    const promptTextArea = promptRef.current!;
+    const promptTextArea = promptRef.current!.shadowRoot!.querySelector("textarea")!;
     promptTextArea.focus();
     promptTextArea.addEventListener("keydown", onPromptTextAreaKeyDown);
 
     // Use provided UI props to set initial textarea dimensions if available
     if (args.uiProps?.promptTextAreaHeight) {
       promptTextArea.style.height = `${args.uiProps.promptTextAreaHeight}px`;
+      setInitialHeight(promptTextArea.clientHeight);
     }
 
     if (args.uiProps?.promptTextAreaWidth) {
       promptTextArea.style.width = `${args.uiProps.promptTextAreaWidth}px`;
+      setInitialWidth(promptTextArea.clientWidth);
     }
-
 
     function listener(event: unknown) {
       const message = (event as any).data;
@@ -214,9 +215,7 @@ export function Generate() {
     vsCodeApi.postMessage(message);
 
     // Check if the textarea dimensions have changed
-    const promptTextArea = document.getElementsByClassName(
-      "prompt-textarea"
-    )[0] as HTMLTextAreaElement;
+    const promptTextArea = promptRef.current!.shadowRoot!.querySelector("textarea")!;
     if (
       promptTextArea.clientHeight !== initialHeight ||
       promptTextArea.clientWidth !== initialWidth
