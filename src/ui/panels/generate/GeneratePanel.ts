@@ -37,11 +37,13 @@ import {
   OpenFileEvent,
   PromptCreatedEvent,
   ResponseStreamEvent,
+  UIPropsUpdateEvent,
 } from "./types.js";
 import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
 import { getDefaultModel } from "../../../settings/models/getDefaultModel.js";
 import { getModels } from "../../../settings/models/getModels.js";
 import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
+import { saveUIProps } from "../../../settings/ui/saveUIProps.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
@@ -319,6 +321,17 @@ export class GeneratePanel extends UIPanel {
       case "modelChange": {
         await setDefaultModel(
           (message as ModelChangeEvent).model,
+          workspaceRoot
+        );
+        break;
+      }
+      case "uiPropsUpdate": {
+        const event = message as UIPropsUpdateEvent;
+        saveUIProps(
+          {
+            promptTextAreaHeight: event.promptTextAreaHeight,
+            promptTextAreaWidth: event.promptTextAreaWidth,
+          },
           workspaceRoot
         );
         break;

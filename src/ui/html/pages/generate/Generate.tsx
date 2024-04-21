@@ -65,6 +65,10 @@ export function Generate() {
     args.outputKind
   );
 
+  // Track the initial textarea dimensions
+  const [initialHeight, setInitialHeight] = useState(0);
+  const [initialWidth, setInitialWidth] = useState(0);
+
   function onOutputKindChange(e: React.ChangeEvent<Dropdown>) {
     setOutputKind(e.target.value as "full" | "diff");
   }
@@ -93,6 +97,10 @@ export function Generate() {
 
     promptTextArea.focus();
     promptTextArea.addEventListener("keydown", onPromptTextAreaKeyDown);
+
+    // Store the initial textarea dimensions
+    setInitialHeight(promptTextArea.clientHeight);
+    setInitialWidth(promptTextArea.clientWidth);
 
     function listener(event: unknown) {
       const message = (event as any).data;
@@ -196,15 +204,22 @@ export function Generate() {
     };
     vsCodeApi.postMessage(message);
 
-    const uiPropsUpdate: UIPropsUpdateEvent = {
-      type: "uiPropsUpdate",
-      promptTextAreaHeight:
-        document.getElementsByClassName("prompt-textarea")[0].clientHeight,
-      promptTextAreaWidth:
-        document.getElementsByClassName("prompt-textarea")[0].clientWidth,
-    };
+    // Check if the textarea dimensions have changed
+    const promptTextArea = document.getElementsByClassName(
+      "prompt-textarea"
+    )[0] as HTMLTextAreaElement;
+    if (
+      promptTextArea.clientHeight !== initialHeight ||
+      promptTextArea.clientWidth !== initialWidth
+    ) {
+      const uiPropsUpdate: UIPropsUpdateEvent = {
+        type: "uiPropsUpdate",
+        promptTextAreaHeight: promptTextArea.clientHeight,
+        promptTextAreaWidth: promptTextArea.clientWidth,
+      };
 
-    vsCodeApi.postMessage(uiPropsUpdate);
+      vsCodeApi.postMessage(uiPropsUpdate);
+    }
   }
 
   function handleDeleteFile(filePath: string) {
