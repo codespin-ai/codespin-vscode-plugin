@@ -442,6 +442,6 @@ export function Generate() {
   );
 }
 
-function getFileExtension(fileName: string) {
-  return fileName.slice(((fileName.lastIndexOf(".") - 1) >>> 0) + 2);
+function getFileExtension(filename: string) {
+  return filename.split(".").slice(-1)[0] ?? "";
 }
