@@ -1,5 +1,5 @@
 export type CodingConvention = {
   filename: string;
-  extension: string;
+  extensions: string[];
   description: string;
 };

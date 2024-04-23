@@ -25,7 +25,6 @@ import {
 import { CSFormField } from "../../components/CSFormField.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
 
-
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
   const args: GeneratePageArgs = history.state;
@@ -72,7 +71,7 @@ export function Generate() {
       const fileExtension = getFileExtension(files[0].path);
       if (files.every((x) => x.path.endsWith(fileExtension))) {
         const matchingConvention = args.codingConventions.find((convention) => {
-          return convention.extension === fileExtension;
+          return convention.extensions.includes(fileExtension);
         });
 
         if (matchingConvention) {
@@ -137,7 +136,7 @@ export function Generate() {
 
     if (targetExtension) {
       const matchingConvention = args.codingConventions.find((convention) => {
-        return convention.extension === targetExtension;
+        return convention.extensions.includes(targetExtension);
       });
 
       if (matchingConvention) {

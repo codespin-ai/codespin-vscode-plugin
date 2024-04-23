@@ -22,17 +22,24 @@ export async function getConventions(
             const parsedContent = matter(fileContents);
             const autoSelectedConvention = autoSelectConvention(file);
 
-            return {
-              filename: file,
-              extension:
-                parsedContent.data.extension && parsedContent.data.extension
-                  ? parsedContent.data.extension
-                  : autoSelectedConvention?.extension || "$$unknown$$",
-              description:
-                parsedContent.data && parsedContent.data.description
-                  ? parsedContent.data.description
-                  : autoSelectedConvention?.description || file,
-            };
+            return parsedContent.data
+              ? {
+                  filename: file,
+                  extensions: parsedContent.data.extensions ?? [
+                    autoSelectedConvention?.extension ?? "$$unknown$$",
+                  ],
+                  description:
+                    parsedContent.data.description ??
+                    autoSelectedConvention?.description ??
+                    file,
+                }
+              : {
+                  filename: file,
+                  extensions: [
+                    autoSelectedConvention?.extension ?? "$$unknown$$",
+                  ],
+                  description: autoSelectedConvention?.description ?? file,
+                };
           })
       )
     : [];
