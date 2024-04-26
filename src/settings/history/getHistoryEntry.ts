@@ -8,20 +8,21 @@ import {
   HistoryEntry,
 } from "../../ui/viewProviders/history/types.js";
 import { GenerateUserInput } from "../../ui/panels/generate/types.js";
+import { pathExists } from "../../fs/pathExists.js";
 
-// Functional style utility functions
 async function readJsonFile<T>(filePath: string): Promise<T> {
   const fileContents = await fs.readFile(filePath, "utf8");
   return JSON.parse(fileContents) as T;
 }
 
-// Convert readTextFile to also check if the file exists before reading
 async function readTextFile(filePath: string): Promise<string> {
-  try {
-    await fs.access(filePath);
-    return fs.readFile(filePath, "utf8");
-  } catch {
-    // If the file does not exist, return an empty string
+  return await fs.readFile(filePath, "utf8");
+}
+
+async function readTextFileIfExists(filePath: string): Promise<string> {
+  if (await pathExists(filePath)) {
+    return await fs.readFile(filePath, "utf8");
+  } else {
     return "";
   }
 }
@@ -50,7 +51,7 @@ export async function getHistoryEntry(
     const userInput = await readJsonFile<GenerateUserInput>(userInputPath);
     const prompt = await readTextFile(promptPath);
     const rawPrompt = await readTextFile(rawPromptPath);
-    const rawResponse = await readTextFile(rawResponsePath);
+    const rawResponse = await readTextFileIfExists(rawResponsePath);
 
     return { timestamp, userInput, prompt, rawPrompt, rawResponse };
   } catch (ex: any) {

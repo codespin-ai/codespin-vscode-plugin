@@ -4,8 +4,8 @@ import * as path from "path";
 import { getHistoryDir } from "../codespinDirs.js";
 
 export async function writeGeneratedFiles(
-  dirName: string,
   files: GeneratedSourceFile[],
+  dirName: string,
   workspaceRoot: string
 ) {
   const historyDir = getHistoryDir(workspaceRoot);

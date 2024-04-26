@@ -1,11 +1,7 @@
-import {
-  GenerateArgs as CodespinGenerateArgs,
-  GenerateArgs,
-} from "codespin/dist/commands/generate.js";
+import { GenerateArgs as CodespinGenerateArgs } from "codespin/dist/commands/generate.js";
 import * as path from "path";
 import { getAPIConfigPath } from "../../../settings/api/getAPIConfigPath.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
-import { GenerateUserInput } from "./types.js";
 import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
 import { GeneratePanel } from "./GeneratePanel.js";
 
@@ -17,26 +13,25 @@ type GetGenerateArgsResult =
   | {
       status: "can_generate";
       args: CodespinGenerateArgs;
-      dirName: string;
       promptFilePath: string;
     };
 
 export async function getGenerateArgs(
   generatePanel: GeneratePanel,
+  dirName: string,
   workspaceRoot: string
 ): Promise<GetGenerateArgsResult> {
   const userInputFromPanel = generatePanel.userInput!;
   const [api] = userInputFromPanel.model.split(":");
 
   const configFilePath = await getAPIConfigPath(api, workspaceRoot);
-  const dirName = Date.now().toString();
 
   if (configFilePath) {
     const historyDirPath = getHistoryItemDir(dirName, workspaceRoot);
 
     const promptFilePath = path.join(historyDirPath, "prompt.txt");
 
-    const codespinGenerateArgs: GenerateArgs = {
+    const codespinGenerateArgs: CodespinGenerateArgs = {
       promptFile: promptFilePath,
       out:
         userInputFromPanel.codegenTargets !== ":prompt"
@@ -67,7 +62,6 @@ export async function getGenerateArgs(
     return {
       status: "can_generate",
       args: codespinGenerateArgs,
-      dirName,
       promptFilePath,
     };
   }

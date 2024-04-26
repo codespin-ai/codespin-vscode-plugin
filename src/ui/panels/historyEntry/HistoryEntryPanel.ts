@@ -127,7 +127,6 @@ export class HistoryEntryPanel extends UIPanel {
         this.dispose();
         break;
       default:
-        console.log("Unhandled message type from webview:", message.type);
         break;
     }
   }

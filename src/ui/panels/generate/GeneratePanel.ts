@@ -1,7 +1,3 @@
-import {
-  PromptResult,
-  generate as codespinGenerate,
-} from "codespin/dist/commands/generate.js";
 import { EventEmitter } from "events";
 import * as path from "path";
 import * as vscode from "vscode";
@@ -15,7 +11,7 @@ import { getConventions } from "../../../settings/conventions/getCodingConventio
 import { initialize } from "../../../settings/initialize.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
 import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
-import { getUIProps } from "../../../settings/ui/getUIProps.js"; // Added import for getUIProps
+import { getUIProps } from "../../../settings/ui/getUIProps.js";
 import { saveUIProps } from "../../../settings/ui/saveUIProps.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
@@ -23,9 +19,9 @@ import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js"
 import { navigateTo } from "../../navigateTo.js";
 import { UIPanel } from "../UIPanel.js";
 import { addDeps } from "./addDeps.js";
+import { copyToClipboard } from "./copyToClipboard.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import { getPageArgs } from "./getPageArgs.js";
-import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
 import { invokeGeneration } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
@@ -33,9 +29,12 @@ import {
   GenerateEvent,
   GenerateUserInput,
   ModelChangeEvent,
+  NewHistoryEntryEvent,
   OpenFileEvent,
   UIPropsUpdateEvent,
 } from "./types.js";
+import { UpdateHistoryEvent } from "../../viewProviders/history/types.js";
+import { getHistory } from "../../../settings/history/getHistory.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
@@ -49,6 +48,7 @@ export function getActivePanel() {
 
 export class GeneratePanel extends UIPanel {
   userInput: GenerateEvent | undefined;
+  dirName: string | undefined = undefined;
   cancelGeneration: (() => void) | undefined;
 
   constructor(
@@ -104,25 +104,50 @@ export class GeneratePanel extends UIPanel {
         await addDeps(this, message as AddDepsEvent, workspaceRoot);
         break;
       case "copyToClipboard": {
-        const clipboardArgs = message as CopyToClipboardEvent;
+        if (this.dirName === undefined) {
+          this.dirName = Date.now().toString();
+        }
 
-        const args = getPrintPromptArgs(clipboardArgs, workspaceRoot);
+        await copyToClipboard(
+          message as CopyToClipboardEvent,
+          this.dirName,
+          workspaceRoot
+        );
 
-        const result = await codespinGenerate(args, {
-          workingDir: workspaceRoot,
-        });
+        const newHistoryEntry: NewHistoryEntryEvent = {
+          type: "newHistoryEntry",
+        };
+        this.globalEventEmitter.emit("message", newHistoryEntry);
 
-        const prompt = (result as PromptResult).prompt;
-        vscode.env.clipboard.writeText(prompt);
         break;
       }
       case "generate": {
-        this.userInput = message as GenerateEvent;        
-        const generateArgs = await getGenerateArgs(this, workspaceRoot);
+        this.userInput = message as GenerateEvent;
+
+        if (this.dirName === undefined) {
+          this.dirName = Date.now().toString();
+        }
+
+        const generateArgs = await getGenerateArgs(
+          this,
+          this.dirName,
+          workspaceRoot
+        );
 
         switch (generateArgs.status) {
           case "can_generate":
-            await invokeGeneration(this, generateArgs, workspaceRoot);
+            await invokeGeneration(
+              this,
+              generateArgs,
+              this.dirName,
+              workspaceRoot
+            );
+
+            const newHistoryEntry: NewHistoryEntryEvent = {
+              type: "newHistoryEntry",
+            };
+            this.globalEventEmitter.emit("message", newHistoryEntry);
+
             this.dispose();
             break;
           case "missing_config":

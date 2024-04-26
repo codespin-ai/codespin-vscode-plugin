@@ -1,10 +1,9 @@
-import * as vscode from "vscode";
-import { getWebviewContent } from "../getWebviewContent.js";
-import { EventTemplate } from "../EventTemplate.js";
-import { NavigateEvent } from "../types.js";
 import { EventEmitter } from "events";
+import * as vscode from "vscode";
+import { EventTemplate } from "../EventTemplate.js";
 import { WebviewOptions } from "../UIContainer.js";
 import { getMessageHandler } from "../getMessageHandler.js";
+import { getWebviewContent } from "../getWebviewContent.js";
 
 export abstract class ViewProvider implements vscode.WebviewViewProvider {
   private webviewView?: vscode.WebviewView;
@@ -88,12 +87,6 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
 
   webviewReadyEvent() {
     return this.webviewReadyPromise;
-  }
-
-  postMessageToWebview<T>(message: EventTemplate) {
-    if (!this.isDisposed) {
-      this.webviewView?.webview.postMessage(message);
-    }
   }
 
   dispose() {

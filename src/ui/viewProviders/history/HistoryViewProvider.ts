@@ -41,13 +41,13 @@ export class HistoryViewProvider extends ViewProvider {
         }
         break;
       }
-      case "generate": {
+      case "newHistoryEntry": {
         const updateHistoryEvent: UpdateHistoryEvent = {
           type: "updateHistory",
           entries: await getHistory(workspaceRoot),
         };
 
-        this.postMessageToWebview(updateHistoryEvent);
+        this.getWebview().postMessage(updateHistoryEvent);
         break;
       }
       case "initialize": {

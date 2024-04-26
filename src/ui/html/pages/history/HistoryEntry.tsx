@@ -147,7 +147,7 @@ export function HistoryEntry() {
                   ))
                 )
               ) : (
-                <p>No files were generated.</p>
+                <div>No files were generated.</div>
               )}
             </>
           </div>
@@ -164,24 +164,30 @@ export function HistoryEntry() {
             <pre>{<div>{args.entry.rawResponse}</div>}</pre>
           </div>
         </VSCodePanelView>
+
         <VSCodePanelView>
-          {args.files.map((file) => (
-            <div key={`file-diff-${file.filePath}`}>
-              <h2 style={{ fontSize: "14px", marginTop: "1em" }}>Diff</h2>
-              <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
-                {file.filePath}
-              </h3>
-              <div
-                style={{
-                  padding: "0.5em 1em 0.5em 1em",
-                  borderRadius: "4px",
-                }}
-              >
-                <pre>{file.diffHtml}</pre>
+          {args.files.length ? (
+            args.files.map((file) => (
+              <div key={`file-diff-${file.filePath}`}>
+                <h2 style={{ fontSize: "14px", marginTop: "1em" }}>Diff</h2>
+                <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
+                  {file.filePath}
+                </h3>
+                <div
+                  style={{
+                    padding: "0.5em 1em 0.5em 1em",
+                    borderRadius: "4px",
+                  }}
+                >
+                  <pre>{file.diffHtml}</pre>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            <div>No files were generated.</div>
+          )}
         </VSCodePanelView>
+
         <VSCodePanelView>
           <div style={{ display: "flex", flexDirection: "column" }}>
             {args.git.files.length ? (

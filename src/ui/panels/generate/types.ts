@@ -84,3 +84,7 @@ export type UIPropsUpdateArgs = {
 export type UIPropsUpdateEvent = {
   type: "uiPropsUpdate";
 } & UIPropsUpdateArgs;
+
+export type NewHistoryEntryEvent = {
+  type: "newHistoryEntry";
+};

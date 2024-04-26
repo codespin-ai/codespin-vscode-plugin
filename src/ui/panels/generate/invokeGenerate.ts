@@ -1,7 +1,7 @@
-import { generate as codespinGenerate } from "codespin/dist/commands/generate.js";
+import { GenerateArgs as CodespinGenerateArgs, generate as codespinGenerate } from "codespin/dist/commands/generate.js";
 import { mkdir } from "fs/promises";
-import * as path from "path";
 import { pathExists } from "../../../fs/pathExists.js";
+import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
 import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFiles.js";
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
 import { navigateTo } from "../../navigateTo.js";
@@ -10,13 +10,14 @@ import { PromptCreatedEvent, ResponseStreamEvent } from "./types.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
-  result: any,
+  argsForGeneration: { args: CodespinGenerateArgs; promptFilePath: string },
+  dirName: string,
   workspaceRoot: string
 ) {
   const userInputFromPanel = generatePanel.userInput!;
-  const historyDirPath = path.dirname(result.promptFilePath);
 
-  // The entry will not exist. Make.
+  const historyDirPath = getHistoryItemDir(dirName, workspaceRoot);
+
   if (!(await pathExists(historyDirPath))) {
     await mkdir(historyDirPath, { recursive: true });
   }
@@ -24,7 +25,7 @@ export async function invokeGeneration(
   await writeHistoryItem(
     userInputFromPanel.prompt,
     "prompt.txt",
-    result.dirName,
+    dirName,
     workspaceRoot
   );
 
@@ -35,15 +36,15 @@ export async function invokeGeneration(
   await writeHistoryItem(
     inputAsJson,
     "user-input.json",
-    result.dirName,
+    dirName,
     workspaceRoot
   );
 
   await navigateTo(generatePanel, `/generate/invoke`, {
-    model: result.args.model,
+    model: argsForGeneration.args.model,
   });
 
-  result.args.promptCallback = async (prompt: string) => {
+  argsForGeneration.args.promptCallback = async (prompt: string) => {
     const promptCreated: PromptCreatedEvent = {
       type: "promptCreated",
       prompt,
@@ -51,15 +52,10 @@ export async function invokeGeneration(
 
     generatePanel.getWebview().postMessage(promptCreated);
 
-    await writeHistoryItem(
-      prompt,
-      "raw-prompt.txt",
-      result.dirName,
-      workspaceRoot
-    );
+    await writeHistoryItem(prompt, "raw-prompt.txt", dirName, workspaceRoot);
   };
 
-  result.args.responseStreamCallback = (text: string) => {
+  argsForGeneration.args.responseStreamCallback = (text: string) => {
     const responseStreamEvent: ResponseStreamEvent = {
       type: "responseStream",
       data: text,
@@ -68,20 +64,15 @@ export async function invokeGeneration(
     generatePanel.getWebview().postMessage(responseStreamEvent);
   };
 
-  result.args.responseCallback = async (text: string) => {
-    await writeHistoryItem(
-      text,
-      "raw-response.txt",
-      result.dirName,
-      workspaceRoot
-    );
+  argsForGeneration.args.responseCallback = async (text: string) => {
+    await writeHistoryItem(text, "raw-response.txt", dirName, workspaceRoot);
   };
 
-  result.args.parseCallback = async (files: any) => {
-    await writeGeneratedFiles(result.dirName, files, workspaceRoot);
+  argsForGeneration.args.parseCallback = async (files: any) => {
+    await writeGeneratedFiles(files, dirName, workspaceRoot);
   };
 
-  await codespinGenerate(result.args, {
+  await codespinGenerate(argsForGeneration.args, {
     workingDir: workspaceRoot,
   });
 }
