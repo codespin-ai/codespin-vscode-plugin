@@ -13,6 +13,10 @@ export async function navigateTo<T>(
       url,
       state: args,
     };
-    uiContainer.getWebview().postMessage(navigateEvent);
+
+    const webview = uiContainer.getWebview();
+    if (webview) {
+      webview.postMessage(navigateEvent);
+    }
   });
 }

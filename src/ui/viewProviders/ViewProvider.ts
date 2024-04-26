@@ -81,8 +81,8 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     return this.initializePromise;
   }
 
-  getWebview(): vscode.Webview {
-    return this.webviewView!.webview;
+  getWebview(): vscode.Webview | undefined {
+    return this.webviewView?.webview;
   }
 
   webviewReadyEvent() {

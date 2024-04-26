@@ -10,5 +10,5 @@ export type UIContainer = {
   resolveWebviewReady: () => void;
   navigationPromiseResolvers: Map<string, () => void>;
   onMessage: (message: EventTemplate) => void;
-  getWebview(): vscode.Webview;
+  getWebview(): vscode.Webview | undefined;
 };

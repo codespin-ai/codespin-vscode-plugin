@@ -47,7 +47,11 @@ export class HistoryViewProvider extends ViewProvider {
           entries: await getHistory(workspaceRoot),
         };
 
-        this.getWebview().postMessage(updateHistoryEvent);
+        const webview = this.getWebview();
+        if (webview) {
+          webview.postMessage(updateHistoryEvent);
+        }
+
         break;
       }
       case "initialize": {
