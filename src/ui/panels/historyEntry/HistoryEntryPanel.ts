@@ -90,8 +90,8 @@ export class HistoryEntryPanel extends UIPanel {
     switch (message.type) {
       case "generateCommitMessage": {
         const incomingMessage = message as GenerateCommitMessageEvent;
-        const generateArgs = await getGenCommitMessageArgs(incomingMessage);
-        const result = await codespinGenerate(generateArgs, {
+        const genCommitMessageArgs = await getGenCommitMessageArgs(incomingMessage);
+        const result = await codespinGenerate(genCommitMessageArgs, {
           workingDir: getWorkspaceRoot(this.context),
         });
         const commitMessage = (result as UnparsedResult).text;

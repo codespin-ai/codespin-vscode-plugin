@@ -48,7 +48,7 @@ export function getActivePanel() {
 }
 
 export class GeneratePanel extends UIPanel {
-  generateArgs: GenerateEvent | undefined;
+  userInput: GenerateEvent | undefined;
   cancelGeneration: (() => void) | undefined;
 
   constructor(
@@ -117,17 +117,17 @@ export class GeneratePanel extends UIPanel {
         break;
       }
       case "generate": {
-        this.generateArgs = message as GenerateEvent;
-        const result = await getGenerateArgs(this, workspaceRoot);
+        this.userInput = message as GenerateEvent;        
+        const generateArgs = await getGenerateArgs(this, workspaceRoot);
 
-        switch (result.status) {
+        switch (generateArgs.status) {
           case "can_generate":
-            await invokeGeneration(this, result, workspaceRoot);
+            await invokeGeneration(this, generateArgs, workspaceRoot);
             this.dispose();
             break;
           case "missing_config":
             await navigateTo(this, `/api/config/edit`, {
-              api: result.api,
+              api: generateArgs.api,
             });
             break;
         }
@@ -135,12 +135,12 @@ export class GeneratePanel extends UIPanel {
       }
       case "editAnthropicConfig": {
         await editAnthropicConfig(message as EditAnthropicConfigEvent);
-        await this.onMessage(this.generateArgs!);
+        await this.onMessage(this.userInput!);
         break;
       }
       case "editOpenAIConfig": {
         await editOpenAIConfig(message as EditOpenAIConfigEvent);
-        await this.onMessage(this.generateArgs!);
+        await this.onMessage(this.userInput!);
         break;
       }
       case "modelChange": {

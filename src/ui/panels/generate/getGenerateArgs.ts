@@ -25,8 +25,8 @@ export async function getGenerateArgs(
   generatePanel: GeneratePanel,
   workspaceRoot: string
 ): Promise<GetGenerateArgsResult> {
-  const argsFromPanel = generatePanel.generateArgs!;
-  const [api] = argsFromPanel.model.split(":");
+  const userInputFromPanel = generatePanel.userInput!;
+  const [api] = userInputFromPanel.model.split(":");
 
   const configFilePath = await getAPIConfigPath(api, workspaceRoot);
   const dirName = Date.now().toString();
@@ -39,26 +39,26 @@ export async function getGenerateArgs(
     const codespinGenerateArgs: GenerateArgs = {
       promptFile: promptFilePath,
       out:
-        argsFromPanel.codegenTargets !== ":prompt"
-          ? argsFromPanel.codegenTargets
+        userInputFromPanel.codegenTargets !== ":prompt"
+          ? userInputFromPanel.codegenTargets
           : undefined,
-      model: argsFromPanel.model,
+      model: userInputFromPanel.model,
       write: true,
-      include: argsFromPanel.includedFiles
+      include: userInputFromPanel.includedFiles
         .filter((f) => f.includeOption === "source")
         .map((f) =>
-          argsFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
+          userInputFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
         ),
-      declare: argsFromPanel.includedFiles
+      declare: userInputFromPanel.includedFiles
         .filter((f) => f.includeOption === "declaration")
         .map((f) => f.path),
-      spec: argsFromPanel.codingConvention
+      spec: userInputFromPanel.codingConvention
         ? await getCodingConventionPath(
-            argsFromPanel.codingConvention,
+            userInputFromPanel.codingConvention,
             workspaceRoot
           )
         : undefined,
-      template: argsFromPanel.outputKind === "diff" ? "diff" : "default",
+      template: userInputFromPanel.outputKind === "diff" ? "diff" : "default",
       cancelCallback: (cancel: () => void) => {
         generatePanel.cancelGeneration = cancel;
       },

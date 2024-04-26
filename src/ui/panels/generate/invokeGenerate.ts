@@ -13,7 +13,7 @@ export async function invokeGeneration(
   result: any,
   workspaceRoot: string
 ) {
-  const generateArgs = generatePanel.generateArgs!;
+  const userInputFromPanel = generatePanel.userInput!;
   const historyDirPath = path.dirname(result.promptFilePath);
 
   // The entry will not exist. Make.
@@ -22,13 +22,13 @@ export async function invokeGeneration(
   }
 
   await writeHistoryItem(
-    generateArgs.prompt,
+    userInputFromPanel.prompt,
     "prompt.txt",
     result.dirName,
     workspaceRoot
   );
 
-  const { type: unused1, ...messageSansType } = generateArgs;
+  const { type: unused1, ...messageSansType } = userInputFromPanel;
 
   const inputAsJson = JSON.stringify(messageSansType, null, 2);
 

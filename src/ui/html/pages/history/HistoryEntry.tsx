@@ -46,7 +46,7 @@ export function HistoryEntry() {
   const gatherArgsForRegenerateCommand = (): GenerateUserInput => {
     const { userInput } = args.entry;
 
-    const regenerateArgs: GenerateUserInput = {
+    const codegenUserInput: GenerateUserInput = {
       model: userInput.model,
       codegenTargets: userInput.codegenTargets,
       prompt: args.entry.prompt,
@@ -56,7 +56,7 @@ export function HistoryEntry() {
       outputKind: userInput.outputKind,
     };
 
-    return regenerateArgs;
+    return codegenUserInput;
   };
 
   const onEditClick = () => {
