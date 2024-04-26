@@ -1,15 +1,12 @@
-import { dependencies as codespinDependencies } from "codespin/dist/commands/dependencies.js";
 import {
   PromptResult,
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate.js";
 import { EventEmitter } from "events";
 import { promises as fs } from "fs";
-import { mkdir } from "fs/promises";
 import * as path from "path";
 import * as vscode from "vscode";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
-import { pathExists } from "../../../fs/pathExists.js";
 import { editAnthropicConfig } from "../../../settings/api/editAnthropicConfig.js";
 import { editOpenAIConfig } from "../../../settings/api/editOpenAIConfig.js";
 import {
@@ -17,16 +14,20 @@ import {
   EditOpenAIConfigEvent,
 } from "../../../settings/api/types.js";
 import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
-import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFiles.js";
-import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
-import { writeUserInput } from "../../../settings/history/writeUserInput.js";
 import { initialize } from "../../../settings/initialize.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
+import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
 import { getUIProps } from "../../../settings/ui/getUIProps.js"; // Added import for getUIProps
+import { saveUIProps } from "../../../settings/ui/saveUIProps.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
+import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
 import { UIPanel } from "../UIPanel.js";
+import { addDeps } from "./addDeps.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
+import { getPageArgs } from "./getPageArgs.js";
+import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
+import { invokeGeneration } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
@@ -35,16 +36,8 @@ import {
   IncludeFilesEvent,
   ModelChangeEvent,
   OpenFileEvent,
-  PromptCreatedEvent,
-  ResponseStreamEvent,
   UIPropsUpdateEvent,
 } from "./types.js";
-import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
-import { getDefaultModel } from "../../../settings/models/getDefaultModel.js";
-import { getModels } from "../../../settings/models/getModels.js";
-import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
-import { saveUIProps } from "../../../settings/ui/saveUIProps.js";
-import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
@@ -95,67 +88,12 @@ export class GeneratePanel extends UIPanel {
 
     const uiProps = await getUIProps(workspaceRoot);
 
-    const generatePageArgs: GeneratePageArgs =
-      initArgs.type === "files"
-        ? await (async () => {
-            const allPaths = await getFilesRecursive(initArgs.args);
-
-            const fileDetails = (
-              await Promise.all(
-                allPaths.map(async (filePath) => {
-                  const size = (await fs.stat(filePath)).size;
-                  return {
-                    path: path.relative(workspaceRoot, filePath),
-                    size,
-                    includeOption: "source" as "source",
-                  };
-                })
-              )
-            ).sort((a, b) => a.path.localeCompare(b.path));
-
-            return {
-              includedFiles: fileDetails,
-              codingConventions: conventions,
-              models: await getModels(workspaceRoot),
-              selectedModel: await getDefaultModel(workspaceRoot),
-              codegenTargets: ":prompt",
-              fileVersion: "current",
-              prompt: initArgs.prompt ?? "",
-              codingConvention: undefined,
-              outputKind: "full",
-              uiProps,
-            };
-          })()
-        : await (async () => {
-            const fileDetails = (
-              await Promise.all(
-                initArgs.args.includedFiles.map(async (x) => {
-                  const filePath = path.resolve(workspaceRoot, x.path);
-                  const size = (await fs.stat(filePath)).size;
-                  const relativePath = path.relative(workspaceRoot, filePath);
-                  return {
-                    path: relativePath,
-                    size,
-                    includeOption: "source" as "source",
-                  };
-                })
-              )
-            ).sort((a, b) => a.path.localeCompare(b.path)); // Sorting by path for consistency.
-
-            const args: GeneratePageArgs = {
-              includedFiles: fileDetails,
-              codingConventions: conventions,
-              models: await getModels(workspaceRoot),
-              selectedModel: initArgs.args.model,
-              codegenTargets: initArgs.args.codegenTargets,
-              fileVersion: initArgs.args.fileVersion,
-              prompt: initArgs.args.prompt,
-              codingConvention: initArgs.args.codingConvention,
-              outputKind: initArgs.args.outputKind,
-              uiProps,
-            };
-            return args;
-          })();
+    const generatePageArgs: GeneratePageArgs = await getPageArgs(
+      initArgs,
+      workspaceRoot,
+      conventions,
+      uiProps
+    );
 
     await this.navigateTo("/generate", generatePageArgs);
   }
@@ -181,32 +119,10 @@ export class GeneratePanel extends UIPanel {
 
     switch (message.type) {
       case "addDeps":
-        const incomingMessage = message as AddDepsEvent;
-        const dependenciesArgs = {
-          file: incomingMessage.file,
-          config: undefined,
-          model: incomingMessage.model,
-          maxTokens: undefined,
-        };
-        const dependenciesResult = await codespinDependencies(
-          dependenciesArgs,
-          {
-            workingDir: workspaceRoot,
-          }
-        );
-
-        this.includeFiles(
-          (
-            await Promise.all(
-              dependenciesResult.dependencies
-                .filter((x) => x.isProjectFile)
-                .map(async (x) => {
-                  const fullPath = path.resolve(workspaceRoot, x.filePath);
-                  const fileExists = await pathExists(fullPath);
-                  return fileExists ? fullPath : undefined;
-                })
-            )
-          ).filter(Boolean) as string[]
+        await addDeps(
+          message as AddDepsEvent,
+          workspaceRoot,
+          this.includeFiles.bind(this)
         );
         break;
       case "copyToClipboard": {
@@ -232,78 +148,14 @@ export class GeneratePanel extends UIPanel {
 
         switch (result.status) {
           case "can_generate":
-            const historyDirPath = path.dirname(result.promptFilePath);
-
-            // The entry will not exist. Make.
-            if (!(await pathExists(historyDirPath))) {
-              await mkdir(historyDirPath, { recursive: true });
-            }
-
-            await writeHistoryItem(
-              this.generateArgs.prompt,
-              "prompt.txt",
-              result.dirName,
-              workspaceRoot
+            await invokeGeneration(
+              this.generateArgs!,
+              result,
+              workspaceRoot,
+              this.navigateTo.bind(this),
+              this.postMessageToWebview.bind(this),
+              this.dispose.bind(this)
             );
-
-            const { type: unused1, ...messageSansType } =
-              message as GenerateEvent;
-
-            await writeUserInput(
-              result.dirName,
-              messageSansType as GenerateUserInput,
-              workspaceRoot
-            );
-
-            await this.navigateTo(`/generate/invoke`, {
-              model: result.args.model,
-            });
-
-            result.args.promptCallback = async (prompt) => {
-              const promptCreated: PromptCreatedEvent = {
-                type: "promptCreated",
-                prompt,
-              };
-              this.postMessageToWebview(promptCreated);
-
-              await writeHistoryItem(
-                prompt,
-                "raw-prompt.txt",
-                result.dirName,
-                workspaceRoot
-              );
-            };
-
-            result.args.responseStreamCallback = (text) => {
-              const responseStreamEvent: ResponseStreamEvent = {
-                type: "responseStream",
-                data: text,
-              };
-              this.postMessageToWebview(responseStreamEvent);
-            };
-
-            result.args.responseCallback = async (text) => {
-              await writeHistoryItem(
-                text,
-                "raw-response.txt",
-                result.dirName,
-                workspaceRoot
-              );
-              this.dispose();
-            };
-
-            result.args.parseCallback = async (files) => {
-              await writeGeneratedFiles(result.dirName, files, workspaceRoot);
-            };
-
-            this.globalEventEmitter.emit("message", {
-              type: "generate",
-            });
-
-            await codespinGenerate(result.args, {
-              workingDir: workspaceRoot,
-            });
-
             break;
           case "missing_config":
             await this.navigateTo(`/api/config/edit`, {
