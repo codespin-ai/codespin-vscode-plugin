@@ -8,18 +8,20 @@ import { ViewProvider } from "../ViewProvider.js";
 import { HistoryPageArgs } from "../../html/pages/history/History.js";
 import { UpdateHistoryEvent } from "./types.js";
 import { EventEmitter } from "events";
+import { navigateTo } from "../../navigateTo.js";
 
 export class HistoryViewProvider extends ViewProvider {
   constructor(
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
-    super(context, globalEventEmitter);
+    const webviewOptions = {};
+    super(webviewOptions, context, globalEventEmitter);
   }
 
   async init() {
-    await this.onInitialize();
-    await this.onWebviewReady();
+    await this.initializeEvent();
+    await this.webviewReadyEvent();
   }
 
   async onMessage(data: EventTemplate) {
@@ -33,9 +35,9 @@ export class HistoryViewProvider extends ViewProvider {
             entries: initialized ? await getHistory(workspaceRoot) : [],
           };
 
-          this.navigateTo("/history", historyPageArgs);
+          navigateTo(this, "/history", historyPageArgs);
         } else {
-          this.navigateTo("/initialize");
+          navigateTo(this, "/initialize");
         }
         break;
       }
@@ -55,7 +57,7 @@ export class HistoryViewProvider extends ViewProvider {
           entries: await getHistory(workspaceRoot),
         };
 
-        this.navigateTo("/history", historyPageArgs);
+        navigateTo(this, "/history", historyPageArgs);
 
         break;
       }

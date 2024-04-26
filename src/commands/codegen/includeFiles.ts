@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { getActivePanel } from "../../ui/panels/generate/GeneratePanel.js";
+import { includeFiles } from "../../ui/panels/generate/includeFiles.js";
 
 export function getIncludeFilesCommand(context: vscode.ExtensionContext) {
   return async function includeFilesCommand(
@@ -8,6 +9,7 @@ export function getIncludeFilesCommand(context: vscode.ExtensionContext) {
   ): Promise<void> {
     // Get the active GeneratePanel
     const panel = getActivePanel();
+    
     if (!panel) {
       vscode.window.showErrorMessage("No active code generation panel found.");
       return;
@@ -19,6 +21,6 @@ export function getIncludeFilesCommand(context: vscode.ExtensionContext) {
     );
 
     // Invoke includeFiles on the panel
-    panel.includeFiles(filePaths);
+    includeFiles(panel, filePaths);
   };
 }

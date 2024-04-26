@@ -25,17 +25,18 @@ import { SelectHistoryEntryArgs } from "../../../commands/history/command.js";
 import { commitFiles } from "../../../git/commitFiles.js";
 import { GeneratePanel } from "../generate/GeneratePanel.js";
 import { EventEmitter } from "events";
+import { navigateTo } from "../../navigateTo.js";
 
 export class HistoryEntryPanel extends UIPanel {
   constructor(
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
-    super(context, globalEventEmitter);
+    super({}, context, globalEventEmitter);
   }
 
   async init(commandArgs: SelectHistoryEntryArgs) {
-    await this.onWebviewReady();
+    await this.webviewReadyEvent();
 
     const workspaceRoot = await getWorkspaceRoot(this.context);
 
@@ -81,7 +82,7 @@ export class HistoryEntryPanel extends UIPanel {
         },
       };
 
-      await this.navigateTo("/history/entry", pageArgs);
+      await navigateTo(this, "/history/entry", pageArgs);
     }
   }
 
@@ -100,8 +101,8 @@ export class HistoryEntryPanel extends UIPanel {
           type: "generatedCommitMessage",
           message: commitMessage,
         };
-        this.postMessageToWebview(generatedMessage);
 
+        this.panel.webview.postMessage(generatedMessage);
         break;
       }
       case "regenerate":
@@ -119,7 +120,7 @@ export class HistoryEntryPanel extends UIPanel {
         const committedMessage: CommittedEvent = {
           type: "committed",
         };
-        this.postMessageToWebview(committedMessage);
+        this.panel.webview.postMessage(committedMessage);
         break;
       }
       case "cancel":

@@ -1,9 +1,10 @@
 import { randomInt } from "crypto";
-import * as vscode from "vscode";
-import { getWebviewContent } from "../getWebviewContent.js";
-import { EventTemplate } from "../EventTemplate.js";
-import { NavigateEvent } from "../types.js";
 import { EventEmitter } from "events";
+import * as vscode from "vscode";
+import { EventTemplate } from "../EventTemplate.js";
+import { WebviewOptions } from "../UIContainer.js";
+import { getMessageHandler } from "../getMessageHandler.js";
+import { getWebviewContent } from "../getWebviewContent.js";
 
 export abstract class UIPanel {
   context: vscode.ExtensionContext;
@@ -14,15 +15,24 @@ export abstract class UIPanel {
   navigationPromiseResolvers: Map<string, () => void>;
   isDisposed: boolean;
   globalEventEmitter: EventEmitter;
+  webviewOptions: WebviewOptions;
+  messageHandler: ReturnType<typeof getMessageHandler>;
 
   constructor(
+    webviewOptions: WebviewOptions,
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
+    webviewOptions = webviewOptions ?? {};
+    webviewOptions.style =
+      webviewOptions.style ?? `code { background: initial; }`;
+
+    this.webviewOptions = webviewOptions;
     this.navigationPromiseResolvers = new Map();
     this.context = context;
     this.globalEventEmitter = globalEventEmitter;
     this.isDisposed = false;
+    this.messageHandler = getMessageHandler(this);
     this.panel = vscode.window.createWebviewPanel(
       "codespin-panel",
       "CodeSpin",
@@ -41,15 +51,13 @@ export abstract class UIPanel {
     this.panel.webview.html = getWebviewContent(
       this.panel.webview,
       this.context.extensionUri,
-      {
-        style: this.getStyle(),
-      }
+      this.webviewOptions
     );
 
     this.panel.onDidDispose(() => this.dispose(), null, this.disposables);
 
     this.panel.webview.onDidReceiveMessage(
-      (message) => this.onDidReceiveMessageBase(message),
+      this.messageHandler,
       null,
       this.disposables
     );
@@ -67,66 +75,19 @@ export abstract class UIPanel {
       this.resolveWebviewReady = resolve;
     });
 
-    this.globalEventEmitter.on("message", this.onDidReceiveMessageBase);
+    this.globalEventEmitter.on("message", this.messageHandler);
   }
 
-  getStyle() {
-    return `code { background: initial; }`;
-  }
-
-  onWebviewReady() {
+  webviewReadyEvent() {
     return this.webviewReadyPromise;
   }
 
-  onDidReceiveMessageBase = (message: EventTemplate) => {
-    if (message.type.startsWith("command:")) {
-      const command = message.type.split(":")[1];
-      const args = (message as EventTemplate<string, { args: unknown[] }>).args;
-      vscode.commands.executeCommand(command, ...args);
-    } else {
-      switch (message.type) {
-        case "webviewReady":
-          this.resolveWebviewReady();
-          break;
-        case "navigated":
-          const incomingMessage = message as NavigateEvent;
-          const resolver = this.navigationPromiseResolvers.get(
-            incomingMessage.url
-          );
-          if (resolver) {
-            resolver();
-            this.navigationPromiseResolvers.delete(incomingMessage.url);
-          }
-          break;
-      }
-    }
-
-    this.onMessage(message);
-  };
-
-  postMessageToWebview(message: EventTemplate) {
-    if (!this.isDisposed) {
-      this.panel.webview.postMessage(message);
-    }
-  }
-
-  navigateTo(url: string, args?: unknown) {
-    return new Promise<void>((resolve) => {
-      this.navigationPromiseResolvers.set(url, resolve);
-      const navigateEvent: NavigateEvent = {
-        type: "navigate",
-        url,
-        state: args,
-      };
-      this.postMessageToWebview(navigateEvent);
-    });
+  getWebview(): vscode.Webview {
+    return this.panel.webview;
   }
 
   dispose() {
-    this.globalEventEmitter.removeListener(
-      "message",
-      this.onDidReceiveMessageBase
-    );
+    this.globalEventEmitter.removeListener("message", this.messageHandler);
 
     this.isDisposed = true;
     this.panel.dispose();

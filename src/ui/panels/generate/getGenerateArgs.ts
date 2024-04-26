@@ -7,6 +7,7 @@ import { getAPIConfigPath } from "../../../settings/api/getAPIConfigPath.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 import { GenerateUserInput } from "./types.js";
 import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
+import { GeneratePanel } from "./GeneratePanel.js";
 
 type GetGenerateArgsResult =
   | {
@@ -21,10 +22,10 @@ type GetGenerateArgsResult =
     };
 
 export async function getGenerateArgs(
-  argsFromPanel: GenerateUserInput,
-  cancelCallback: (cancel: () => void) => void,
+  generatePanel: GeneratePanel,
   workspaceRoot: string
 ): Promise<GetGenerateArgsResult> {
+  const argsFromPanel = generatePanel.generateArgs!;
   const [api] = argsFromPanel.model.split(":");
 
   const configFilePath = await getAPIConfigPath(api, workspaceRoot);
@@ -58,7 +59,9 @@ export async function getGenerateArgs(
           )
         : undefined,
       template: argsFromPanel.outputKind === "diff" ? "diff" : "default",
-      cancelCallback,
+      cancelCallback: (cancel: () => void) => {
+        generatePanel.cancelGeneration = cancel;
+      },
     };
 
     return {

@@ -3,9 +3,12 @@ import { getWebviewContent } from "../getWebviewContent.js";
 import { EventTemplate } from "../EventTemplate.js";
 import { NavigateEvent } from "../types.js";
 import { EventEmitter } from "events";
+import { WebviewOptions } from "../UIContainer.js";
+import { getMessageHandler } from "../getMessageHandler.js";
 
 export abstract class ViewProvider implements vscode.WebviewViewProvider {
   private webviewView?: vscode.WebviewView;
+  webviewOptions: WebviewOptions;
   context: vscode.ExtensionContext;
   disposables: vscode.Disposable[] = [];
   navigationPromiseResolvers: Map<string, () => void>;
@@ -15,14 +18,18 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   webviewReadyPromise: Promise<void>;
   resolveWebviewReady: () => void = () => {};
   globalEventEmitter: EventEmitter;
+  messageHandler: ReturnType<typeof getMessageHandler>;
 
   constructor(
+    webviewOptions: WebviewOptions,
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
+    this.webviewOptions = webviewOptions;
     this.navigationPromiseResolvers = new Map();
     this.isDisposed = false;
     this.globalEventEmitter = globalEventEmitter;
+    this.messageHandler = getMessageHandler(this);
 
     this.initializePromise = new Promise((resolve) => {
       this.resolveInitialize = resolve;
@@ -37,7 +44,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
       this.resolveInitialize = resolve;
     });
 
-    this.globalEventEmitter.on("message", this.onDidReceiveMessageBase);
+    this.globalEventEmitter.on("message", this.messageHandler);
   }
 
   public resolveWebviewView(
@@ -56,14 +63,14 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
       webviewView.webview,
       this.context.extensionUri,
       {
-        style: this.getStyle(),
+        style: this.webviewOptions.style,
       }
     );
 
     webviewView.onDidDispose(() => this.dispose(), null, this.disposables);
 
     webviewView.webview.onDidReceiveMessage(
-      (message) => this.onDidReceiveMessageBase(message),
+      this.messageHandler,
       null,
       this.disposables
     );
@@ -71,39 +78,15 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     this.resolveInitialize();
   }
 
-  onDidReceiveMessageBase = (message: EventTemplate) => {
-    if (message.type.startsWith("command:")) {
-      const command = message.type.split(":")[1];
-      const args = (message as EventTemplate<string, { args: unknown[] }>).args;
-      vscode.commands.executeCommand(command, ...args);
-    } else {
-      switch (message.type) {
-        case "webviewReady":
-          this.resolveWebviewReady();
-          break;
-        case "navigated":
-          const { url } = message as NavigateEvent;
-          const resolver = this.navigationPromiseResolvers.get(url);
-          if (resolver) {
-            resolver();
-            this.navigationPromiseResolvers.delete(url);
-          }
-          break;
-      }
-    }
-
-    this.onMessage(message);
-  };
-
-  getStyle() {
-    return undefined;
-  }
-
-  onInitialize() {
+  initializeEvent() {
     return this.initializePromise;
   }
 
-  onWebviewReady() {
+  getWebview(): vscode.Webview {
+    return this.webviewView!.webview;
+  }
+
+  webviewReadyEvent() {
     return this.webviewReadyPromise;
   }
 
@@ -113,23 +96,8 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     }
   }
 
-  navigateTo<T>(url: string, args?: T) {
-    return new Promise<void>((resolve) => {
-      this.navigationPromiseResolvers.set(url, resolve);
-      const navigateEvent: NavigateEvent = {
-        type: "navigate",
-        url,
-        state: args,
-      };
-      this.postMessageToWebview(navigateEvent);
-    });
-  }
-
   dispose() {
-    this.globalEventEmitter.removeListener(
-      "message",
-      this.onDidReceiveMessageBase
-    );
+    this.globalEventEmitter.removeListener("message", this.messageHandler);
 
     this.isDisposed = true;
     this.dispose();

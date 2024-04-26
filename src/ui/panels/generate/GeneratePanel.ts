@@ -3,10 +3,8 @@ import {
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate.js";
 import { EventEmitter } from "events";
-import { promises as fs } from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
-import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
 import { editAnthropicConfig } from "../../../settings/api/editAnthropicConfig.js";
 import { editOpenAIConfig } from "../../../settings/api/editOpenAIConfig.js";
 import {
@@ -22,6 +20,7 @@ import { saveUIProps } from "../../../settings/ui/saveUIProps.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { EventTemplate } from "../../EventTemplate.js";
 import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
+import { navigateTo } from "../../navigateTo.js";
 import { UIPanel } from "../UIPanel.js";
 import { addDeps } from "./addDeps.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
@@ -33,7 +32,6 @@ import {
   CopyToClipboardEvent,
   GenerateEvent,
   GenerateUserInput,
-  IncludeFilesEvent,
   ModelChangeEvent,
   OpenFileEvent,
   UIPropsUpdateEvent,
@@ -57,7 +55,7 @@ export class GeneratePanel extends UIPanel {
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
-    super(context, globalEventEmitter);
+    super({}, context, globalEventEmitter);
   }
 
   async init(initArgs: InitArgs) {
@@ -82,7 +80,7 @@ export class GeneratePanel extends UIPanel {
       }
     }
 
-    await this.onWebviewReady();
+    await this.webviewReadyEvent();
 
     const conventions = await getConventions(workspaceRoot);
 
@@ -95,23 +93,7 @@ export class GeneratePanel extends UIPanel {
       uiProps
     );
 
-    await this.navigateTo("/generate", generatePageArgs);
-  }
-
-  // Method to include files
-  async includeFiles(filePaths: string[]) {
-    const allPaths = await getFilesRecursive(filePaths);
-    const workspaceRoot = getWorkspaceRoot(this.context);
-    const message: IncludeFilesEvent = {
-      type: "includeFiles",
-      files: await Promise.all(
-        allPaths.map(async (filePath) => ({
-          path: path.relative(workspaceRoot, filePath),
-          size: (await fs.stat(path.resolve(workspaceRoot, filePath))).size,
-        }))
-      ),
-    };
-    this.postMessageToWebview(message);
+    await navigateTo(this, "/generate", generatePageArgs);
   }
 
   async onMessage(message: EventTemplate) {
@@ -119,11 +101,7 @@ export class GeneratePanel extends UIPanel {
 
     switch (message.type) {
       case "addDeps":
-        await addDeps(
-          message as AddDepsEvent,
-          workspaceRoot,
-          this.includeFiles.bind(this)
-        );
+        await addDeps(this, message as AddDepsEvent, workspaceRoot);
         break;
       case "copyToClipboard": {
         const clipboardArgs = message as CopyToClipboardEvent;
@@ -140,25 +118,15 @@ export class GeneratePanel extends UIPanel {
       }
       case "generate": {
         this.generateArgs = message as GenerateEvent;
-        const result = await getGenerateArgs(
-          this.generateArgs!,
-          this.setCancelGeneration.bind(this),
-          workspaceRoot
-        );
+        const result = await getGenerateArgs(this, workspaceRoot);
 
         switch (result.status) {
           case "can_generate":
-            await invokeGeneration(
-              this.generateArgs!,
-              result,
-              workspaceRoot,
-              this.navigateTo.bind(this),
-              this.postMessageToWebview.bind(this),
-              this.dispose.bind(this)
-            );
+            await invokeGeneration(this, result, workspaceRoot);
+            this.dispose();
             break;
           case "missing_config":
-            await this.navigateTo(`/api/config/edit`, {
+            await navigateTo(this, `/api/config/edit`, {
               api: result.api,
             });
             break;
@@ -215,10 +183,6 @@ export class GeneratePanel extends UIPanel {
       default:
         break;
     }
-  }
-
-  setCancelGeneration(cancel: () => void) {
-    this.cancelGeneration = cancel;
   }
 
   onDidChangeViewState(e: vscode.WebviewPanelOnDidChangeViewStateEvent): void {

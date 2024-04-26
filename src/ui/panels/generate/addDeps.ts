@@ -2,11 +2,13 @@ import { dependencies as codespinDependencies } from "codespin/dist/commands/dep
 import { pathExists } from "../../../fs/pathExists.js";
 import * as path from "path";
 import { AddDepsEvent } from "./types.js";
+import { GeneratePanel } from "./GeneratePanel.js";
+import { includeFiles } from "./includeFiles.js";
 
 export async function addDeps(
+  generatePanel: GeneratePanel,
   message: AddDepsEvent,
-  workspaceRoot: string,
-  includeFiles: (filePaths: string[]) => Promise<void>
+  workspaceRoot: string
 ) {
   const dependenciesArgs = {
     file: message.file,
@@ -19,6 +21,7 @@ export async function addDeps(
   });
 
   includeFiles(
+    generatePanel,
     (
       await Promise.all(
         dependenciesResult.dependencies

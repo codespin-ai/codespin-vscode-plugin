@@ -4,20 +4,16 @@ import * as path from "path";
 import { pathExists } from "../../../fs/pathExists.js";
 import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFiles.js";
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
-import {
-  GenerateEvent,
-  PromptCreatedEvent,
-  ResponseStreamEvent,
-} from "./types.js";
+import { navigateTo } from "../../navigateTo.js";
+import { GeneratePanel } from "./GeneratePanel.js";
+import { PromptCreatedEvent, ResponseStreamEvent } from "./types.js";
 
 export async function invokeGeneration(
-  generateArgs: GenerateEvent,
+  generatePanel: GeneratePanel,
   result: any,
-  workspaceRoot: string,
-  navigateTo: (route: string, args: any) => Promise<void>,
-  postMessageToWebview: (message: any) => void,
-  dispose: () => void
+  workspaceRoot: string
 ) {
+  const generateArgs = generatePanel.generateArgs!;
   const historyDirPath = path.dirname(result.promptFilePath);
 
   // The entry will not exist. Make.
@@ -43,7 +39,7 @@ export async function invokeGeneration(
     workspaceRoot
   );
 
-  await navigateTo(`/generate/invoke`, {
+  await navigateTo(generatePanel, `/generate/invoke`, {
     model: result.args.model,
   });
 
@@ -52,7 +48,8 @@ export async function invokeGeneration(
       type: "promptCreated",
       prompt,
     };
-    postMessageToWebview(promptCreated);
+
+    generatePanel.getWebview().postMessage(promptCreated);
 
     await writeHistoryItem(
       prompt,
@@ -67,7 +64,8 @@ export async function invokeGeneration(
       type: "responseStream",
       data: text,
     };
-    postMessageToWebview(responseStreamEvent);
+
+    generatePanel.getWebview().postMessage(responseStreamEvent);
   };
 
   result.args.responseCallback = async (text: string) => {
@@ -77,7 +75,6 @@ export async function invokeGeneration(
       result.dirName,
       workspaceRoot
     );
-    dispose();
   };
 
   result.args.parseCallback = async (files: any) => {
