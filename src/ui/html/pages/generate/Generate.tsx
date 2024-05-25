@@ -48,7 +48,7 @@ export function Generate() {
     args.outputKind ?? "full"
   );
 
-  const [multi, setMulti] = useState(0);
+  const [multi, setMulti] = useState(args.multi ?? 0);
 
   const [initialHeight, setInitialHeight] = useState(
     args.uiProps?.promptTextAreaHeight ?? 0

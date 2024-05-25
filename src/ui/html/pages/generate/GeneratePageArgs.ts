@@ -1,7 +1,5 @@
 import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
-import {
-  FileVersions
-} from "../../../panels/generate/types.js";
+import { FileVersions } from "../../../panels/generate/types.js";
 
 export type GeneratePageArgs = {
   models: { [key: string]: string };
@@ -12,6 +10,7 @@ export type GeneratePageArgs = {
   codegenTargets: string;
   fileVersion: FileVersions;
   outputKind: "full" | "diff";
+  multi: number;
   includedFiles: {
     path: string;
     size: number;

@@ -39,6 +39,7 @@ export async function getPageArgs(
           prompt: initArgs.prompt ?? "",
           codingConvention: undefined,
           outputKind: "full",
+          multi: 0,
           uiProps,
         };
       })()
@@ -68,6 +69,7 @@ export async function getPageArgs(
           prompt: initArgs.args.prompt,
           codingConvention: initArgs.args.codingConvention,
           outputKind: initArgs.args.outputKind,
+          multi: initArgs.args.multi,
           uiProps,
         };
         return args;
