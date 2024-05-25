@@ -20,15 +20,6 @@ export async function diffContent(
     }
 
     return diffOutput;
-
-    // // Convert the git diff output to HTML using diff2html
-    // const htmlOutput = diff2Html(diffOutput, {
-    //   drawFileList: true,
-    //   matching: "lines",
-    //   outputFormat: "side-by-side",
-    // });
-
-    // return htmlOutput;
   } catch (error) {
     console.error(
       "Error generating HTML from git diff:",

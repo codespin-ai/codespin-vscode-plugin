@@ -41,7 +41,7 @@ export async function copyToClipboard(
   const { type: unused1, ...messageSansType } = clipboardArgs;
 
   const inputAsJson = JSON.stringify(messageSansType, null, 2);
-  
+
   await writeHistoryItem(
     inputAsJson,
     "user-input.json",
