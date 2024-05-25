@@ -54,6 +54,7 @@ export function HistoryEntry() {
       fileVersion: userInput.fileVersion,
       includedFiles: userInput.includedFiles,
       outputKind: userInput.outputKind,
+      multi: userInput.multi,
     };
 
     return codegenUserInput;

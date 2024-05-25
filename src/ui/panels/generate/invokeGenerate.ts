@@ -1,4 +1,7 @@
-import { GenerateArgs as CodespinGenerateArgs, generate as codespinGenerate } from "codespin/dist/commands/generate.js";
+import {
+  GenerateArgs as CodespinGenerateArgs,
+  generate as codespinGenerate,
+} from "codespin/dist/commands/generate/index.js";
 import { mkdir } from "fs/promises";
 import { pathExists } from "../../../fs/pathExists.js";
 import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";

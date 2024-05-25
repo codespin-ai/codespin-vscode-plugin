@@ -1,7 +1,6 @@
 import { CodingConvention } from "../../../settings/conventions/CodingConvention.js";
 
 export type FileVersions = "current" | "HEAD";
-export type IncludeOptions = "source" | "declaration";
 
 export type ModelChange = {
   model: string;
@@ -68,8 +67,8 @@ export type GenerateUserInput = {
   outputKind: "full" | "diff";
   includedFiles: {
     path: string;
-    includeOption: IncludeOptions;
   }[];
+  multi: number;
 };
 
 export type CopyToClipboardEvent = {

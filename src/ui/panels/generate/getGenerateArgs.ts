@@ -1,4 +1,4 @@
-import { GenerateArgs as CodespinGenerateArgs } from "codespin/dist/commands/generate.js";
+import { GenerateArgs as CodespinGenerateArgs } from "codespin/dist/commands/generate/index.js";
 import * as path from "path";
 import { getAPIConfigPath } from "../../../settings/api/getAPIConfigPath.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
@@ -39,20 +39,19 @@ export async function getGenerateArgs(
           : undefined,
       model: userInputFromPanel.model,
       write: true,
-      include: userInputFromPanel.includedFiles
-        .filter((f) => f.includeOption === "source")
-        .map((f) =>
-          userInputFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
-        ),
-      declare: userInputFromPanel.includedFiles
-        .filter((f) => f.includeOption === "declaration")
-        .map((f) => f.path),
+      include: userInputFromPanel.includedFiles.map((f) =>
+        userInputFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
+      ),
       spec: userInputFromPanel.codingConvention
         ? await getCodingConventionPath(
             userInputFromPanel.codingConvention,
             workspaceRoot
           )
         : undefined,
+      multi:
+        userInputFromPanel.outputKind === "diff"
+          ? undefined
+          : userInputFromPanel.multi,
       template: userInputFromPanel.outputKind === "diff" ? "diff" : "default",
       cancelCallback: (cancel: () => void) => {
         generatePanel.cancelGeneration = cancel;

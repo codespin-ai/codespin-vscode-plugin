@@ -1,7 +1,4 @@
-import {
-  UnparsedResult,
-  generate as codespinGenerate,
-} from "codespin/dist/commands/generate.js";
+import { go as codespinGo } from "codespin/dist/commands/go.js";
 import * as vscode from "vscode";
 import { diffContent } from "../../../git/diffContent.js";
 import { getChanges } from "../../../git/getChanges.js";
@@ -90,11 +87,13 @@ export class HistoryEntryPanel extends UIPanel {
     switch (message.type) {
       case "generateCommitMessage": {
         const incomingMessage = message as GenerateCommitMessageEvent;
-        const genCommitMessageArgs = await getGenCommitMessageArgs(incomingMessage);
-        const result = await codespinGenerate(genCommitMessageArgs, {
+        const genCommitMessageArgs = await getGenCommitMessageArgs(
+          incomingMessage
+        );
+        const result = await codespinGo(genCommitMessageArgs, {
           workingDir: getWorkspaceRoot(this.context),
         });
-        const commitMessage = (result as UnparsedResult).text;
+        const commitMessage = result.response;
 
         // Post an event back to the page.
         const generatedMessage: GeneratedCommitMessageEvent = {

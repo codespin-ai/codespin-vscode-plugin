@@ -1,7 +1,7 @@
 import {
   PromptResult,
   generate as codespinGenerate,
-} from "codespin/dist/commands/generate.js";
+} from "codespin/dist/commands/generate/index.js";
 import { mkdir } from "fs/promises";
 import * as vscode from "vscode";
 import { pathExists } from "../../../fs/pathExists.js";

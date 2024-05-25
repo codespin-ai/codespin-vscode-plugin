@@ -5,7 +5,6 @@ import {
   UpdateHistoryEvent,
 } from "../../../viewProviders/history/types.js";
 import { SelectHistoryEntryCommandEvent } from "../../../../commands/history/command.js";
-import { IncludeOptions } from "../../../panels/generate/types.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
 
@@ -91,7 +90,6 @@ export function History() {
   function getFilePaths(
     includedFiles: {
       path: string;
-      includeOption: IncludeOptions;
     }[]
   ) {
     return includedFiles.map((x) => x.path.split("/").slice(-1)[0]);

@@ -1,7 +1,6 @@
 import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
 import {
-  FileVersions,
-  IncludeOptions,
+  FileVersions
 } from "../../../panels/generate/types.js";
 
 export type GeneratePageArgs = {
@@ -16,7 +15,6 @@ export type GeneratePageArgs = {
   includedFiles: {
     path: string;
     size: number;
-    includeOption: IncludeOptions;
   }[];
   uiProps?: {
     promptTextAreaHeight?: number;

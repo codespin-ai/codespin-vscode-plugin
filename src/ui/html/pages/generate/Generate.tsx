@@ -17,7 +17,6 @@ import {
   FileVersions,
   GenerateEvent,
   IncludeFilesEvent,
-  IncludeOptions,
   ModelChangeEvent,
   OpenFileEvent,
   UIPropsUpdateEvent,
@@ -31,35 +30,42 @@ export function Generate() {
   const promptRef = useRef<TextArea>(null);
 
   const [model, setModel] = useState(args.selectedModel);
-  const [prompt, setPrompt] = useState<string>(args.prompt || "");
+  const [prompt, setPrompt] = useState<string>(args.prompt ?? "");
   const [codegenTargets, setCodegenTargets] = useState(
-    args.codegenTargets || ":prompt"
+    args.codegenTargets ?? ":prompt"
   );
   const [codingConvention, setCodingConvention] = useState<string | undefined>(
-    args.codingConvention
+    args.codingConvention ?? "None"
   );
   const [fileVersion, setFileVersion] = useState<FileVersions>(
-    args.fileVersion || "current"
+    args.fileVersion ?? "current"
   );
-  const [files, setFiles] = useState<
-    { path: string; size: number; includeOption: IncludeOptions }[]
-  >(args.includedFiles);
+  const [files, setFiles] = useState<{ path: string; size: number }[]>(
+    args.includedFiles
+  );
 
   const [outputKind, setOutputKind] = useState<"full" | "diff">(
-    args.outputKind
+    args.outputKind ?? "full"
   );
 
+  const [multi, setMulti] = useState(0);
+
   const [initialHeight, setInitialHeight] = useState(
-    args.uiProps?.promptTextAreaHeight || 0
+    args.uiProps?.promptTextAreaHeight ?? 0
   );
+
   const [initialWidth, setInitialWidth] = useState(
-    args.uiProps?.promptTextAreaWidth || 0
+    args.uiProps?.promptTextAreaWidth ?? 0
   );
 
   const [showCopied, setShowCopied] = useState(false);
 
   function onOutputKindChange(e: React.ChangeEvent<Dropdown>) {
     setOutputKind(e.target.value as "full" | "diff");
+  }
+
+  function onMultiChange(e: React.ChangeEvent<Dropdown>) {
+    setMulti(Number(e.target.value));
   }
 
   useEffect(() => {
@@ -172,6 +178,7 @@ export function Generate() {
       codingConvention,
       fileVersion,
       outputKind,
+      multi,
     };
     vsCodeApi.postMessage(message);
 
@@ -182,7 +189,7 @@ export function Generate() {
   }
 
   function onPromptTextAreaKeyDown(e: KeyboardEvent) {
-    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+    if (e.key === "Enter" && (e.ctrlKey ?? e.metaKey)) {
       e.preventDefault();
       e.stopPropagation();
 
@@ -200,6 +207,7 @@ export function Generate() {
       codingConvention,
       fileVersion,
       outputKind,
+      multi,
       ...args,
     };
     vsCodeApi.postMessage(message);
@@ -207,7 +215,7 @@ export function Generate() {
     const promptTextArea =
       promptRef.current!.shadowRoot!.querySelector("textarea")!;
     if (
-      promptTextArea.clientHeight !== initialHeight ||
+      promptTextArea.clientHeight !== initialHeight ??
       promptTextArea.clientWidth !== initialWidth
     ) {
       const uiPropsUpdate: UIPropsUpdateEvent = {
@@ -326,7 +334,7 @@ export function Generate() {
         </CSFormField>
         <CSFormField label={{ text: "Output Kind:" }}>
           <VSCodeDropdown
-            currentValue={outputKind || "full"}
+            currentValue={outputKind}
             style={{ width: "180px" }}
             onChange={onOutputKindChange}
           >
@@ -334,6 +342,26 @@ export function Generate() {
             <VSCodeOption value="diff">Diff</VSCodeOption>
           </VSCodeDropdown>
         </CSFormField>
+        {outputKind === "full" ? (
+          <CSFormField label={{ text: "Continue after max tokens?:" }}>
+            <VSCodeDropdown
+              currentValue={multi.toString()}
+              style={{ width: "180px" }}
+              onChange={onMultiChange}
+            >
+              {[
+                { text: "No", value: "0" },
+                { text: "Up to 4 times", value: "4" },
+                { text: "Up to 8 times", value: "8" },
+                { text: "Up to 12 times", value: "12" },
+              ].map((x) => (
+                <VSCodeOption value={x.value}>{x.text}</VSCodeOption>
+              ))}
+            </VSCodeDropdown>
+          </CSFormField>
+        ) : (
+          <></>
+        )}
         <CSFormField label={{ text: "Coding Conventions:" }}>
           <VSCodeDropdown
             style={{ width: "180px" }}
@@ -344,7 +372,7 @@ export function Generate() {
                   : e.currentTarget.value
               )
             }
-            currentValue={codingConvention || "None"}
+            currentValue={codingConvention}
           >
             <VSCodeOption key="none" value="None">
               None
@@ -374,7 +402,13 @@ export function Generate() {
             ))}
           </VSCodeDropdown>
         </CSFormField>
-        <CSFormField label={{ text: "Included Files:" }}>
+        <CSFormField
+          label={{
+            text: `Included Files (${formatFileSize(
+              files.reduce((acc, file) => acc + file.size, 0)
+            )}):`,
+          }}
+        >
           {files.map((file) => (
             <div
               key={file.path}
@@ -385,39 +419,6 @@ export function Generate() {
                 alignItems: "center",
               }}
             >
-              <VSCodeDropdown
-                currentValue={
-                  files.find((f) => f.path === file.path)?.includeOption ||
-                  "source"
-                }
-                style={{ width: "120px", marginRight: "8px" }}
-                onChange={(e: React.ChangeEvent<Dropdown>) => {
-                  const filesCopy = [...files];
-                  const fileIndex = filesCopy.findIndex(
-                    (f) => f.path === file.path
-                  );
-                  if (fileIndex !== -1) {
-                    filesCopy[fileIndex].includeOption = e.target
-                      .value as IncludeOptions;
-                  } else {
-                    filesCopy.push({
-                      path: file.path,
-                      includeOption: e.target.value as IncludeOptions,
-                      size: file.size,
-                    });
-                  }
-                  setFiles(filesCopy);
-                }}
-              >
-                {[
-                  { text: "Full Source", value: "source" },
-                  { text: "Declarations", value: "declarations" },
-                ].map((item) => (
-                  <VSCodeOption key={item.value} value={item.value}>
-                    {item.text}
-                  </VSCodeOption>
-                ))}
-              </VSCodeDropdown>
               <VSCodeLink onClick={() => onFileClick(file.path)}>
                 {file.path}
               </VSCodeLink>
