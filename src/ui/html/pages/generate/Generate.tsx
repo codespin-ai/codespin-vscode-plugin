@@ -249,6 +249,10 @@ export function Generate() {
     vsCodeApi.postMessage(message);
   }
 
+  function getTotalFileSize(): number {
+    return files.reduce((acc, file) => acc + file.size, 0);
+  }
+
   return (
     <div>
       <h1>Generate</h1>
@@ -308,6 +312,15 @@ export function Generate() {
             )}
           </div>
         </CSFormField>
+        {getTotalFileSize() > 50000 ? (
+          <p style={{ color: "red" }}>
+            WARN: You have included {formatFileSize(getTotalFileSize())} of file
+            content.{" "}
+          </p>
+        ) : (
+          <></>
+        )}
+
         <VSCodeDivider />
         <h3>Additional Options</h3>
         <CSFormField label={{ text: "Files to generate:" }}>
@@ -404,9 +417,7 @@ export function Generate() {
         </CSFormField>
         <CSFormField
           label={{
-            text: `Included Files (${formatFileSize(
-              files.reduce((acc, file) => acc + file.size, 0)
-            )}):`,
+            text: `Included Files (${formatFileSize(getTotalFileSize())}):`,
           }}
         >
           {files.map((file) => (
