@@ -33,8 +33,6 @@ import {
   OpenFileEvent,
   UIPropsUpdateEvent,
 } from "./types.js";
-import { UpdateHistoryEvent } from "../../viewProviders/history/types.js";
-import { getHistory } from "../../../settings/history/getHistory.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
@@ -136,19 +134,20 @@ export class GeneratePanel extends UIPanel {
 
         switch (generateArgs.status) {
           case "can_generate":
-            await invokeGeneration(
-              this,
-              generateArgs,
-              this.dirName,
-              workspaceRoot
-            );
-
-            const newHistoryEntry: NewHistoryEntryEvent = {
-              type: "newHistoryEntry",
-            };
-            this.globalEventEmitter.emit("message", newHistoryEntry);
-
-            this.dispose();
+            try {
+              await invokeGeneration(
+                this,
+                generateArgs,
+                this.dirName,
+                workspaceRoot
+              );
+            } finally {
+              const newHistoryEntry: NewHistoryEntryEvent = {
+                type: "newHistoryEntry",
+              };
+              this.globalEventEmitter.emit("message", newHistoryEntry);
+              this.dispose();
+            }
             break;
           case "missing_config":
             await navigateTo(this, `/api/config/edit`, {
