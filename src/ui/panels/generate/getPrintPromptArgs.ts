@@ -1,27 +1,19 @@
-import { GenerateArgs } from "codespin/dist/commands/generate/index.js";
+import { FormatPromptArgs } from "codespin/dist/commands/formatPrompt.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 import { GenerateUserInput } from "./types.js";
 
-export function getPrintPromptArgs(
+export async function getPrintPromptArgs(
   argsFromPanel: GenerateUserInput,
   workspaceRoot: string
-): GenerateArgs {
-  const printPromptArgs: GenerateArgs = {
+): Promise<FormatPromptArgs> {
+  const templateArgs: FormatPromptArgs = {
+    include: argsFromPanel.includedFiles.map((inc) => inc.path),
     prompt: argsFromPanel.prompt,
-    printPrompt: true,
-    out:
-      argsFromPanel.codegenTargets !== ":prompt"
-        ? argsFromPanel.codegenTargets
-        : undefined,
-    include: argsFromPanel.includedFiles
-      .map((f) =>
-        argsFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
-      ),
     spec: argsFromPanel.codingConvention
       ? getCodingConventionPath(argsFromPanel.codingConvention, workspaceRoot)
       : undefined,
     template: "files",
   };
 
-  return printPromptArgs;
+  return templateArgs;
 }

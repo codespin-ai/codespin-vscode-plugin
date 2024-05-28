@@ -1,7 +1,6 @@
 import {
-  PromptResult,
-  generate as codespinGenerate,
-} from "codespin/dist/commands/generate/index.js";
+  formatPrompt
+} from "codespin/dist/commands/formatPrompt.js";
 import { mkdir } from "fs/promises";
 import * as vscode from "vscode";
 import { pathExists } from "../../../fs/pathExists.js";
@@ -15,14 +14,13 @@ export async function copyToClipboard(
   dirName: string,
   workspaceRoot: string
 ) {
-  const args = getPrintPromptArgs(clipboardArgs, workspaceRoot);
+  const args = await getPrintPromptArgs(clipboardArgs, workspaceRoot);
 
-  const result = await codespinGenerate(args, {
+  const result = await formatPrompt(args, {
     workingDir: workspaceRoot,
   });
 
-  const prompt = (result as PromptResult).prompt;
-  vscode.env.clipboard.writeText(prompt);
+  vscode.env.clipboard.writeText(result.prompt);
 
   // Write prompt and raw-prompt to history
   const historyDirPath = getHistoryItemDir(dirName, workspaceRoot);
@@ -49,5 +47,10 @@ export async function copyToClipboard(
     workspaceRoot
   );
 
-  await writeHistoryItem(prompt, "raw-prompt.txt", dirName, workspaceRoot);
+  await writeHistoryItem(
+    result.prompt,
+    "raw-prompt.txt",
+    dirName,
+    workspaceRoot
+  );
 }
