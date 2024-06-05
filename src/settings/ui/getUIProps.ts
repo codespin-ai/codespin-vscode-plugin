@@ -1,13 +1,13 @@
 import { readFile } from "fs/promises";
 import * as path from "path";
-import { getCodespinDir } from "../codespinDirs.js";
+import { getCodeSpinDir } from "../codespinDirs.js";
 import { pathExists } from "../../fs/pathExists.js";
 import { UIPropsUpdateArgs } from "../../ui/panels/generate/types.js";
 
 export async function getUIProps(
   workspaceRoot: string
 ): Promise<UIPropsUpdateArgs | undefined> {
-  const projectConfigDir = getCodespinDir(workspaceRoot);
+  const projectConfigDir = getCodeSpinDir(workspaceRoot);
   const uiConfigPath = path.join(projectConfigDir, `ui.json`);
 
   if (await pathExists(uiConfigPath)) {

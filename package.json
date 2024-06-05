@@ -2,8 +2,8 @@
   "name": "codespin-ai",
   "displayName": "CodeSpin.AI",
   "description": "AI-assisted Code Generation",
-  "version": "0.1.49",
-  "publisher": "CodespinAI",
+  "version": "0.1.50",
+  "publisher": "CodeSpinAI",
   "license": "MIT",
   "icon": "resources/logo.png",
   "repository": {
@@ -76,7 +76,7 @@
     "submenus": [
       {
         "id": "codespin-ai.more",
-        "label": "CodeSpin AI: More"
+        "label": "CodeSpin.AI: More"
       }
     ],
     "viewsContainers": {
@@ -126,7 +126,7 @@
     "@types/react-dom": "^18.2.24",
     "@types/react-router-dom": "^5.3.3",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.213",
+    "codespin": "^0.0.214",
     "diff2html": "^3.4.48",
     "gray-matter": "^4.0.3",
     "react": "^18.2.0",

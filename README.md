@@ -1,4 +1,4 @@
-This extension is a front-end for the Codespin.AI CLI App.
+This extension is a front-end for the CodeSpin.AI CLI App.
 
 There are two ways to invoke it:
 1. But selecting CodeSpin.AI Generate from the File Explorer menu

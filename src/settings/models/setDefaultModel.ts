@@ -1,18 +1,18 @@
-import { CodespinConfig } from "codespin/dist/settings/CodespinConfig.js";
+import { CodeSpinConfig } from "codespin/dist/settings/CodeSpinConfig.js";
 import { readFile, writeFile } from "fs/promises";
 import * as path from "path";
-import { getCodespinDir } from "../codespinDirs.js";
+import { getCodeSpinDir } from "../codespinDirs.js";
 
 export async function setDefaultModel(
   model: string,
   workspaceRoot: string
 ): Promise<void> {
-  const projectConfigDir = getCodespinDir(workspaceRoot);
+  const projectConfigDir = getCodeSpinDir(workspaceRoot);
   const configFilePath = path.join(projectConfigDir, `codespin.json`);
 
   // Read the existing configuration
   const configContent = await readFile(configFilePath, { encoding: "utf-8" });
-  const config = JSON.parse(configContent) as CodespinConfig;
+  const config = JSON.parse(configContent) as CodeSpinConfig;
 
   // Update the api and model properties
   config.model = model;

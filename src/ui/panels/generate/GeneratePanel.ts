@@ -63,7 +63,7 @@ export class GeneratePanel extends UIPanel {
     if (!initialized) {
       // Ask the user if they want to force initialize
       const userChoice = await vscode.window.showWarningMessage(
-        "Codespin configuration is not initialized for this project. Create?",
+        "CodeSpin configuration is not initialized for this project. Create?",
         "Yes",
         "No"
       );

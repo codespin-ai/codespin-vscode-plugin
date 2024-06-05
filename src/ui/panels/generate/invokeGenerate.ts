@@ -1,5 +1,5 @@
 import {
-  GenerateArgs as CodespinGenerateArgs,
+  GenerateArgs as CodeSpinGenerateArgs,
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
 import { mkdir } from "fs/promises";
@@ -13,7 +13,7 @@ import { PromptCreatedEvent, ResponseStreamEvent } from "./types.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
-  argsForGeneration: { args: CodespinGenerateArgs; promptFilePath: string },
+  argsForGeneration: { args: CodeSpinGenerateArgs; promptFilePath: string },
   dirName: string,
   workspaceRoot: string
 ) {

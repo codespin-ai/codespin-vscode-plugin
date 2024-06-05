@@ -22,7 +22,7 @@ export function Initialize() {
           flexDirection: "column",
         }}
       >
-        <p>Codespin needs to be initialized for this project.</p>
+        <p>CodeSpin needs to be initialized for this project.</p>
         <VSCodeButton onClick={initializeProject}>
           Initialize Project
         </VSCodeButton>
