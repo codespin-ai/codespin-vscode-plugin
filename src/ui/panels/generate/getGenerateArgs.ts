@@ -52,7 +52,7 @@ export async function getGenerateArgs(
         userInputFromPanel.outputKind === "diff"
           ? undefined
           : userInputFromPanel.multi,
-      template: userInputFromPanel.outputKind === "diff" ? "diff" : "default",
+      template: userInputFromPanel.outputKind === "diff" ? "diff" : undefined,
       cancelCallback: (cancel: () => void) => {
         generatePanel.cancelGeneration = cancel;
       },
