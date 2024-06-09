@@ -1,4 +1,4 @@
-import { FormatPromptArgs } from "codespin/dist/commands/formatPrompt.js";
+import { FormatPromptArgs } from "codespin/dist/commands/formatPrompt/index.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 import { GenerateUserInput } from "./types.js";
 

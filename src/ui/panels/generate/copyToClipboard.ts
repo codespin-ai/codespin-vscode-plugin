@@ -1,6 +1,6 @@
 import {
   formatPrompt
-} from "codespin/dist/commands/formatPrompt.js";
+} from "codespin/dist/commands/formatPrompt/index.js";
 import { mkdir } from "fs/promises";
 import * as vscode from "vscode";
 import { pathExists } from "../../../fs/pathExists.js";
