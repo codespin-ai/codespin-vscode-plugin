@@ -218,7 +218,7 @@ export function Generate() {
     const promptTextArea =
       promptRef.current!.shadowRoot!.querySelector("textarea")!;
     if (
-      promptTextArea.clientHeight !== initialHeight ??
+      promptTextArea.clientHeight !== initialHeight ||
       promptTextArea.clientWidth !== initialWidth
     ) {
       const uiPropsUpdate: UIPropsUpdateEvent = {
