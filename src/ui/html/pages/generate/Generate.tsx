@@ -22,7 +22,25 @@ import {
   UIPropsUpdateEvent,
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
+import { ChatIcon } from "../../components/icons/ChatIcon.js";
+import { CopyIcon } from "../../components/icons/CopyIcon.js";
+import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
+
+const promptSuffix = `
+When you generate a file, it should start with:
+
+  File path:./src/handlers/keepalive.ts
+  ^ showing the path to the project root.
+  Immediately followed by a code block contain the file content
+
+  example:
+  File path:./src/handlers/keepalive.ts
+  \`\`\`ts
+  code goes here...
+  \`\`\`
+
+The project root is "/home/john/project/sheep" but that's not relevant.`;
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -59,6 +77,7 @@ export function Generate() {
   );
 
   const [showCopied, setShowCopied] = useState(false);
+  const [showCopyToChatGPT, setShowCopyToChatGPT] = useState(false);
 
   function onOutputKindChange(e: React.ChangeEvent<Dropdown>) {
     setOutputKind(e.target.value as "full" | "diff");
@@ -180,11 +199,33 @@ export function Generate() {
       outputKind,
       multi,
     };
+
     vsCodeApi.postMessage(message);
 
     setShowCopied(true);
     setTimeout(() => {
       setShowCopied(false);
+    }, 3000);
+  }
+
+  function copyForChatGPT() {
+    const message: CopyToClipboardEvent = {
+      type: "copyToClipboard",
+      model,
+      includedFiles: files,
+      prompt,
+      includeFileFormatHint: true,
+      codegenTargets,
+      codingConvention,
+      fileVersion,
+      outputKind,
+      multi,
+    };
+    vsCodeApi.postMessage(message);
+
+    setShowCopyToChatGPT(true);
+    setTimeout(() => {
+      setShowCopyToChatGPT(false);
     }, 3000);
   }
 
@@ -215,7 +256,7 @@ export function Generate() {
     const promptTextArea =
       promptRef.current!.shadowRoot!.querySelector("textarea")!;
     if (
-      promptTextArea.clientHeight !== initialHeight ??
+      promptTextArea.clientHeight !== initialHeight ||
       promptTextArea.clientWidth !== initialWidth
     ) {
       const uiPropsUpdate: UIPropsUpdateEvent = {
@@ -296,20 +337,34 @@ export function Generate() {
               alignItems: "center",
             }}
           >
-            <VSCodeButton onClick={onGenerateButtonClick}>
+            <VSCodeButton
+              style={{ width: "172px" }}
+              onClick={onGenerateButtonClick}
+            >
+              <GenerateIcon />
               Generate Code
             </VSCodeButton>
-            {!showCopied && (
-              <VSCodeLink
-                style={{ marginLeft: "1em" }}
-                onClick={copyToClipboard}
-              >
-                Copy To Clipboard
-              </VSCodeLink>
-            )}
-            {showCopied && (
-              <span style={{ marginLeft: "1em", color: "white" }}>Copied</span>
-            )}
+
+            {/* Copy for ChatGPT */}
+
+            <VSCodeButton
+              onClick={copyForChatGPT}
+              style={{ marginLeft: "8px", width: "172px" }}
+            >
+              {!showCopyToChatGPT ? <ChatIcon /> : <></>}
+              {!showCopyToChatGPT
+                ? "Copy for ChatGPT"
+                : "Now Paste in ChatGPT..."}
+            </VSCodeButton>
+
+            {/* Copy to clipboard */}
+            <VSCodeButton
+              onClick={copyToClipboard}
+              style={{ marginLeft: "8px", width: "172px" }}
+            >
+              {!showCopied ? <CopyIcon /> : <></>}
+              {!showCopied ? "Copy To Clipboard" : "Copied"}
+            </VSCodeButton>
           </div>
         </CSFormField>
         {getTotalFileSize() > 50000 ? (
@@ -367,8 +422,10 @@ export function Generate() {
                 { text: "Up to 4 times", value: "4" },
                 { text: "Up to 8 times", value: "8" },
                 { text: "Up to 12 times", value: "12" },
-              ].map((x) => (
-                <VSCodeOption value={x.value}>{x.text}</VSCodeOption>
+              ].map((x, i) => (
+                <VSCodeOption key={i} value={x.value}>
+                  {x.text}
+                </VSCodeOption>
               ))}
             </VSCodeDropdown>
           </CSFormField>

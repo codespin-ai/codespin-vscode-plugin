@@ -8,12 +8,16 @@ import { getSelectHistoryEntryCommand } from "./commands/history/command.js";
 import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvider.js";
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { EventEmitter } from "events";
+import { exec } from "child_process";
+import { startSyncServer } from "./commands/sync/startSyncServer.js";
+import { getWorkspaceRoot } from "./vscode/getWorkspaceRoot.js";
+import { init } from "./commands/sync/init.js";
 
 const globalEventEmitter = new EventEmitter();
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   process.on("exit", () => {
     deactivate();
   });
@@ -57,7 +61,26 @@ export function activate(context: vscode.ExtensionContext) {
       includeFilesCommand
     )
   );
+
+  // Check if the server is running before starting it
+  const serverRunning = await isSyncServerRunning();
+  if (!serverRunning) {
+    startSyncServer();
+    init(context);
+  }
 }
 
 // This method is called when your extension is deactivated
 function deactivate() {}
+
+async function isSyncServerRunning() {
+  try {
+    const response = await fetch(`http://localhost:60280/projects`);
+    if (response.ok) {
+      return true;
+    }
+  } catch (error) {
+    // Server is not running or cannot be reached
+  }
+  return false;
+}
