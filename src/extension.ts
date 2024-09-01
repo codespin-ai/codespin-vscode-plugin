@@ -8,6 +8,7 @@ import { getSelectHistoryEntryCommand } from "./commands/history/command.js";
 import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvider.js";
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { EventEmitter } from "events";
+import { start } from "codespin-sync-server";
 
 const globalEventEmitter = new EventEmitter();
 
@@ -57,6 +58,8 @@ export function activate(context: vscode.ExtensionContext) {
       includeFilesCommand
     )
   );
+
+  start();
 }
 
 // This method is called when your extension is deactivated

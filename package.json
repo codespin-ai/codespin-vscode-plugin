@@ -127,6 +127,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@vscode/webview-ui-toolkit": "^1.4.0",
     "codespin": "^0.0.219",
+    "codespin-sync-server": "^0.0.1",
     "diff2html": "^3.4.48",
     "gray-matter": "^4.0.3",
     "react": "^18.2.0",
