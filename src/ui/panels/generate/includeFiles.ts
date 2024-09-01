@@ -1,4 +1,4 @@
-import path = require("path");
+import * as path from "path";
 import { promises as fs } from "fs";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";

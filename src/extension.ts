@@ -64,6 +64,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
   // Check if the server is running before starting it
   const serverRunning = await isSyncServerRunning();
+
   if (!serverRunning) {
     startSyncServer();
     init(context);

@@ -2,8 +2,8 @@ import { ExtensionContext } from "vscode";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import * as ws from "ws";
 import { SyncCodeData, SyncData } from "./types.js";
-import path = require("path");
-import { writeFile } from "fs/promises";
+import * as path from "path";
+import { writeFile, mkdir } from "fs/promises";
 
 let currentWebSocket: ws.WebSocket | null = null;
 
@@ -21,7 +21,7 @@ export function connectWebSocket(context: ExtensionContext) {
 
   webSocket.onopen = () => {};
 
-  webSocket.onmessage = (event) => {
+  webSocket.onmessage = async (event) => {
     const data = JSON.parse(event.data.toString()) as SyncData;
     if (data.type === "code") {
       const codeData = data as SyncCodeData;
@@ -30,16 +30,14 @@ export function connectWebSocket(context: ExtensionContext) {
         reconnectWebSocket(context);
       } else {
         // Write out the files
-        console.log({
-          codeData,
-        });
-
         if (
           codeData.filePath.startsWith("./") &&
           !codeData.filePath.includes("..")
         ) {
           const outputPath = path.join(projectPath, codeData.filePath);
-          writeFile(outputPath, codeData.contents);
+          const outputDir = path.dirname(outputPath);
+          await mkdir(outputDir, { recursive: true });
+          await writeFile(outputPath, codeData.contents);
         }
       }
     }
