@@ -1,17 +1,25 @@
-import { ExtensionContext } from "vscode";
-import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
+import { clearInterval } from "timers";
+import { connectWebSocket } from "./connectWebSocket.js";
 import { keepAlive } from "./keepAlive.js";
 import { registerProject } from "./register.js";
-import { connectWebSocket } from "./connectWebSocket.js";
+import { startSyncServer } from "./startSyncServer.js";
 
-export function init(context: ExtensionContext) {
+let interval: NodeJS.Timeout | undefined = undefined;
+
+export function init(workspaceRoot: string) {
+  if (interval) {
+    clearInterval(interval);
+  }
+
+  startSyncServer();
+
   setTimeout(() => {
-    registerProject(getWorkspaceRoot(context));
+    registerProject(workspaceRoot);
 
-    setInterval(() => {
-      keepAlive(getWorkspaceRoot(context));
+    interval = setInterval(() => {
+      keepAlive(workspaceRoot);
     }, 30000);
 
-    connectWebSocket(context);
+    connectWebSocket(workspaceRoot);
   }, 1000);
 }

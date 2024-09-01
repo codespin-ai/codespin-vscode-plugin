@@ -12,6 +12,7 @@ import { exec } from "child_process";
 import { startSyncServer } from "./commands/sync/startSyncServer.js";
 import { getWorkspaceRoot } from "./vscode/getWorkspaceRoot.js";
 import { init } from "./commands/sync/init.js";
+import { SYNC_SERVER_PORT } from "./constants.js";
 
 const globalEventEmitter = new EventEmitter();
 
@@ -62,12 +63,13 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
+  const workspaceRoot = getWorkspaceRoot(context);
+
   // Check if the server is running before starting it
   const serverRunning = await isSyncServerRunning();
 
   if (!serverRunning) {
-    startSyncServer();
-    init(context);
+    init(workspaceRoot);
   }
 }
 
@@ -76,7 +78,7 @@ function deactivate() {}
 
 async function isSyncServerRunning() {
   try {
-    const response = await fetch(`http://localhost:60280/projects`);
+    const response = await fetch(`http://localhost:${SYNC_SERVER_PORT}/projects`);
     if (response.ok) {
       return true;
     }
