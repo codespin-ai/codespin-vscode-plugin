@@ -7,12 +7,20 @@ import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js"
 import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
 import { CopyToClipboardEvent } from "./types.js";
 import { trimWhitespace } from "../../../text/trimWhitespace.js";
+import { syncIsInstalled } from "../../../commands/sync/syncIsInstalled.js";
 
 export async function copyToClipboard(
   clipboardArgs: CopyToClipboardEvent,
   dirName: string,
   workspaceRoot: string
 ) {
+  if (clipboardArgs.includeFileFormatHint && !syncIsInstalled()) {
+    vscode.window.showErrorMessage(
+      "You need to 'npm install codespin-sync-server'"
+    );
+    return;
+  }
+
   const args = await getPrintPromptArgs(clipboardArgs, workspaceRoot);
 
   const result = await formatPrompt(args, {
@@ -22,19 +30,12 @@ export async function copyToClipboard(
   const prompt = clipboardArgs.includeFileFormatHint
     ? result.prompt +
       trimWhitespace(`
-      When you generate a file, it should start with:
-  
-        File path:./path/to/file.ts
-        ^ showing the path relative to the project root.
-        Immediately followed by a code block containing the file content
+      The project root is "${workspaceRoot}" but that's not relevant.
       
-        example:
-        File path:./path/to/file.ts
-        \`\`\`ts
-        code goes here...
-        \`\`\`
-      
-      The project root is "${workspaceRoot}" but that's not relevant.`)
+      Your response must be in the same format as the included content above.
+      Make sure you mention "File path:" before beginning the markdown code blocks in your response - for each file.
+      That is, "File path:" should come just before the markdown code block's triple backquotes begin.
+      `).trim()
     : result.prompt;
 
   vscode.env.clipboard.writeText(prompt);

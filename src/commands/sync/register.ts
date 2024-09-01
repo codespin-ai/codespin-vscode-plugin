@@ -8,5 +8,4 @@ export async function registerProject(projectPath: string) {
   });
 
   const data = await response.json();
-  console.log("Registration response:", data);
 }

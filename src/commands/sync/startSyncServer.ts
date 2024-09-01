@@ -1,23 +1,13 @@
 import { exec } from "child_process";
+import * as vscode from "vscode";
+import { syncIsInstalled } from "./syncIsInstalled.js";
 
 // Function to start the sync server
 export function startSyncServer() {
-  const serverProcess = exec(
-    "codespin-sync-server",
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error starting server: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`Server stderr: ${stderr}`);
-        return;
-      }
-      console.log(`Server stdout: ${stdout}`);
-    }
-  );
-
-  serverProcess.on("exit", (code) => {
-    console.log(`codespin-sync-server exited with code ${code}`);
-  });
+  if (syncIsInstalled()) {
+    const serverProcess = exec(
+      "codespin-sync-server",
+      (error, stdout, stderr) => {}
+    );
+  }
 }

@@ -65,11 +65,8 @@ export async function activate(context: vscode.ExtensionContext) {
   // Check if the server is running before starting it
   const serverRunning = await isSyncServerRunning();
   if (!serverRunning) {
-    console.log("Starting codespin-sync-server...");
     startSyncServer();
     init(context);
-  } else {
-    console.log("codespin-sync-server is already running.");
   }
 }
 

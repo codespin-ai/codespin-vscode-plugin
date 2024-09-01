@@ -2,6 +2,8 @@ import { ExtensionContext } from "vscode";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import * as ws from "ws";
 import { SyncCodeData, SyncData } from "./types.js";
+import path = require("path");
+import { writeFile } from "fs/promises";
 
 let currentWebSocket: ws.WebSocket | null = null;
 
@@ -17,34 +19,35 @@ export function connectWebSocket(context: ExtensionContext) {
     `ws://localhost:60280/sync?projectPath=${encodeURIComponent(projectPath)}`
   );
 
-  webSocket.onopen = () => {
-    console.log(`Connected to WebSocket server`);
-  };
+  webSocket.onopen = () => {};
 
   webSocket.onmessage = (event) => {
-    console.log(`Received message: ${event.data}`);
     const data = JSON.parse(event.data.toString()) as SyncData;
     if (data.type === "code") {
       const codeData = data as SyncCodeData;
       // Are we getting messages for another project? (Maybe we reloaded the project)
       if (codeData.projectPath !== getWorkspaceRoot(context)) {
         reconnectWebSocket(context);
-      }
-      // All ok
-      else {
+      } else {
+        // Write out the files
         console.log({
           codeData,
         });
+
+        if (
+          codeData.filePath.startsWith("./") &&
+          !codeData.filePath.includes("..")
+        ) {
+          const outputPath = path.join(projectPath, codeData.filePath);
+          writeFile(outputPath, codeData.contents);
+        }
       }
     }
   };
 
-  webSocket.onerror = (error) => {
-    console.error(`WebSocket error: ${error}`);
-  };
+  webSocket.onerror = (error) => {};
 
   webSocket.onclose = () => {
-    console.log("WebSocket connection closed. Attempting to reconnect...");
     setTimeout(() => connectWebSocket(context), 5000); // Try to reconnect every 5 seconds
   };
 
@@ -54,6 +57,5 @@ export function connectWebSocket(context: ExtensionContext) {
 
 // Function to reconnect WebSocket when projectPath changes
 export function reconnectWebSocket(context: ExtensionContext) {
-  console.log("Reconnecting WebSocket due to projectPath change...");
   connectWebSocket(context);
 }
