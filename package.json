@@ -10,7 +10,7 @@
     "url": "https://github.com/codespin-ai/codespin-vscode-plugin/"
   },
   "engines": {
-    "vscode": "^1.88.0"
+    "vscode": "^1.92.0"
   },
   "categories": [
     "Other"
