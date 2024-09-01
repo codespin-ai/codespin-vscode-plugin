@@ -22,10 +22,25 @@ import {
   UIPropsUpdateEvent,
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { GeneratePageArgs } from "./GeneratePageArgs.js";
-import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { ChatIcon } from "../../components/icons/ChatIcon.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
+import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
+import { GeneratePageArgs } from "./GeneratePageArgs.js";
+
+const promptSuffix = `
+When you generate a file, it should start with:
+
+  File path:./src/handlers/keepalive.ts
+  ^ showing the path to the project root.
+  Immediately followed by a code block contain the file content
+
+  example:
+  File path:./src/handlers/keepalive.ts
+  \`\`\`ts
+  code goes here...
+  \`\`\`
+
+The project root is "/home/john/project/sheep" but that's not relevant.`;
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -62,6 +77,7 @@ export function Generate() {
   );
 
   const [showCopied, setShowCopied] = useState(false);
+  const [showCopyToChatGPT, setShowCopyToChatGPT] = useState(false);
 
   function onOutputKindChange(e: React.ChangeEvent<Dropdown>) {
     setOutputKind(e.target.value as "full" | "diff");
@@ -183,11 +199,33 @@ export function Generate() {
       outputKind,
       multi,
     };
+
     vsCodeApi.postMessage(message);
 
     setShowCopied(true);
     setTimeout(() => {
       setShowCopied(false);
+    }, 3000);
+  }
+
+  function copyForChatGPT() {
+    const message: CopyToClipboardEvent = {
+      type: "copyToClipboard",
+      model,
+      includedFiles: files,
+      prompt,
+      includeFileFormatHint: true,
+      codegenTargets,
+      codingConvention,
+      fileVersion,
+      outputKind,
+      multi,
+    };
+    vsCodeApi.postMessage(message);
+
+    setShowCopyToChatGPT(true);
+    setTimeout(() => {
+      setShowCopyToChatGPT(false);
     }, 3000);
   }
 
@@ -300,28 +338,33 @@ export function Generate() {
             }}
           >
             <VSCodeButton
-              style={{ width: "160px" }}
+              style={{ width: "172px" }}
               onClick={onGenerateButtonClick}
             >
               <GenerateIcon />
               Generate Code
             </VSCodeButton>
-            <VSCodeButton style={{ marginLeft: "8px", width: "160px" }}>
-              <ChatIcon />
-              Copy for ChatGPT
+
+            {/* Copy for ChatGPT */}
+
+            <VSCodeButton
+              onClick={copyForChatGPT}
+              style={{ marginLeft: "8px", width: "172px" }}
+            >
+              {!showCopyToChatGPT ? <ChatIcon /> : <></>}
+              {!showCopyToChatGPT
+                ? "Copy for ChatGPT"
+                : "Now Paste in ChatGPT..."}
             </VSCodeButton>
-            {!showCopied && (
-              <VSCodeButton
-                onClick={copyToClipboard}
-                style={{ marginLeft: "8px", width: "160px" }}
-              >
-                <CopyIcon />
-                Copy To Clipboard
-              </VSCodeButton>
-            )}
-            {showCopied && (
-              <span style={{ marginLeft: "1em", color: "white" }}>Copied</span>
-            )}
+
+            {/* Copy to clipboard */}
+            <VSCodeButton
+              onClick={copyToClipboard}
+              style={{ marginLeft: "8px", width: "172px" }}
+            >
+              {!showCopied ? <CopyIcon /> : <></>}
+              {!showCopied ? "Copy To Clipboard" : "Copied"}
+            </VSCodeButton>
           </div>
         </CSFormField>
         {getTotalFileSize() > 50000 ? (

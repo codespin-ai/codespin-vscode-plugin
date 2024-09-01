@@ -9,6 +9,9 @@ import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvi
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { EventEmitter } from "events";
 import { exec } from "child_process";
+import { startSyncServer } from "./commands/sync/startSyncServer.js";
+import { getWorkspaceRoot } from "./vscode/getWorkspaceRoot.js";
+import { init } from "./commands/sync/init.js";
 
 const globalEventEmitter = new EventEmitter();
 
@@ -64,6 +67,7 @@ export async function activate(context: vscode.ExtensionContext) {
   if (!serverRunning) {
     console.log("Starting codespin-sync-server...");
     startSyncServer();
+    init(getWorkspaceRoot(context));
   } else {
     console.log("codespin-sync-server is already running.");
   }
@@ -82,26 +86,4 @@ async function isSyncServerRunning() {
     // Server is not running or cannot be reached
   }
   return false;
-}
-
-// Function to start the sync server
-function startSyncServer() {
-  const serverProcess = exec(
-    "codespin-sync-server",
-    (error, stdout, stderr) => {
-      if (error) {
-        console.error(`Error starting server: ${error.message}`);
-        return;
-      }
-      if (stderr) {
-        console.error(`Server stderr: ${stderr}`);
-        return;
-      }
-      console.log(`Server stdout: ${stdout}`);
-    }
-  );
-
-  serverProcess.on("exit", (code) => {
-    console.log(`codespin-sync-server exited with code ${code}`);
-  });
 }

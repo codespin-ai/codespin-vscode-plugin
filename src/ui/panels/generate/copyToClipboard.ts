@@ -1,6 +1,4 @@
-import {
-  formatPrompt
-} from "codespin/dist/commands/formatPrompt/index.js";
+import { formatPrompt } from "codespin/dist/commands/formatPrompt/index.js";
 import { mkdir } from "fs/promises";
 import * as vscode from "vscode";
 import { pathExists } from "../../../fs/pathExists.js";
@@ -8,6 +6,7 @@ import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.j
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
 import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
 import { CopyToClipboardEvent } from "./types.js";
+import { trimWhitespace } from "../../../text/trimWhitespace.js";
 
 export async function copyToClipboard(
   clipboardArgs: CopyToClipboardEvent,
@@ -20,7 +19,25 @@ export async function copyToClipboard(
     workingDir: workspaceRoot,
   });
 
-  vscode.env.clipboard.writeText(result.prompt);
+  const prompt = clipboardArgs.includeFileFormatHint
+    ? result.prompt +
+      trimWhitespace(`
+      When you generate a file, it should start with:
+  
+        File path:./src/handlers/keepalive.ts
+        ^ showing the path to the project root.
+        Immediately followed by a code block contain the file content
+      
+        example:
+        File path:./src/handlers/keepalive.ts
+        \`\`\`ts
+        code goes here...
+        \`\`\`
+      
+      The project root is ${workspaceRoot} but that's not relevant.`)
+    : result.prompt;
+
+  vscode.env.clipboard.writeText(prompt);
 
   // Write prompt and raw-prompt to history
   const historyDirPath = getHistoryItemDir(dirName, workspaceRoot);
