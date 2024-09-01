@@ -14,7 +14,7 @@ const globalEventEmitter = new EventEmitter();
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
   process.on("exit", () => {
     deactivate();
   });
@@ -59,8 +59,27 @@ export function activate(context: vscode.ExtensionContext) {
     )
   );
 
-  start();
+  // Check if the server is running before starting it
+  const serverRunning = await isSyncServerRunning();
+  if (!serverRunning) {
+    console.log("Starting codespin-sync-server...");
+    start();
+  } else {
+    console.log("codespin-sync-server is already running.");
+  }
 }
 
 // This method is called when your extension is deactivated
 function deactivate() {}
+
+async function isSyncServerRunning() {
+  try {
+    const response = await fetch(`http://localhost:60280/projects`);
+    if (response.ok) {
+      return true;
+    }
+  } catch (error) {
+    // Server is not running or cannot be reached
+  }
+  return false;
+}

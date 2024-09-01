@@ -23,6 +23,9 @@ import {
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
+import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
+import { ChatIcon } from "../../components/icons/ChatIcon.js";
+import { CopyIcon } from "../../components/icons/CopyIcon.js";
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -296,16 +299,25 @@ export function Generate() {
               alignItems: "center",
             }}
           >
-            <VSCodeButton onClick={onGenerateButtonClick}>
+            <VSCodeButton
+              style={{ width: "160px" }}
+              onClick={onGenerateButtonClick}
+            >
+              <GenerateIcon />
               Generate Code
             </VSCodeButton>
+            <VSCodeButton style={{ marginLeft: "8px", width: "160px" }}>
+              <ChatIcon />
+              Copy for ChatGPT
+            </VSCodeButton>
             {!showCopied && (
-              <VSCodeLink
-                style={{ marginLeft: "1em" }}
+              <VSCodeButton
                 onClick={copyToClipboard}
+                style={{ marginLeft: "8px", width: "160px" }}
               >
+                <CopyIcon />
                 Copy To Clipboard
-              </VSCodeLink>
+              </VSCodeButton>
             )}
             {showCopied && (
               <span style={{ marginLeft: "1em", color: "white" }}>Copied</span>
@@ -367,8 +379,10 @@ export function Generate() {
                 { text: "Up to 4 times", value: "4" },
                 { text: "Up to 8 times", value: "8" },
                 { text: "Up to 12 times", value: "12" },
-              ].map((x) => (
-                <VSCodeOption value={x.value}>{x.text}</VSCodeOption>
+              ].map((x, i) => (
+                <VSCodeOption key={i} value={x.value}>
+                  {x.text}
+                </VSCodeOption>
               ))}
             </VSCodeDropdown>
           </CSFormField>
