@@ -24,17 +24,17 @@ export async function copyToClipboard(
       trimWhitespace(`
       When you generate a file, it should start with:
   
-        File path:./src/handlers/keepalive.ts
-        ^ showing the path to the project root.
-        Immediately followed by a code block contain the file content
+        File path:./path/to/file.ts
+        ^ showing the path relative to the project root.
+        Immediately followed by a code block containing the file content
       
         example:
-        File path:./src/handlers/keepalive.ts
+        File path:./path/to/file.ts
         \`\`\`ts
         code goes here...
         \`\`\`
       
-      The project root is ${workspaceRoot} but that's not relevant.`)
+      The project root is "${workspaceRoot}" but that's not relevant.`)
     : result.prompt;
 
   vscode.env.clipboard.writeText(prompt);

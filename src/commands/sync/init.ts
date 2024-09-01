@@ -1,12 +1,17 @@
+import { ExtensionContext } from "vscode";
+import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { keepAlive } from "./keepAlive.js";
 import { registerProject } from "./register.js";
+import { connectWebSocket } from "./connectWebSocket.js";
 
-export function init(projectPath: string) {
+export function init(context: ExtensionContext) {
   setTimeout(() => {
-    registerProject(projectPath);
+    registerProject(getWorkspaceRoot(context));
 
     setInterval(() => {
-      keepAlive(projectPath);
+      keepAlive(getWorkspaceRoot(context));
     }, 30000);
+
+    connectWebSocket(context);
   }, 1000);
 }
