@@ -2,17 +2,14 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
-import { getGenerateCommand } from "./commands/codegen/generate.js";
-import { getInitCommand } from "./commands/init/command.js";
-import { getSelectHistoryEntryCommand } from "./commands/history/command.js";
-import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvider.js";
-import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { EventEmitter } from "events";
-import { exec } from "child_process";
-import { startSyncServer } from "./commands/sync/startSyncServer.js";
-import { getWorkspaceRoot } from "./vscode/getWorkspaceRoot.js";
-import { init } from "./commands/sync/init.js";
+import { getGenerateCommand } from "./commands/codegen/generate.js";
+import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
+import { getSelectHistoryEntryCommand } from "./commands/history/command.js";
+import { getInitCommand } from "./commands/init/command.js";
 import { SYNC_SERVER_PORT } from "./constants.js";
+import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvider.js";
+import { getWorkspaceRoot } from "./vscode/getWorkspaceRoot.js";
 
 const globalEventEmitter = new EventEmitter();
 
@@ -62,28 +59,7 @@ export async function activate(context: vscode.ExtensionContext) {
       includeFilesCommand
     )
   );
-
-  const workspaceRoot = getWorkspaceRoot(context);
-
-  // Check if the server is running before starting it
-  const serverRunning = await isSyncServerRunning();
-
-  if (!serverRunning) {
-    init(workspaceRoot);
-  }
 }
 
 // This method is called when your extension is deactivated
 function deactivate() {}
-
-async function isSyncServerRunning() {
-  try {
-    const response = await fetch(`http://localhost:${SYNC_SERVER_PORT}/projects`);
-    if (response.ok) {
-      return true;
-    }
-  } catch (error) {
-    // Server is not running or cannot be reached
-  }
-  return false;
-}

@@ -1,12 +1,9 @@
 import { formatPrompt } from "codespin/dist/commands/formatPrompt/index.js";
 import { mkdir } from "fs/promises";
 import * as vscode from "vscode";
-import { init } from "../../../commands/sync/init.js";
-import { syncIsInstalled } from "../../../commands/sync/syncIsInstalled.js";
 import { pathExists } from "../../../fs/pathExists.js";
 import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
-import { trimWhitespace } from "../../../text/trimWhitespace.js";
 import { getPrintPromptArgs } from "./getPrintPromptArgs.js";
 import { CopyToClipboardEvent } from "./types.js";
 
@@ -15,35 +12,13 @@ export async function copyToClipboard(
   dirName: string,
   workspaceRoot: string
 ) {
-  if (clipboardArgs.includeFileFormatHint) {
-    if (syncIsInstalled()) {
-      init(workspaceRoot);
-    } else {
-      vscode.window.showErrorMessage(
-        "You need to 'npm install codespin-sync-server'"
-      );
-      return;
-    }
-  }
-
   const args = await getPrintPromptArgs(clipboardArgs, workspaceRoot);
 
   const result = await formatPrompt(args, {
     workingDir: workspaceRoot,
   });
 
-  const prompt = clipboardArgs.includeFileFormatHint
-    ? result.prompt +
-      trimWhitespace(`
-      The project root is "${workspaceRoot}" but that's not relevant.
-      
-      Your response must be in the same format as the included content above.
-      Make sure you mention "File path:" before beginning the markdown code blocks in your response - for each file.
-      That is, "File path:" should come just before the markdown code block's triple backquotes begin.
-      `).trim()
-    : result.prompt;
-
-  vscode.env.clipboard.writeText(prompt);
+  vscode.env.clipboard.writeText(result.prompt);
 
   // Write prompt and raw-prompt to history
   const historyDirPath = getHistoryItemDir(dirName, workspaceRoot);

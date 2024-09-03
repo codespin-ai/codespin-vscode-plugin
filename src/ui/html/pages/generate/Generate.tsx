@@ -208,27 +208,6 @@ export function Generate() {
     }, 3000);
   }
 
-  function copyForChatGPT() {
-    const message: CopyToClipboardEvent = {
-      type: "copyToClipboard",
-      model,
-      includedFiles: files,
-      prompt,
-      includeFileFormatHint: true,
-      codegenTargets,
-      codingConvention,
-      fileVersion,
-      outputKind,
-      multi,
-    };
-    vsCodeApi.postMessage(message);
-
-    setShowCopyToChatGPT(true);
-    setTimeout(() => {
-      setShowCopyToChatGPT(false);
-    }, 3000);
-  }
-
   function onPromptTextAreaKeyDown(e: KeyboardEvent) {
     if (e.key === "Enter" && (e.ctrlKey ?? e.metaKey)) {
       e.preventDefault();
@@ -343,18 +322,6 @@ export function Generate() {
             >
               <GenerateIcon />
               Generate Code
-            </VSCodeButton>
-
-            {/* Copy for ChatGPT */}
-
-            <VSCodeButton
-              onClick={copyForChatGPT}
-              style={{ marginLeft: "8px", width: "172px" }}
-            >
-              {!showCopyToChatGPT ? <ChatIcon /> : <></>}
-              {!showCopyToChatGPT
-                ? "Copy for ChatGPT"
-                : "Now Paste in ChatGPT..."}
             </VSCodeButton>
 
             {/* Copy to clipboard */}

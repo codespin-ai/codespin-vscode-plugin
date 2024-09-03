@@ -61,7 +61,6 @@ export type GenerateEvent = {
 export type GenerateUserInput = {
   model: string;
   prompt: string;
-  includeFileFormatHint?: boolean;
   codegenTargets: string;
   codingConvention: string | undefined;
   fileVersion: FileVersions;
