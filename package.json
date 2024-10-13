@@ -2,12 +2,12 @@
   "name": "codespin-ai",
   "displayName": "CodeSpin.AI",
   "description": "AI-assisted Code Generation",
-  "version": "0.1.65",
+  "version": "0.1.66",
   "publisher": "codespin-ai",
   "license": "MIT",
   "icon": "resources/logo.png",
   "repository": {
-    "url": "https://github.com/codespin-ai/codespin-vscode-plugin/"
+    "url": "https://github.com/codespin-ai/codespin-vscode-extension/"
   },
   "engines": {
     "vscode": "^1.92.0"
