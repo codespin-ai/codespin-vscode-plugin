@@ -1,8 +1,8 @@
 import { promises as fs } from "fs";
 import * as path from "path";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
-import { getModels } from "../../../settings/models/getModels.js";
 import { getDefaultModel } from "../../../settings/models/getDefaultModel.js";
+import { getModels } from "../../../settings/models/getModels.js";
 import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
 import { InitArgs } from "./GeneratePanel.js";
 
@@ -14,7 +14,7 @@ export async function getPageArgs(
 ): Promise<GeneratePageArgs> {
   return initArgs.type === "files"
     ? await (async () => {
-        const allPaths = await getFilesRecursive(initArgs.args);
+        const allPaths = await getFilesRecursive(initArgs.args, workspaceRoot);
 
         const fileDetails = (
           await Promise.all(

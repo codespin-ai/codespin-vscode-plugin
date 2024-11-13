@@ -9,8 +9,9 @@ export async function includeFiles(
   generatePanel: GeneratePanel,
   filePaths: string[]
 ) {
-  const allPaths = await getFilesRecursive(filePaths);
   const workspaceRoot = getWorkspaceRoot(generatePanel.context);
+  const allPaths = await getFilesRecursive(filePaths, workspaceRoot);
+
   const message: IncludeFilesEvent = {
     type: "includeFiles",
     files: await Promise.all(
