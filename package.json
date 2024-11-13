@@ -2,7 +2,7 @@
   "name": "codespin-ai",
   "displayName": "CodeSpin.AI",
   "description": "AI-assisted Code Generation",
-  "version": "0.1.68",
+  "version": "0.1.70",
   "publisher": "codespin-ai",
   "license": "MIT",
   "icon": "resources/logo.png",
@@ -21,7 +21,7 @@
       {
         "command": "codespin-ai.generate",
         "key": "ctrl+shift+alt+g",
-        "when": "editorTextFocus",
+        "when": "editorTextFocus || explorerViewletVisible",
         "mac": "cmd+shift+alt+g"
       }
     ],
