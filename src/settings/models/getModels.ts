@@ -8,9 +8,10 @@ export async function getModels(
 ): Promise<NonNullable<CodeSpinConfig["models"]>> {
   const projectConfigDir = getCodeSpinDir(workspaceRoot);
   const configFilePath = path.join(projectConfigDir, `codespin.json`);
+
   const config = JSON.parse(
     (await readFile(configFilePath)).toString()
   ) as CodeSpinConfig;
 
-  return config.models ?? {};
+  return config.models ?? [];
 }

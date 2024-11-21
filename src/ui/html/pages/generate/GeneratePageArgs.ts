@@ -1,8 +1,9 @@
+import { ModelDescription } from "codespin/dist/settings/CodeSpinConfig.js";
 import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
 import { FileVersions } from "../../../panels/generate/types.js";
 
 export type GeneratePageArgs = {
-  models: { [key: string]: string };
+  models: ModelDescription[],
   codingConventions: Array<CodingConvention>;
   selectedModel: string;
   codingConvention: string | undefined;

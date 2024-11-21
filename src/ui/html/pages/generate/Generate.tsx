@@ -22,7 +22,6 @@ import {
   UIPropsUpdateEvent,
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { ChatIcon } from "../../components/icons/ChatIcon.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
 import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
@@ -279,17 +278,17 @@ export function Generate() {
       <form id="mainform">
         <CSFormField label={{ text: "Model" }}>
           <VSCodeDropdown
-            items={Object.keys(args.models).map((x) => ({
-              text: x,
-              value: args.models[x],
+            items={args.models.map((x) => ({
+              text: x.alias ?? x.name,
+              value: x.alias ?? x.name,
             }))}
             currentValue={model}
             style={{ width: "180px" }}
             onChange={onModelChange}
           >
-            {Object.keys(args.models).map((x) => (
-              <VSCodeOption key={x} value={args.models[x]}>
-                {x}
+            {args.models.map((x) => (
+              <VSCodeOption key={x.alias ?? x.name} value={x.alias ?? x.name}>
+                {x.alias ?? x.name}
               </VSCodeOption>
             ))}
           </VSCodeDropdown>
