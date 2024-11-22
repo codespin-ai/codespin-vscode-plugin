@@ -28,7 +28,7 @@
     "commands": [
       {
         "command": "codespin-ai.generate",
-        "title": "CodeSpin.AI: Generate"
+        "title": "CodeSpin.AI: Start Chatting"
       },
       {
         "command": "codespin-ai.includeFiles",

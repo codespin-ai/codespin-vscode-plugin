@@ -61,14 +61,10 @@ export type GenerateEvent = {
 export type GenerateUserInput = {
   model: string;
   prompt: string;
-  codegenTargets: string;
   codingConvention: string | undefined;
-  fileVersion: FileVersions;
-  outputKind: "full" | "diff";
   includedFiles: {
     path: string;
   }[];
-  multi: number;
 };
 
 export type CopyToClipboardEvent = {

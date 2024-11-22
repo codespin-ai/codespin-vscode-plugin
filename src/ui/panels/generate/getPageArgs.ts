@@ -64,12 +64,8 @@ export async function getPageArgs(
           codingConventions: conventions,
           models: await getModels(workspaceRoot),
           selectedModel: initArgs.args.model,
-          codegenTargets: initArgs.args.codegenTargets,
-          fileVersion: initArgs.args.fileVersion,
           prompt: initArgs.args.prompt,
           codingConvention: initArgs.args.codingConvention,
-          outputKind: initArgs.args.outputKind,
-          multi: initArgs.args.multi,
           uiProps,
         };
         return args;

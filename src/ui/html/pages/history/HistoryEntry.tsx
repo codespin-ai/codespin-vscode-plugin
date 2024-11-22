@@ -48,13 +48,9 @@ export function HistoryEntry() {
 
     const codegenUserInput: GenerateUserInput = {
       model: userInput.model,
-      codegenTargets: userInput.codegenTargets,
       prompt: args.entry.prompt,
       codingConvention: userInput.codingConvention,
-      fileVersion: userInput.fileVersion,
       includedFiles: userInput.includedFiles,
-      outputKind: userInput.outputKind,
-      multi: userInput.multi,
     };
 
     return codegenUserInput;

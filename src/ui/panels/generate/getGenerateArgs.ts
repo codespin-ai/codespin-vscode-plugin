@@ -33,26 +33,15 @@ export async function getGenerateArgs(
 
     const codespinGenerateArgs: CodeSpinGenerateArgs = {
       promptFile: promptFilePath,
-      out:
-        userInputFromPanel.codegenTargets !== ":prompt"
-          ? userInputFromPanel.codegenTargets
-          : undefined,
       model: userInputFromPanel.model,
       write: true,
-      include: userInputFromPanel.includedFiles.map((f) =>
-        userInputFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
-      ),
+      include: userInputFromPanel.includedFiles.map((f) => f.path),
       spec: userInputFromPanel.codingConvention
         ? await getCodingConventionPath(
             userInputFromPanel.codingConvention,
             workspaceRoot
           )
         : undefined,
-      multi:
-        userInputFromPanel.outputKind === "diff"
-          ? undefined
-          : userInputFromPanel.multi,
-      template: userInputFromPanel.outputKind === "diff" ? "diff" : undefined,
       cancelCallback: (cancel: () => void) => {
         generatePanel.cancelGeneration = cancel;
       },

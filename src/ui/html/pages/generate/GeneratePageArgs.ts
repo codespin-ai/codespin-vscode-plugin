@@ -8,10 +8,6 @@ export type GeneratePageArgs = {
   selectedModel: string;
   codingConvention: string | undefined;
   prompt: string;
-  codegenTargets: string;
-  fileVersion: FileVersions;
-  outputKind: "full" | "diff";
-  multi: number;
   includedFiles: {
     path: string;
     size: number;
