@@ -11,8 +11,7 @@ export abstract class UIPanel {
   disposables: vscode.Disposable[] = [];
   panel: vscode.WebviewPanel;
   webviewReadyPromise: Promise<void>;
-  resolveWebviewReady: () => void = () => {};
-  navigationPromiseResolvers: Map<string, () => void>;
+  waitUntilWebviewIsReady: () => void = () => {};
   isDisposed: boolean;
   globalEventEmitter: EventEmitter;
   webviewOptions: WebviewOptions;
@@ -28,11 +27,11 @@ export abstract class UIPanel {
       webviewOptions.style ?? `code { background: initial; }`;
 
     this.webviewOptions = webviewOptions;
-    this.navigationPromiseResolvers = new Map();
     this.context = context;
     this.globalEventEmitter = globalEventEmitter;
     this.isDisposed = false;
     this.messageHandler = getMessageHandler(this);
+
     this.panel = vscode.window.createWebviewPanel(
       "codespin-panel",
       "CodeSpin",
@@ -72,7 +71,7 @@ export abstract class UIPanel {
     this.panel.onDidDispose(() => {}, null, this.disposables);
 
     this.webviewReadyPromise = new Promise((resolve) => {
-      this.resolveWebviewReady = resolve;
+      this.waitUntilWebviewIsReady = resolve;
     });
 
     this.globalEventEmitter.on("message", this.messageHandler);

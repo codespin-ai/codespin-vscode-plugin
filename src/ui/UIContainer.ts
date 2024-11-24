@@ -7,7 +7,7 @@ export type WebviewOptions = {
 
 export type UIContainer = {
   context: vscode.ExtensionContext;
-  resolveWebviewReady: () => void;
+  waitUntilWebviewIsReady: () => void;
   onMessage: (message: EventTemplate) => void;
   getWebview(): vscode.Webview | undefined;
 };

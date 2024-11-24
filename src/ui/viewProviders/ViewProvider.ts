@@ -10,12 +10,11 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   webviewOptions: WebviewOptions;
   context: vscode.ExtensionContext;
   disposables: vscode.Disposable[] = [];
-  navigationPromiseResolvers: Map<string, () => void>;
   isDisposed: boolean;
   initializePromise: Promise<void>;
   resolveInitialize: () => void = () => {};
   webviewReadyPromise: Promise<void>;
-  resolveWebviewReady: () => void = () => {};
+  waitUntilWebviewIsReady: () => void = () => {};
   globalEventEmitter: EventEmitter;
   messageHandler: ReturnType<typeof getMessageHandler>;
 
@@ -25,7 +24,6 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     globalEventEmitter: EventEmitter
   ) {
     this.webviewOptions = webviewOptions;
-    this.navigationPromiseResolvers = new Map();
     this.isDisposed = false;
     this.globalEventEmitter = globalEventEmitter;
     this.messageHandler = getMessageHandler(this);
@@ -36,7 +34,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     this.context = context;
 
     this.initializePromise = new Promise((resolve) => {
-      this.resolveWebviewReady = resolve;
+      this.waitUntilWebviewIsReady = resolve;
     });
 
     this.webviewReadyPromise = new Promise((resolve) => {
