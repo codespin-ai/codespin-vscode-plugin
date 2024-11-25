@@ -1,8 +1,8 @@
 import { promises as fs } from "fs";
+import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
+import { getModel } from "codespin/dist/settings/getModel.js";
 import * as path from "path";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
-import { getDefaultModel } from "../../../settings/models/getDefaultModel.js";
-import { getModels } from "../../../settings/models/getModels.js";
 import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
 import { InitArgs } from "./GeneratePanel.js";
 
@@ -12,6 +12,9 @@ export async function getPageArgs(
   conventions: any,
   uiProps: any
 ): Promise<GeneratePageArgs> {
+  const codespinConfig = await readCodeSpinConfig(undefined, workspaceRoot);
+  const selectedModel = await getModel([codespinConfig.model], codespinConfig);
+
   return initArgs.type === "files"
     ? await (async () => {
         const allPaths = await getFilesRecursive(initArgs.args, workspaceRoot);
@@ -32,8 +35,8 @@ export async function getPageArgs(
         return {
           includedFiles: fileDetails,
           codingConventions: conventions,
-          models: await getModels(workspaceRoot),
-          selectedModel: await getDefaultModel(workspaceRoot),
+          models: codespinConfig.models ?? [],
+          selectedModel: selectedModel.alias ?? selectedModel.name,
           codegenTargets: ":prompt",
           fileVersion: "current",
           prompt: initArgs.prompt ?? "",
@@ -62,7 +65,7 @@ export async function getPageArgs(
         const args: GeneratePageArgs = {
           includedFiles: fileDetails,
           codingConventions: conventions,
-          models: await getModels(workspaceRoot),
+          models: codespinConfig.models ?? [],
           selectedModel: initArgs.args.model,
           prompt: initArgs.args.prompt,
           codingConvention: initArgs.args.codingConvention,

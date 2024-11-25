@@ -7,6 +7,7 @@ export async function navigateTo<T>(
   args?: T
 ) {
   return new Promise<void>((resolve) => {
+    uiContainer.navigationPromiseResolvers.set(url, resolve);
     const navigateEvent: NavigateEvent = {
       type: "navigate",
       url,

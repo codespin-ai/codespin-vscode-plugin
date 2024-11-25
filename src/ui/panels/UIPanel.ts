@@ -16,12 +16,14 @@ export abstract class UIPanel {
   globalEventEmitter: EventEmitter;
   webviewOptions: WebviewOptions;
   messageHandler: ReturnType<typeof getMessageHandler>;
+  navigationPromiseResolvers: Map<string, () => void>;
 
   constructor(
     webviewOptions: WebviewOptions,
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
+    this.navigationPromiseResolvers = new Map();
     webviewOptions = webviewOptions ?? {};
     webviewOptions.style =
       webviewOptions.style ?? `code { background: initial; }`;

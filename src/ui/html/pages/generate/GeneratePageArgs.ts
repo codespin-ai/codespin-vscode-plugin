@@ -1,6 +1,5 @@
 import { ModelDescription } from "codespin/dist/settings/CodeSpinConfig.js";
 import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
-import { FileVersions } from "../../../panels/generate/types.js";
 
 export type GeneratePageArgs = {
   models: ModelDescription[],

@@ -1,9 +1,9 @@
 import { FormatPromptArgs } from "codespin/dist/commands/formatPrompt/index.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
-import { GenerateUserInput } from "./types.js";
+import { CopyToClipboardUserInput } from "./types.js";
 
 export async function getPrintPromptArgs(
-  argsFromPanel: GenerateUserInput,
+  argsFromPanel: CopyToClipboardUserInput,
   workspaceRoot: string
 ): Promise<FormatPromptArgs> {
   const templateArgs: FormatPromptArgs = {

@@ -5,10 +5,10 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useState } from "react";
-import { EditOpenAIConfigEvent } from "../../../../settings/api/types.js";
+import { EditOpenAIConfigEvent } from "../../../../settings/provider/types.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
-import { OpenAIConfigArgs } from "../../../../settings/api/editOpenAIConfig.js";
+import { OpenAIConfigArgs } from "../../../../settings/provider/editOpenAIConfig.js";
 
 export function EditOpenAIConfig(props: OpenAIConfigArgs) {
   const vsCodeApi = getVSCodeApi();

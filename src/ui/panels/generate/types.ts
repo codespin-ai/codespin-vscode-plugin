@@ -67,9 +67,17 @@ export type GenerateUserInput = {
   }[];
 };
 
+export type CopyToClipboardUserInput = {
+  prompt: string;
+  codingConvention: string | undefined;
+  includedFiles: {
+    path: string;
+  }[];
+};
+
 export type CopyToClipboardEvent = {
   type: "copyToClipboard";
-} & GenerateUserInput;
+} & CopyToClipboardUserInput;
 
 export type UIPropsUpdateArgs = {
   promptTextAreaWidth?: number;

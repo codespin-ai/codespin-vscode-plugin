@@ -14,12 +14,11 @@ import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
-  FileVersions,
   GenerateEvent,
   IncludeFilesEvent,
   ModelChangeEvent,
   OpenFileEvent,
-  UIPropsUpdateEvent,
+  UIPropsUpdateEvent
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
@@ -143,7 +142,6 @@ export function Generate() {
   function copyToClipboard() {
     const message: CopyToClipboardEvent = {
       type: "copyToClipboard",
-      model,
       includedFiles: files,
       prompt,
       codingConvention,

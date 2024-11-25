@@ -3,16 +3,17 @@ import { EditAnthropicConfig } from "./EditAnthropicConfig.js";
 import { EditOpenAIConfig } from "./EditOpenAIConfig.js";
 
 export type EditConfigPageArgs = {
-  api: "openai" | "anthropic" | "google";
+  provider: "openai" | "anthropic" | "google";
   [key: string]: string;
 };
 
 export function EditConfig() {
+  debugger;
   const args: EditConfigPageArgs = history.state;
   const Page: any =
-    args.api === "anthropic"
+    args.provider === "anthropic"
       ? EditAnthropicConfig
-      : args.api === "openai"
+      : args.provider === "openai"
       ? EditOpenAIConfig
       : undefined;
 

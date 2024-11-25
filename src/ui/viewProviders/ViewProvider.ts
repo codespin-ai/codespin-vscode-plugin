@@ -16,12 +16,14 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   webviewReadyPromiseResolve: () => void = () => {};
   globalEventEmitter: EventEmitter;
   messageHandler: ReturnType<typeof getMessageHandler>;
+  navigationPromiseResolvers: Map<string, () => void>;
 
   constructor(
     webviewOptions: WebviewOptions,
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
+    this.navigationPromiseResolvers = new Map();
     this.webviewOptions = webviewOptions;
     this.isDisposed = false;
     this.globalEventEmitter = globalEventEmitter;
