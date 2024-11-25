@@ -13,7 +13,7 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   isDisposed: boolean;
   initializePromise: Promise<void>;
   webviewReadyPromise: Promise<void>;
-  resolveWebviewReadyPromise: () => void = () => {};
+  webviewReadyPromiseResolve: () => void = () => {};
   globalEventEmitter: EventEmitter;
   messageHandler: ReturnType<typeof getMessageHandler>;
 
@@ -29,11 +29,11 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
     this.context = context;
 
     this.initializePromise = new Promise((resolve) => {
-      this.resolveWebviewReadyPromise = resolve;
+      this.webviewReadyPromiseResolve = resolve;
     });
 
     this.webviewReadyPromise = new Promise((resolve) => {
-      this.resolveWebviewReadyPromise = resolve;
+      this.webviewReadyPromiseResolve = resolve;
     });
 
     this.globalEventEmitter.on("message", this.messageHandler);

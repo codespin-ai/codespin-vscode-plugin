@@ -11,7 +11,7 @@ export function getMessageHandler(uiContainer: UIContainer) {
     } else {
       switch (message.type) {
         case "webviewReady":
-          uiContainer.resolveWebviewReadyPromise();
+          uiContainer.webviewReadyPromiseResolve();
           break;
       }
     }

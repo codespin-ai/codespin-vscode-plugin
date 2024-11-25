@@ -11,7 +11,7 @@ export abstract class UIPanel {
   disposables: vscode.Disposable[] = [];
   panel: vscode.WebviewPanel;
   webviewReadyPromise: Promise<void>;
-  resolveWebviewReadyPromise: () => void = () => {};
+  webviewReadyPromiseResolve: () => void = () => {};
   isDisposed: boolean;
   globalEventEmitter: EventEmitter;
   webviewOptions: WebviewOptions;
@@ -71,7 +71,7 @@ export abstract class UIPanel {
     this.panel.onDidDispose(() => {}, null, this.disposables);
 
     this.webviewReadyPromise = new Promise((resolve) => {
-      this.resolveWebviewReadyPromise = resolve;
+      this.webviewReadyPromiseResolve = resolve;
     });
 
     this.globalEventEmitter.on("message", this.messageHandler);
