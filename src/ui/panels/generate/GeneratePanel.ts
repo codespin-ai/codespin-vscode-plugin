@@ -59,25 +59,6 @@ export class GeneratePanel extends UIPanel {
   async init(initArgs: InitArgs) {
     const workspaceRoot = getWorkspaceRoot(this.context);
 
-    const initialized = await isInitialized(workspaceRoot);
-    if (!initialized) {
-      // Ask the user if they want to force initialize
-      const userChoice = await vscode.window.showWarningMessage(
-        "CodeSpin configuration is not initialized for this project. Create?",
-        "Yes",
-        "No"
-      );
-
-      if (userChoice === "Yes") {
-        await initialize(false, workspaceRoot);
-      }
-      // If the user chooses No, we must exit.
-      else {
-        this.dispose();
-        return;
-      }
-    }
-
     await this.webviewReadyEvent();
 
     const conventions = await getConventions(workspaceRoot);

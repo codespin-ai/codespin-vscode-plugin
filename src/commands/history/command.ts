@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { HistoryEntryPanel } from "../../ui/panels/historyEntry/HistoryEntryPanel.js";
 import { EventEmitter } from "events";
+import { validateConfig } from "../../config/validateConfig.js";
 
 export type SelectHistoryEntryArgs = {
   itemId: string;
@@ -18,6 +19,10 @@ export function getSelectHistoryEntryCommand(
   return async function selectHistoryItemCommand(
     args: SelectHistoryEntryArgs
   ): Promise<void> {
+    if (!(await validateConfig(context))) {
+      return;
+    }
+
     if (!args.itemId) {
       vscode.window.showErrorMessage("No history item ID provided.");
       return;

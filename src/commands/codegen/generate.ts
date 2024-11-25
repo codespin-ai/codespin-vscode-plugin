@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { GeneratePanel } from "../../ui/panels/generate/GeneratePanel.js";
 import { EventEmitter } from "events";
+import { validateConfig } from "../../config/validateConfig.js";
 
 export function getGenerateCommand(
   context: vscode.ExtensionContext,
@@ -10,6 +11,10 @@ export function getGenerateCommand(
     _: unknown,
     args: vscode.Uri[]
   ): Promise<void> {
+    if (!(await validateConfig(context))) {
+      return;
+    }
+
     const filePaths: string[] = !args
       ? !vscode.window.activeTextEditor
         ? []

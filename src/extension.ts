@@ -7,9 +7,8 @@ import { getGenerateCommand } from "./commands/codegen/generate.js";
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { getSelectHistoryEntryCommand } from "./commands/history/command.js";
 import { getInitCommand } from "./commands/init/command.js";
-import { SYNC_SERVER_PORT } from "./constants.js";
 import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvider.js";
-import { getWorkspaceRoot } from "./vscode/getWorkspaceRoot.js";
+import { validateConfig } from "./config/validateConfig.js";
 
 const globalEventEmitter = new EventEmitter();
 
