@@ -10,37 +10,32 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   webviewOptions: WebviewOptions;
   context: vscode.ExtensionContext;
   disposables: vscode.Disposable[] = [];
-  navigationPromiseResolvers: Map<string, () => void>;
   isDisposed: boolean;
   initializePromise: Promise<void>;
-  resolveInitialize: () => void = () => {};
   webviewReadyPromise: Promise<void>;
-  resolveWebviewReady: () => void = () => {};
+  webviewReadyPromiseResolve: () => void = () => {};
   globalEventEmitter: EventEmitter;
   messageHandler: ReturnType<typeof getMessageHandler>;
+  navigationPromiseResolvers: Map<string, () => void>;
 
   constructor(
     webviewOptions: WebviewOptions,
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
-    this.webviewOptions = webviewOptions;
     this.navigationPromiseResolvers = new Map();
+    this.webviewOptions = webviewOptions;
     this.isDisposed = false;
     this.globalEventEmitter = globalEventEmitter;
     this.messageHandler = getMessageHandler(this);
-
-    this.initializePromise = new Promise((resolve) => {
-      this.resolveInitialize = resolve;
-    });
     this.context = context;
 
     this.initializePromise = new Promise((resolve) => {
-      this.resolveWebviewReady = resolve;
+      this.webviewReadyPromiseResolve = resolve;
     });
 
     this.webviewReadyPromise = new Promise((resolve) => {
-      this.resolveInitialize = resolve;
+      this.webviewReadyPromiseResolve = resolve;
     });
 
     this.globalEventEmitter.on("message", this.messageHandler);
@@ -73,8 +68,6 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
       null,
       this.disposables
     );
-
-    this.resolveInitialize();
   }
 
   initializeEvent() {

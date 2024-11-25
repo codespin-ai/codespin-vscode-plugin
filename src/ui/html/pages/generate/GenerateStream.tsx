@@ -13,7 +13,7 @@ import {
 import { CSFormField } from "../../components/CSFormField.js";
 
 type GenerateStreamArgs = {
-  api: string;
+  provider: string;
   model: string;
 };
 
@@ -52,7 +52,7 @@ export function GenerateStream() {
   return (
     <div>
       <h1>
-        Generating ({args.api}:{args.model})
+        Generating ({args.provider}:{args.model})
       </h1>
       <CSFormField>
         <VSCodeButton onClick={cancel}>Cancel</VSCodeButton>

@@ -14,12 +14,11 @@ import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
-  FileVersions,
   GenerateEvent,
   IncludeFilesEvent,
   ModelChangeEvent,
   OpenFileEvent,
-  UIPropsUpdateEvent,
+  UIPropsUpdateEvent
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
@@ -48,24 +47,12 @@ export function Generate() {
 
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>(args.prompt ?? "");
-  const [codegenTargets, setCodegenTargets] = useState(
-    args.codegenTargets ?? ":prompt"
-  );
   const [codingConvention, setCodingConvention] = useState<string | undefined>(
     args.codingConvention ?? "None"
-  );
-  const [fileVersion, setFileVersion] = useState<FileVersions>(
-    args.fileVersion ?? "current"
   );
   const [files, setFiles] = useState<{ path: string; size: number }[]>(
     args.includedFiles
   );
-
-  const [outputKind, setOutputKind] = useState<"full" | "diff">(
-    args.outputKind ?? "full"
-  );
-
-  const [multi, setMulti] = useState(args.multi ?? 0);
 
   const [initialHeight, setInitialHeight] = useState(
     args.uiProps?.promptTextAreaHeight ?? 0
@@ -76,21 +63,8 @@ export function Generate() {
   );
 
   const [showCopied, setShowCopied] = useState(false);
-  const [showCopyToChatGPT, setShowCopyToChatGPT] = useState(false);
-
-  function onOutputKindChange(e: React.ChangeEvent<Dropdown>) {
-    setOutputKind(e.target.value as "full" | "diff");
-  }
-
-  function onMultiChange(e: React.ChangeEvent<Dropdown>) {
-    setMulti(Number(e.target.value));
-  }
 
   useEffect(() => {
-    if (files.length === 1) {
-      setCodegenTargets(files[0].path);
-    }
-
     if (files.length >= 1) {
       const fileExtension = getFileExtension(files[0].path);
       if (files.every((x) => x.path.endsWith(fileExtension))) {
@@ -152,27 +126,6 @@ export function Generate() {
     };
   }, []);
 
-  useEffect(() => {
-    const targetExtension =
-      codegenTargets !== ":prompt"
-        ? getFileExtension(codegenTargets)
-        : undefined;
-
-    if (targetExtension) {
-      const matchingConvention = args.codingConventions.find((convention) => {
-        return convention.extensions.includes(targetExtension);
-      });
-
-      if (matchingConvention) {
-        setCodingConvention(matchingConvention.filename);
-      } else {
-        setCodingConvention(undefined);
-      }
-    } else {
-      setCodingConvention(undefined);
-    }
-  }, [codegenTargets]);
-
   function onModelChange(e: React.ChangeEvent<Dropdown>) {
     setModel(e.target.value);
     const modelChangeMessage: ModelChangeEvent = {
@@ -189,14 +142,9 @@ export function Generate() {
   function copyToClipboard() {
     const message: CopyToClipboardEvent = {
       type: "copyToClipboard",
-      model,
       includedFiles: files,
       prompt,
-      codegenTargets,
       codingConvention,
-      fileVersion,
-      outputKind,
-      multi,
     };
 
     vsCodeApi.postMessage(message);
@@ -222,11 +170,7 @@ export function Generate() {
       includedFiles: files,
       model,
       prompt,
-      codegenTargets,
       codingConvention,
-      fileVersion,
-      outputKind,
-      multi,
       ...args,
     };
     vsCodeApi.postMessage(message);
@@ -274,7 +218,7 @@ export function Generate() {
 
   return (
     <div>
-      <h1>Generate</h1>
+      <h1>Start Chatting</h1>
       <form id="mainform">
         <CSFormField label={{ text: "Model" }}>
           <VSCodeDropdown
@@ -320,7 +264,7 @@ export function Generate() {
               onClick={onGenerateButtonClick}
             >
               <GenerateIcon />
-              Generate Code
+              Start Chatting
             </VSCodeButton>
 
             {/* Copy to clipboard */}
@@ -344,60 +288,6 @@ export function Generate() {
 
         <VSCodeDivider />
         <h3>Additional Options</h3>
-        <CSFormField label={{ text: "Files to generate:" }}>
-          <VSCodeDropdown
-            currentValue={codegenTargets}
-            style={{ width: "420px" }}
-            onChange={(e: React.ChangeEvent<Dropdown>) =>
-              setCodegenTargets(e.target.value)
-            }
-          >
-            {[{ text: "As in Prompt", value: ":prompt" }]
-              .concat(
-                files.map((x) => ({
-                  text: x.path,
-                  value: `${x.path}`,
-                }))
-              )
-              .map((item) => (
-                <VSCodeOption key={item.value} value={item.value}>
-                  {item.text}
-                </VSCodeOption>
-              ))}
-          </VSCodeDropdown>
-        </CSFormField>
-        <CSFormField label={{ text: "Output Kind:" }}>
-          <VSCodeDropdown
-            currentValue={outputKind}
-            style={{ width: "180px" }}
-            onChange={onOutputKindChange}
-          >
-            <VSCodeOption value="full">Full Content</VSCodeOption>
-            <VSCodeOption value="diff">Diff</VSCodeOption>
-          </VSCodeDropdown>
-        </CSFormField>
-        {outputKind === "full" ? (
-          <CSFormField label={{ text: "Continue after max tokens?:" }}>
-            <VSCodeDropdown
-              currentValue={multi.toString()}
-              style={{ width: "180px" }}
-              onChange={onMultiChange}
-            >
-              {[
-                { text: "No", value: "0" },
-                { text: "Up to 4 times", value: "4" },
-                { text: "Up to 8 times", value: "8" },
-                { text: "Up to 12 times", value: "12" },
-              ].map((x, i) => (
-                <VSCodeOption key={i} value={x.value}>
-                  {x.text}
-                </VSCodeOption>
-              ))}
-            </VSCodeDropdown>
-          </CSFormField>
-        ) : (
-          <></>
-        )}
         <CSFormField label={{ text: "Coding Conventions:" }}>
           <VSCodeDropdown
             style={{ width: "180px" }}
@@ -416,24 +306,6 @@ export function Generate() {
             {args.codingConventions.map((item) => (
               <VSCodeOption key={item.filename} value={item.filename}>
                 {item.description}
-              </VSCodeOption>
-            ))}
-          </VSCodeDropdown>
-        </CSFormField>
-        <CSFormField label={{ text: "File Version:" }}>
-          <VSCodeDropdown
-            currentValue="current"
-            style={{ width: "180px" }}
-            onChange={(e: React.ChangeEvent<Dropdown>) =>
-              setFileVersion(e.target.value as FileVersions)
-            }
-          >
-            {[
-              { text: "Working Copy", value: "current" },
-              { text: "Git HEAD", value: "HEAD" },
-            ].map((item) => (
-              <VSCodeOption key={item.value} value={item.value}>
-                {item.text}
               </VSCodeOption>
             ))}
           </VSCodeDropdown>

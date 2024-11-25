@@ -1,12 +1,12 @@
 import { EventEmitter } from "events";
 import * as path from "path";
 import * as vscode from "vscode";
-import { editAnthropicConfig } from "../../../settings/api/editAnthropicConfig.js";
-import { editOpenAIConfig } from "../../../settings/api/editOpenAIConfig.js";
+import { editAnthropicConfig } from "../../../settings/provider/editAnthropicConfig.js";
+import { editOpenAIConfig } from "../../../settings/provider/editOpenAIConfig.js";
 import {
   EditAnthropicConfigEvent,
   EditOpenAIConfigEvent,
-} from "../../../settings/api/types.js";
+} from "../../../settings/provider/types.js";
 import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
 import { initialize } from "../../../settings/initialize.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
@@ -150,8 +150,8 @@ export class GeneratePanel extends UIPanel {
             }
             break;
           case "missing_config":
-            await navigateTo(this, `/api/config/edit`, {
-              api: generateArgs.api,
+            await navigateTo(this, `/provider/config/edit`, {
+              provider: generateArgs.provider,
             });
             break;
         }

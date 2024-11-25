@@ -1,6 +1,5 @@
 import { ModelDescription } from "codespin/dist/settings/CodeSpinConfig.js";
 import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
-import { FileVersions } from "../../../panels/generate/types.js";
 
 export type GeneratePageArgs = {
   models: ModelDescription[],
@@ -8,10 +7,6 @@ export type GeneratePageArgs = {
   selectedModel: string;
   codingConvention: string | undefined;
   prompt: string;
-  codegenTargets: string;
-  fileVersion: FileVersions;
-  outputKind: "full" | "diff";
-  multi: number;
   includedFiles: {
     path: string;
     size: number;

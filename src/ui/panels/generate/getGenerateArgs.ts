@@ -1,14 +1,16 @@
 import { GenerateArgs as CodeSpinGenerateArgs } from "codespin/dist/commands/generate/index.js";
+import { getModel } from "codespin/dist/settings/getModel.js";
+import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
 import * as path from "path";
-import { getAPIConfigPath } from "../../../settings/api/getAPIConfigPath.js";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
+import { getProviderConfigPath } from "../../../settings/provider/getProviderConfigPath.js";
 import { GeneratePanel } from "./GeneratePanel.js";
 
 type GetGenerateArgsResult =
   | {
       status: "missing_config";
-      api: string;
+      provider: string;
     }
   | {
       status: "can_generate";
@@ -22,9 +24,14 @@ export async function getGenerateArgs(
   workspaceRoot: string
 ): Promise<GetGenerateArgsResult> {
   const userInputFromPanel = generatePanel.userInput!;
-  const [api] = userInputFromPanel.model.split(":");
 
-  const configFilePath = await getAPIConfigPath(api, workspaceRoot);
+  const codespinConfig = await readCodeSpinConfig(undefined, workspaceRoot);
+  const modelDescription = await getModel([codespinConfig.model], codespinConfig);
+  
+  const configFilePath = await getProviderConfigPath(
+    modelDescription.provider,
+    workspaceRoot
+  );
 
   if (configFilePath) {
     const historyDirPath = getHistoryItemDir(dirName, workspaceRoot);
@@ -33,26 +40,15 @@ export async function getGenerateArgs(
 
     const codespinGenerateArgs: CodeSpinGenerateArgs = {
       promptFile: promptFilePath,
-      out:
-        userInputFromPanel.codegenTargets !== ":prompt"
-          ? userInputFromPanel.codegenTargets
-          : undefined,
       model: userInputFromPanel.model,
       write: true,
-      include: userInputFromPanel.includedFiles.map((f) =>
-        userInputFromPanel.fileVersion === "HEAD" ? `HEAD:${f.path}` : f.path
-      ),
+      include: userInputFromPanel.includedFiles.map((f) => f.path),
       spec: userInputFromPanel.codingConvention
         ? await getCodingConventionPath(
             userInputFromPanel.codingConvention,
             workspaceRoot
           )
         : undefined,
-      multi:
-        userInputFromPanel.outputKind === "diff"
-          ? undefined
-          : userInputFromPanel.multi,
-      template: userInputFromPanel.outputKind === "diff" ? "diff" : undefined,
       cancelCallback: (cancel: () => void) => {
         generatePanel.cancelGeneration = cancel;
       },
@@ -68,7 +64,7 @@ export async function getGenerateArgs(
   else {
     return {
       status: "missing_config",
-      api,
+      provider: modelDescription.provider,
     };
   }
 }

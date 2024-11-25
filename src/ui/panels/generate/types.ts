@@ -61,19 +61,23 @@ export type GenerateEvent = {
 export type GenerateUserInput = {
   model: string;
   prompt: string;
-  codegenTargets: string;
   codingConvention: string | undefined;
-  fileVersion: FileVersions;
-  outputKind: "full" | "diff";
   includedFiles: {
     path: string;
   }[];
-  multi: number;
+};
+
+export type CopyToClipboardUserInput = {
+  prompt: string;
+  codingConvention: string | undefined;
+  includedFiles: {
+    path: string;
+  }[];
 };
 
 export type CopyToClipboardEvent = {
   type: "copyToClipboard";
-} & GenerateUserInput;
+} & CopyToClipboardUserInput;
 
 export type UIPropsUpdateArgs = {
   promptTextAreaWidth?: number;

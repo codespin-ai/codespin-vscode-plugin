@@ -4,8 +4,8 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useState } from "react";
-import { AnthropicConfigArgs } from "../../../../settings/api/editAnthropicConfig.js";
-import { EditAnthropicConfigEvent } from "../../../../settings/api/types.js";
+import { AnthropicConfigArgs } from "../../../../settings/provider/editAnthropicConfig.js";
+import { EditAnthropicConfigEvent } from "../../../../settings/provider/types.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import { CSFormField } from "../../components/CSFormField.js";
 

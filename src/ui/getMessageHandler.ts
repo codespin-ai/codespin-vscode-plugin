@@ -1,7 +1,7 @@
+import * as vscode from "vscode";
 import { EventTemplate } from "./EventTemplate.js";
 import { UIContainer } from "./UIContainer.js";
 import { NavigateEvent } from "./types.js";
-import * as vscode from "vscode";
 
 export function getMessageHandler(uiContainer: UIContainer) {
   return function onDidReceiveMessageBase(message: EventTemplate) {
@@ -12,7 +12,7 @@ export function getMessageHandler(uiContainer: UIContainer) {
     } else {
       switch (message.type) {
         case "webviewReady":
-          uiContainer.resolveWebviewReady();
+          uiContainer.webviewReadyPromiseResolve();
           break;
         case "navigated":
           const incomingMessage = message as NavigateEvent;
