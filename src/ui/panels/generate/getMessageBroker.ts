@@ -2,9 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import {
   BrokerType,
-  createMessageBroker,
-  MessageBroker,
-  Response,
+  createMessageBroker
 } from "../../../messaging/messageBroker.js";
 import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
 import { editAnthropicConfig } from "../../../settings/provider/editAnthropicConfig.js";
@@ -133,3 +131,5 @@ export function getMessageBroker(
 
   return messageBroker;
 }
+
+export type GenerateViewBrokerType = BrokerType<typeof getMessageBroker>;

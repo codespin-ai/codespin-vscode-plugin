@@ -9,13 +9,12 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { createMessageBrokerClient } from "../../../../messaging/messageBrokerClient.js";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
+import type { GenerateViewBrokerType } from "../../../panels/generate/getMessageBroker.js";
 import {
   AddDepsEvent,
   GenerateEvent,
-  IncludeFilesEvent,
   OpenFileEvent,
   UIPropsUpdateEvent
 } from "../../../panels/generate/types.js";
@@ -23,6 +22,8 @@ import { CSFormField } from "../../components/CSFormField.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
 import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
+import { getMessageBroker } from "./getMessageBroker.js";
+import { createMessageClient } from "../../../../messaging/messageClient.js";
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -48,11 +49,10 @@ export function Generate() {
 
   const [showCopied, setShowCopied] = useState(false);
 
-  const messageBrokerClient = createMessageBrokerClient(
-    (message: unknown) => {
+  const viewMessageClient =
+    createMessageClient<GenerateViewBrokerType>((message: unknown) => {
       vsCodeApi.postMessage(message);
-    }
-  );
+    });
 
   useEffect(() => {
     if (files.length >= 1) {
@@ -85,26 +85,13 @@ export function Generate() {
       setInitialWidth(promptTextArea.clientWidth);
     }
 
+    const generatePageMessageBroker = getMessageBroker(setFiles);
+
     function listener(event: unknown) {
       const message = (event as any).data;
-      switch (message.type) {
-        case "includeFiles":
-          setFiles((files) => {
-            const includeFilesMessage: IncludeFilesEvent = message;
 
-            const newFiles = includeFilesMessage.files.filter((x) =>
-              files.every((file) => file.path !== x.path)
-            );
-
-            return files.concat(
-              newFiles.map((file) => ({
-                path: file.path,
-                includeOption: "source",
-                size: file.size,
-              }))
-            );
-          });
-          break;
+      if (generatePageMessageBroker.canHandle(message)) {
+        generatePageMessageBroker.handleRequest(message);
       }
     }
 
@@ -124,7 +111,7 @@ export function Generate() {
       model: e.target.value,
     };
 
-    messageBrokerClient.send("modelChange", modelChangeMessage);
+    viewMessageClient.send("modelChange", modelChangeMessage);
   }
 
   function onGenerateButtonClick() {
@@ -139,7 +126,7 @@ export function Generate() {
       codingConvention,
     };
 
-    await messageBrokerClient.send("copyToClipboard", message);
+    await viewMessageClient.send("copyToClipboard", message);
 
     setShowCopied(true);
     setTimeout(() => {
@@ -165,7 +152,8 @@ export function Generate() {
       codingConvention,
       ...args,
     };
-    vsCodeApi.postMessage(message);
+
+    viewMessageClient.send("generate", message);
 
     const promptTextArea =
       promptRef.current!.shadowRoot!.querySelector("textarea")!;
@@ -179,7 +167,7 @@ export function Generate() {
         promptTextAreaWidth: promptTextArea.clientWidth,
       };
 
-      vsCodeApi.postMessage(uiPropsUpdate);
+      viewMessageClient.send("uiPropsUpdate", uiPropsUpdate);
     }
   }
 
@@ -193,7 +181,7 @@ export function Generate() {
       file: filePath,
       model,
     };
-    vsCodeApi.postMessage(message);
+    viewMessageClient.send("addDeps", message);
   }
 
   function onFileClick(filePath: string) {
@@ -201,7 +189,7 @@ export function Generate() {
       type: "openFile",
       file: filePath,
     };
-    vsCodeApi.postMessage(message);
+    viewMessageClient.send("openFile", message);
   }
 
   function getTotalFileSize(): number {

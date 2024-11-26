@@ -10,6 +10,8 @@ import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js"
 import { navigateTo } from "../../navigateTo.js";
 import { GeneratePanel } from "./GeneratePanel.js";
 import { PromptCreatedEvent, ResponseStreamEvent } from "./types.js";
+import { createMessageClient } from "../../../messaging/messageClient.js";
+import { InvokePageBrokerType } from "../../html/pages/generate/invoke/getMessageBroker.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
@@ -48,23 +50,35 @@ export async function invokeGeneration(
   });
 
   argsForGeneration.args.promptCallback = async (prompt: string) => {
+    const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
+      (message) => {
+        generatePanel.getWebview().postMessage(message);
+      }
+    );
+
     const promptCreated: PromptCreatedEvent = {
       type: "promptCreated",
       prompt,
     };
 
-    generatePanel.getWebview().postMessage(promptCreated);
+    invokePageMessageClient.send("promptCreated", promptCreated);
 
     await writeHistoryItem(prompt, "raw-prompt.txt", dirName, workspaceRoot);
   };
 
   argsForGeneration.args.responseStreamCallback = (text: string) => {
+    const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
+      (message) => {
+        generatePanel.getWebview().postMessage(message);
+      }
+    );
+
     const responseStreamEvent: ResponseStreamEvent = {
       type: "responseStream",
       data: text,
     };
 
-    generatePanel.getWebview().postMessage(responseStreamEvent);
+    invokePageMessageClient.send("responseStream", responseStreamEvent);
   };
 
   argsForGeneration.args.responseCallback = async (text: string) => {

@@ -5,6 +5,7 @@ import {
   UpdateHistoryEvent,
 } from "../../../viewProviders/history/types.js";
 import { SelectHistoryEntryCommandEvent } from "../../../../commands/history/command.js";
+import { getMessageBroker } from "./getMessageBroker.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
 
@@ -96,13 +97,13 @@ export function History() {
   }
 
   React.useEffect(() => {
+    const historyPageMessageBroker = getMessageBroker(setEntries);
+
     function listener(event: unknown) {
       const message = (event as any).data;
-      switch (message.type) {
-        case "updateHistory":
-          const event = message as UpdateHistoryEvent;
-          setEntries(event.entries);
-          break;
+
+      if (historyPageMessageBroker.canHandle(message)) {
+        historyPageMessageBroker.handleRequest(message);
       }
     }
 

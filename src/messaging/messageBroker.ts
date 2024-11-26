@@ -12,41 +12,49 @@ type AttachHandlerFunction<TRequestMap> = <K extends string, P, R>(
   handler: RequestHandler<P, R>
 ) => MessageBroker<TRequestMap & { [key in K]: HandlerParameters<P, R> }>;
 
-// Structure for the request we receive, now typed by the request map
+// Represents a structured request
 export interface Request<
-  TRequestMap extends Record<string, HandlerParameters<any, any>>,
-  K extends Extract<keyof TRequestMap, string>
+  TRequestMap extends {
+    [key in keyof TRequestMap]: HandlerParameters<any, any>;
+  },
+  K extends keyof TRequestMap
 > {
-  id: string; // Unique ID to match requests and responses
-  type: K; // Request type
-  parameters: TRequestMap[K]["parameters"]; // Parameters tied to specific request type
+  id: string; // Unique ID for the request
+  type: K; // Request type identifier
+  parameters: TRequestMap[K]["parameters"]; // Request-specific parameters
 }
 
-// Structure for the response sent back, typed by the result of the request
+// Represents a structured response
 export interface Response<
-  TRequestMap extends Record<string, HandlerParameters<any, any>>,
-  K extends Extract<keyof TRequestMap, string>
+  TRequestMap extends {
+    [key in keyof TRequestMap]: HandlerParameters<any, any>;
+  },
+  K extends keyof TRequestMap
 > {
-  id: string; // Same unique ID to respond back to the correct request
-  result: TRequestMap[K]["result"]; // Result tied to the specific request's result
+  id: string; // Matches the request ID
+  result: TRequestMap[K]["result"]; // Request-specific result
 }
 
 export interface MessageBroker<
-  TRequestMap extends Record<string, HandlerParameters<any, any>>
+  TRequestMap extends {
+    [key in keyof TRequestMap]: HandlerParameters<any, any>;
+  }
 > {
-  attachHandler: AttachHandlerFunction<TRequestMap>;
-  handleRequest: <K extends Extract<keyof TRequestMap, string>>(
+  attachHandler: AttachHandlerFunction<TRequestMap>; // Register a new handler
+  handleRequest: <K extends keyof TRequestMap & string>(
     request: Request<TRequestMap, K>
-  ) => void;
+  ) => void; // Handle incoming requests
+  canHandle: (type: string) => boolean; // Check if a handler exists for a type
 }
 
 export function createMessageBroker<
-  TRequestMap extends Record<string, HandlerParameters<any, any>>,
+  TRequestMap extends {
+    [key in keyof TRequestMap]: HandlerParameters<any, any>;
+  },
   TResponse
 >(
   requestHandlers: Map<string, RequestHandler<any, any>> = new Map()
 ): MessageBroker<TRequestMap> {
-  // The attachHandler function adds request handlers and updates the broker's types
   const attachHandler: AttachHandlerFunction<TRequestMap> = <
     K extends string,
     P,
@@ -56,39 +64,37 @@ export function createMessageBroker<
     handler: RequestHandler<P, R>
   ) => {
     requestHandlers.set(type, handler);
-    // Return a new broker instance with extended types (previous request types + new request type)
+
+    // Return a broker with extended types (existing + newly added handler type)
     return createMessageBroker<
       TRequestMap & { [key in K]: { parameters: P; result: R } },
       TResponse
     >(requestHandlers);
   };
 
-  async function handleRequest<K extends Extract<keyof TRequestMap, string>>(
+  async function handleRequest<K extends keyof TRequestMap & string>(
     request: Request<TRequestMap, K>
   ) {
     const { id, type, parameters } = request;
-
-    // Check if a handler exists for this request type
     const handler = requestHandlers.get(type);
 
     if (handler) {
-      // Call the handler with the unwrapped payload
       const handlerResult = await handler(parameters);
-
-      // Send the response back, wrapping it in the Response structure
-      const response: Response<TRequestMap, K> = {
-        id, // Use the same ID to match the original request
+      return {
+        id,
         result: handlerResult,
-      };
-
-      return response;
+      } as Response<TRequestMap, K>;
     }
   }
 
-  // Return the broker with attachHandler, startListening, and stopListening methods
+  function canHandle(type: string): boolean {
+    return requestHandlers.has(type);
+  }
+
   return {
     attachHandler,
     handleRequest,
+    canHandle,
   };
 }
 

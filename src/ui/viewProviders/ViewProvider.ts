@@ -99,6 +99,6 @@ export abstract class ViewProvider implements vscode.WebviewViewProvider {
   }
 
   // These will be overridden
-  onMessage(request: MessageTemplate): void {}
+  onMessage(message: MessageTemplate): void {}
   onDispose(): void {}
 }
