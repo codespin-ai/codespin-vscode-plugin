@@ -1,7 +1,6 @@
 import * as vscode from "vscode";
-import { MessageTemplate } from "./MessageTemplate.js";
 import { UIContainer } from "./UIContainer.js";
-import { NavigateEvent } from "./types.js";
+import { MessageTemplate, NavigateEvent } from "./types.js";
 
 export function getMessageHandler(uiContainer: UIContainer) {
   return function onDidReceiveMessageBase(message: MessageTemplate) {

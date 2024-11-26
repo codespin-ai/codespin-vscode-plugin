@@ -1,10 +1,10 @@
 import { randomInt } from "crypto";
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
-import { MessageTemplate } from "../MessageTemplate.js";
 import { WebviewOptions } from "../UIContainer.js";
 import { getMessageHandler } from "../getMessageHandler.js";
 import { getWebviewContent } from "../getWebviewContent.js";
+import { MessageTemplate } from "../types.js";
 
 export abstract class UIPanel {
   context: vscode.ExtensionContext;

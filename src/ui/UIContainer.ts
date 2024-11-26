@@ -1,5 +1,5 @@
-import { MessageTemplate } from "./MessageTemplate.js";
 import * as vscode from "vscode";
+import { MessageTemplate } from "./types.js";
 
 export type WebviewOptions = {
   style?: string;

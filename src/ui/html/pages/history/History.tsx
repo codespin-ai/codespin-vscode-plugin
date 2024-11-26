@@ -1,11 +1,9 @@
 import * as React from "react";
-import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
-import {
-  HistoryEntry,
-  UpdateHistoryEvent,
-} from "../../../viewProviders/history/types.js";
 import { SelectHistoryEntryCommandEvent } from "../../../../commands/history/command.js";
+import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
+import { HistoryEntry } from "../../../viewProviders/history/types.js";
 import { getMessageBroker } from "./getMessageBroker.js";
+import { BrowserEvent } from "../../../types.js";
 
 type GroupedEntries = { [date: string]: HistoryEntry[] };
 
@@ -99,11 +97,11 @@ export function History() {
   React.useEffect(() => {
     const historyPageMessageBroker = getMessageBroker(setEntries);
 
-    function listener(event: unknown) {
-      const message = (event as any).data;
+    function listener(event: BrowserEvent) {
+      const message = event.data;
 
-      if (historyPageMessageBroker.canHandle(message)) {
-        historyPageMessageBroker.handleRequest(message);
+      if (historyPageMessageBroker.canHandle(message.type)) {
+        historyPageMessageBroker.handleRequest(message as any);
       }
     }
 

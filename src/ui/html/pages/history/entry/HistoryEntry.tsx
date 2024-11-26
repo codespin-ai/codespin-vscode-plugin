@@ -13,7 +13,7 @@ import {
   GenerateCommitMessageEvent,
   RegenerateEvent,
 } from "../../../../panels/historyEntry/types.js";
-import { CancelEvent } from "../../../../types.js";
+import { BrowserEvent, CancelEvent } from "../../../../types.js";
 import { FullHistoryEntry } from "../../../../viewProviders/history/types.js";
 import { CodeSnippet } from "../../../components/CodeSnippet.js";
 import { CSFormField } from "../../../components/CSFormField.js";
@@ -58,11 +58,10 @@ export function HistoryEntry() {
     return codegenUserInput;
   };
 
-  const historyEntryPanelMessageClient = createMessageClient<HistoryEntryPanelBrokerType>(
-    (message: unknown) => {
+  const historyEntryPanelMessageClient =
+    createMessageClient<HistoryEntryPanelBrokerType>((message: unknown) => {
       getVSCodeApi().postMessage(message);
-    }
-  );
+    });
 
   const onEditClick = () => {
     const regenerateEvent: RegenerateEvent = {
@@ -105,10 +104,10 @@ export function HistoryEntry() {
       setIsCommitted,
     });
 
-    function listener(event: unknown) {
-      const message = (event as any).data;
-      if (historyEntryPageMessageBroker.canHandle(message)) {
-        historyEntryPageMessageBroker.handleRequest(message);
+    function listener(event: BrowserEvent) {
+      const message = event.data;
+      if (historyEntryPageMessageBroker.canHandle(message.type)) {
+        historyEntryPageMessageBroker.handleRequest(message as any);
       }
     }
 

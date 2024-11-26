@@ -11,7 +11,7 @@ export async function includeFiles(
   filePaths: string[],
   workspaceRoot: string
 ) {
-  const pageMessageClient = createMessageClient<GeneratePageBrokerType>(
+  const generatePageMessageClient = createMessageClient<GeneratePageBrokerType>(
     (message: unknown) => {
       generatePanel.panel.webview.postMessage(message);
     }
@@ -29,5 +29,5 @@ export async function includeFiles(
     ),
   };
 
-  pageMessageClient.send("includeFiles", message);
+  generatePageMessageClient.send("includeFiles", message);
 }

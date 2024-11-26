@@ -8,11 +8,11 @@ import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { HistoryEntryPageArgs } from "../../html/pages/history/entry/HistoryEntry.js";
-import { MessageTemplate } from "../../MessageTemplate.js";
 import { navigateTo } from "../../navigateTo.js";
 import { GeneratedSourceFileWithHistory } from "../../viewProviders/history/types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
+import { MessageTemplate } from "../../types.js";
 
 export class HistoryEntryPanel extends UIPanel {
   messageBroker: ReturnType<typeof getMessageBroker>;

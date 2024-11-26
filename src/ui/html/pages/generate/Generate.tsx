@@ -16,7 +16,7 @@ import {
   AddDepsEvent,
   GenerateEvent,
   OpenFileEvent,
-  UIPropsUpdateEvent
+  UIPropsUpdateEvent,
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
@@ -24,6 +24,7 @@ import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { createMessageClient } from "../../../../messaging/messageClient.js";
+import { BrowserEvent } from "../../../types.js";
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -87,11 +88,11 @@ export function Generate() {
 
     const generatePageMessageBroker = getMessageBroker(setFiles);
 
-    function listener(event: unknown) {
-      const message = (event as any).data;
+    function listener(event: BrowserEvent) {
+      const message = event.data;
 
-      if (generatePageMessageBroker.canHandle(message)) {
-        generatePageMessageBroker.handleRequest(message);
+      if (generatePageMessageBroker.canHandle(message.type)) {
+        generatePageMessageBroker.handleRequest(message as any);
       }
     }
 

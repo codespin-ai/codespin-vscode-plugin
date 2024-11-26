@@ -1,7 +1,7 @@
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { MessageTemplate } from "../../../MessageTemplate.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
+import { MessageTemplate } from "../../../types.js";
 
 export function Initialize() {
   const vsCodeApi = getVSCodeApi();

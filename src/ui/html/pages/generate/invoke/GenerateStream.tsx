@@ -4,16 +4,12 @@ import {
   VSCodeProgressRing,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
-import { MessageTemplate } from "../../../../MessageTemplate.js";
-import {
-  PromptCreatedEvent,
-  ResponseStreamEvent,
-} from "../../../../panels/generate/types.js";
-import { CSFormField } from "../../../components/CSFormField.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { GeneratePanelBrokerType } from "../../../../panels/generate/getMessageBroker.js";
+import { CSFormField } from "../../../components/CSFormField.js";
 import { getMessageBroker } from "./getMessageBroker.js";
+import { BrowserEvent, MessageTemplate } from "../../../../types.js";
 
 type GenerateStreamArgs = {
   provider: string;
@@ -34,27 +30,26 @@ export function GenerateStream() {
       setBytesReceived,
     });
 
-    function listeners(event: MessageEvent<MessageTemplate>) {
-      const message = (event as any).data;
+    function listeners(event: BrowserEvent) {
+      const message = event.data;
 
-      if (pageMessageBroker.canHandle(message)) {
-        pageMessageBroker.handleRequest(message);
+      if (pageMessageBroker.canHandle(message.type)) {
+        pageMessageBroker.handleRequest(message as any);
       }
     }
 
     window.addEventListener("message", listeners);
-        
+
     getVSCodeApi().postMessage({ type: "webviewReady" });
-    
+
     return () => window.removeEventListener("message", listeners);
   }, []);
 
   function cancel() {
-    const generatePanelMessageClient = createMessageClient<GeneratePanelBrokerType>(
-      (message: unknown) => {
+    const generatePanelMessageClient =
+      createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
         getVSCodeApi().postMessage(message);
-      }
-    );
+      });
     generatePanelMessageClient.send("cancel", undefined);
   }
 

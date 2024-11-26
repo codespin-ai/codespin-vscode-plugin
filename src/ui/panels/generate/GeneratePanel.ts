@@ -3,13 +3,13 @@ import * as vscode from "vscode";
 import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
 import { getUIProps } from "../../../settings/ui/getUIProps.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
-import { MessageTemplate } from "../../MessageTemplate.js";
 import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
 import { navigateTo } from "../../navigateTo.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getPageArgs } from "./getPageArgs.js";
 import { GenerateEvent, GenerateUserInput } from "./types.js";
+import { MessageTemplate } from "../../types.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };

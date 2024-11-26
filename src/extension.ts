@@ -8,7 +8,6 @@ import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { getSelectHistoryEntryCommand } from "./commands/history/command.js";
 import { getInitCommand } from "./commands/init/command.js";
 import { HistoryViewProvider } from "./ui/viewProviders/history/HistoryViewProvider.js";
-import { validateConfig } from "./config/validateConfig.js";
 
 const globalEventEmitter = new EventEmitter();
 
