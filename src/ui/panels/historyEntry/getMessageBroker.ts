@@ -82,4 +82,4 @@ export function getMessageBroker(
   return messageBroker;
 }
 
-export type HistoryEntryViewBrokerType = BrokerType<typeof getMessageBroker>;
+export type HistoryEntryPanelBrokerType = BrokerType<typeof getMessageBroker>;

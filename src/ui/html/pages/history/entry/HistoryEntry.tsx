@@ -19,7 +19,7 @@ import { CodeSnippet } from "../../../components/CodeSnippet.js";
 import { CSFormField } from "../../../components/CSFormField.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
-import { HistoryEntryViewBrokerType } from "../../../../panels/historyEntry/getMessageBroker.js";
+import { HistoryEntryPanelBrokerType } from "../../../../panels/historyEntry/getMessageBroker.js";
 
 export type HistoryEntryPageFile = {
   filePath: string;
@@ -58,7 +58,7 @@ export function HistoryEntry() {
     return codegenUserInput;
   };
 
-  const viewMessageClient = createMessageClient<HistoryEntryViewBrokerType>(
+  const historyEntryPanelMessageClient = createMessageClient<HistoryEntryPanelBrokerType>(
     (message: unknown) => {
       getVSCodeApi().postMessage(message);
     }
@@ -70,13 +70,13 @@ export function HistoryEntry() {
       args: gatherArgsForRegenerateCommand(),
     };
 
-    viewMessageClient.send("regenerate", regenerateEvent);
+    historyEntryPanelMessageClient.send("regenerate", regenerateEvent);
 
     const cancelEvent: CancelEvent = {
       type: "cancel",
     };
 
-    viewMessageClient.send("cancel", undefined);
+    historyEntryPanelMessageClient.send("cancel", cancelEvent);
   };
 
   const onGenerateCommitMessage = () => {
@@ -86,7 +86,7 @@ export function HistoryEntry() {
       model: args.entry.userInput.model,
     };
 
-    viewMessageClient.send("generateCommitMessage", message);
+    historyEntryPanelMessageClient.send("generateCommitMessage", message);
   };
 
   const onCommitClick = () => {
@@ -95,7 +95,7 @@ export function HistoryEntry() {
       message: commitMessage,
     };
 
-    viewMessageClient.send("commit", message);
+    historyEntryPanelMessageClient.send("commit", message);
   };
 
   useEffect(() => {

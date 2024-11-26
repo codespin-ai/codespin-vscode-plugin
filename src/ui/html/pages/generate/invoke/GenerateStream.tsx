@@ -12,7 +12,7 @@ import {
 } from "../../../../panels/generate/types.js";
 import { CSFormField } from "../../../components/CSFormField.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
-import { GenerateViewBrokerType } from "../../../../panels/generate/getMessageBroker.js";
+import { GeneratePanelBrokerType } from "../../../../panels/generate/getMessageBroker.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 
 type GenerateStreamArgs = {
@@ -50,12 +50,12 @@ export function GenerateStream() {
   }, []);
 
   function cancel() {
-    const viewMessageClient = createMessageClient<GenerateViewBrokerType>(
+    const generatePanelMessageClient = createMessageClient<GeneratePanelBrokerType>(
       (message: unknown) => {
         getVSCodeApi().postMessage(message);
       }
     );
-    viewMessageClient.send("cancel", undefined);
+    generatePanelMessageClient.send("cancel", undefined);
   }
 
   return (

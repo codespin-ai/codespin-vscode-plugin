@@ -11,7 +11,7 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
-import type { GenerateViewBrokerType } from "../../../panels/generate/getMessageBroker.js";
+import type { GeneratePanelBrokerType } from "../../../panels/generate/getMessageBroker.js";
 import {
   AddDepsEvent,
   GenerateEvent,
@@ -49,8 +49,8 @@ export function Generate() {
 
   const [showCopied, setShowCopied] = useState(false);
 
-  const viewMessageClient =
-    createMessageClient<GenerateViewBrokerType>((message: unknown) => {
+  const generatePanelMessageClient =
+    createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
       vsCodeApi.postMessage(message);
     });
 
@@ -111,7 +111,7 @@ export function Generate() {
       model: e.target.value,
     };
 
-    viewMessageClient.send("modelChange", modelChangeMessage);
+    generatePanelMessageClient.send("modelChange", modelChangeMessage);
   }
 
   function onGenerateButtonClick() {
@@ -126,7 +126,7 @@ export function Generate() {
       codingConvention,
     };
 
-    await viewMessageClient.send("copyToClipboard", message);
+    await generatePanelMessageClient.send("copyToClipboard", message);
 
     setShowCopied(true);
     setTimeout(() => {
@@ -153,7 +153,7 @@ export function Generate() {
       ...args,
     };
 
-    viewMessageClient.send("generate", message);
+    generatePanelMessageClient.send("generate", message);
 
     const promptTextArea =
       promptRef.current!.shadowRoot!.querySelector("textarea")!;
@@ -167,7 +167,7 @@ export function Generate() {
         promptTextAreaWidth: promptTextArea.clientWidth,
       };
 
-      viewMessageClient.send("uiPropsUpdate", uiPropsUpdate);
+      generatePanelMessageClient.send("uiPropsUpdate", uiPropsUpdate);
     }
   }
 
@@ -181,7 +181,7 @@ export function Generate() {
       file: filePath,
       model,
     };
-    viewMessageClient.send("addDeps", message);
+    generatePanelMessageClient.send("addDeps", message);
   }
 
   function onFileClick(filePath: string) {
@@ -189,7 +189,7 @@ export function Generate() {
       type: "openFile",
       file: filePath,
     };
-    viewMessageClient.send("openFile", message);
+    generatePanelMessageClient.send("openFile", message);
   }
 
   function getTotalFileSize(): number {

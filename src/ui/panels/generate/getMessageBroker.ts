@@ -132,4 +132,4 @@ export function getMessageBroker(
   return messageBroker;
 }
 
-export type GenerateViewBrokerType = BrokerType<typeof getMessageBroker>;
+export type GeneratePanelBrokerType = BrokerType<typeof getMessageBroker>;
