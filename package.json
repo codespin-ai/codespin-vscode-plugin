@@ -108,8 +108,8 @@
     "package": "NODE_ENV=production node ./esbuild.js"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.9",
-    "@types/node": "^22.9.1",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^22.10.0",
     "@types/vscode": "^1.95.0",
     "@types/vscode-webview": "^1.57.5",
     "@vscode/test-electron": "^2.4.1",
@@ -117,7 +117,7 @@
     "eslint": "^9.15.0",
     "glob": "^11.0.0",
     "mocha": "^10.8.2",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "@types/react": "^18.3.12",
@@ -125,7 +125,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/ws": "^8.5.13",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.229",
+    "codespin": "^0.0.230",
     "diff2html": "^3.4.48",
     "gray-matter": "^4.0.3",
     "ignore": "^6.0.2",
