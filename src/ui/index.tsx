@@ -26,7 +26,9 @@ function App() {
       }
     }
     window.addEventListener("message", listeners);
+
     getVSCodeApi().postMessage({ type: "webviewReady" });
+    
     return () => window.removeEventListener("message", listeners);
   }, []);
 

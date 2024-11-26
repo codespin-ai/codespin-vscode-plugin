@@ -1,7 +1,7 @@
 import { randomInt } from "crypto";
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
-import { EventTemplate } from "../EventTemplate.js";
+import { MessageTemplate } from "../MessageTemplate.js";
 import { WebviewOptions } from "../UIContainer.js";
 import { getMessageHandler } from "../getMessageHandler.js";
 import { getWebviewContent } from "../getWebviewContent.js";
@@ -104,7 +104,7 @@ export abstract class UIPanel {
   }
 
   // These will be overridden
-  onMessage(message: EventTemplate): void {}
+  onMessage(message: MessageTemplate): void {}
   onDispose(): void {}
   onDidChangeViewState(e: vscode.WebviewPanelOnDidChangeViewStateEvent): void {}
 }

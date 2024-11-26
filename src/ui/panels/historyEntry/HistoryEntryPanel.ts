@@ -6,7 +6,7 @@ import { getFullHistoryEntry } from "../../../settings/history/getHistoryEntry.j
 import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
-import { EventTemplate } from "../../EventTemplate.js";
+import { MessageTemplate } from "../../MessageTemplate.js";
 import { GeneratedSourceFileWithHistory } from "../../viewProviders/history/types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getGenCommitMessageArgs } from "./getGenCommitMessageArgs.js";
@@ -83,7 +83,7 @@ export class HistoryEntryPanel extends UIPanel {
     }
   }
 
-  async onMessage(message: EventTemplate) {
+  async onMessage(message: MessageTemplate) {
     switch (message.type) {
       case "generateCommitMessage": {
         const incomingMessage = message as GenerateCommitMessageEvent;

@@ -1,3 +1,3 @@
-import { EventTemplate } from "./EventTemplate.js";
+import { MessageTemplate } from "./MessageTemplate.js";
 
-export type MessageHandler = (message: EventTemplate<string, unknown>) => void;
+export type MessageHandler = (message: MessageTemplate<string, unknown>) => void;

@@ -1,4 +1,4 @@
-import { EventTemplate } from "./EventTemplate.js";
+import { MessageTemplate } from "./MessageTemplate.js";
 import * as vscode from "vscode";
 
 export type WebviewOptions = {
@@ -10,6 +10,6 @@ export type UIContainer = {
   webviewReadyEvent: () => Promise<void>;
   webviewReadyPromiseResolve: () => void;
   navigationPromiseResolvers: Map<string, () => void>;
-  onMessage: (message: EventTemplate) => void;
+  onMessage: (message: MessageTemplate) => void;
   getWebview(): vscode.Webview | undefined;
 };

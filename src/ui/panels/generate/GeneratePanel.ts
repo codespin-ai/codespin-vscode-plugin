@@ -1,26 +1,25 @@
 import { EventEmitter } from "events";
 import * as path from "path";
 import * as vscode from "vscode";
+import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
+import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
 import { editAnthropicConfig } from "../../../settings/provider/editAnthropicConfig.js";
 import { editOpenAIConfig } from "../../../settings/provider/editOpenAIConfig.js";
 import {
   EditAnthropicConfigEvent,
   EditOpenAIConfigEvent,
 } from "../../../settings/provider/types.js";
-import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
-import { initialize } from "../../../settings/initialize.js";
-import { isInitialized } from "../../../settings/isInitialized.js";
-import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
 import { getUIProps } from "../../../settings/ui/getUIProps.js";
 import { saveUIProps } from "../../../settings/ui/saveUIProps.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
-import { EventTemplate } from "../../EventTemplate.js";
+import { MessageTemplate } from "../../MessageTemplate.js";
 import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
 import { navigateTo } from "../../navigateTo.js";
 import { UIPanel } from "../UIPanel.js";
 import { addDeps } from "./addDeps.js";
 import { copyToClipboard } from "./copyToClipboard.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
+import { getMessageBroker } from "./getMessageBroker.js";
 import { getPageArgs } from "./getPageArgs.js";
 import { invokeGeneration } from "./invokeGenerate.js";
 import {
@@ -48,12 +47,16 @@ export class GeneratePanel extends UIPanel {
   userInput: GenerateEvent | undefined;
   dirName: string | undefined = undefined;
   cancelGeneration: (() => void) | undefined;
+  messageBroker: ReturnType<typeof getMessageBroker>;
 
   constructor(
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
     super({}, context, globalEventEmitter);
+
+    const workspaceRoot = getWorkspaceRoot(context);
+    this.messageBroker = getMessageBroker(this, workspaceRoot);
   }
 
   async init(initArgs: InitArgs) {
@@ -75,12 +78,12 @@ export class GeneratePanel extends UIPanel {
     await navigateTo(this, "/generate", generatePageArgs);
   }
 
-  async onMessage(message: EventTemplate) {
+  async onMessage(request: MessageTemplate) {
     const workspaceRoot = getWorkspaceRoot(this.context);
 
-    switch (message.type) {
+    switch (request.type) {
       case "addDeps":
-        await addDeps(this, message as AddDepsEvent, workspaceRoot);
+        await addDeps(this, request as AddDepsEvent, workspaceRoot);
         break;
       case "copyToClipboard": {
         if (this.dirName === undefined) {
@@ -88,7 +91,7 @@ export class GeneratePanel extends UIPanel {
         }
 
         await copyToClipboard(
-          message as CopyToClipboardEvent,
+          request as CopyToClipboardEvent,
           this.dirName,
           workspaceRoot
         );
@@ -101,7 +104,7 @@ export class GeneratePanel extends UIPanel {
         break;
       }
       case "generate": {
-        this.userInput = message as GenerateEvent;
+        this.userInput = request as GenerateEvent;
 
         if (this.dirName === undefined) {
           this.dirName = Date.now().toString();
@@ -139,24 +142,24 @@ export class GeneratePanel extends UIPanel {
         break;
       }
       case "editAnthropicConfig": {
-        await editAnthropicConfig(message as EditAnthropicConfigEvent);
+        await editAnthropicConfig(request as EditAnthropicConfigEvent);
         await this.onMessage(this.userInput!);
         break;
       }
       case "editOpenAIConfig": {
-        await editOpenAIConfig(message as EditOpenAIConfigEvent);
+        await editOpenAIConfig(request as EditOpenAIConfigEvent);
         await this.onMessage(this.userInput!);
         break;
       }
       case "modelChange": {
         await setDefaultModel(
-          (message as ModelChangeEvent).model,
+          (request as ModelChangeEvent).model,
           workspaceRoot
         );
         break;
       }
       case "uiPropsUpdate": {
-        const event = message as UIPropsUpdateEvent;
+        const event = request as UIPropsUpdateEvent;
         saveUIProps(
           {
             promptTextAreaHeight: event.promptTextAreaHeight,
@@ -169,7 +172,7 @@ export class GeneratePanel extends UIPanel {
       case "openFile": {
         const filePath = path.resolve(
           workspaceRoot,
-          (message as OpenFileEvent).file
+          (request as OpenFileEvent).file
         );
         const uri = vscode.Uri.file(filePath);
         vscode.window.showTextDocument(uri, {

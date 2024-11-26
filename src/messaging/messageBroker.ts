@@ -1,98 +1,97 @@
-export type EventHandler<TPayload, TResponse> = (
-  payload: TPayload
-) => Promise<TResponse>;
+export type RequestHandler<TParameters, TResult> = (
+  parameters: TParameters
+) => Promise<TResult>;
 
-export type EventHandlerMap = {
-  [event: string]: {
-    payload: any;
-    response: any;
-  };
+export type HandlerParameters<P, R> = {
+  parameters: P;
+  result: R;
 };
 
-type AttachHandlerFunction<
-  TEvents extends EventHandlerMap,
-  TMessageEvent extends { data: Message<any> }
-> = <K extends string, P, R>(
-  event: K,
-  handler: EventHandler<P, R>
-) => MessageBroker<
-  TEvents & { [key in K]: { payload: P; response: R } },
-  TMessageEvent
->;
+type AttachHandlerFunction<TRequestMap> = <K extends string, P, R>(
+  type: K,
+  handler: RequestHandler<P, R>
+) => MessageBroker<TRequestMap & { [key in K]: HandlerParameters<P, R> }>;
 
-// Structure for the message we receive and send
-export interface Message<TPayload> {
+// Structure for the request we receive, now typed by the request map
+export interface Request<
+  TRequestMap extends Record<string, HandlerParameters<any, any>>,
+  K extends Extract<keyof TRequestMap, string>
+> {
   id: string; // Unique ID to match requests and responses
-  event: string; // Event type
-  payload: TPayload; // Payload to be passed to the handler
+  type: K; // Request type
+  parameters: TRequestMap[K]["parameters"]; // Parameters tied to specific request type
 }
 
-export interface ResponseMessage<TResponse> {
+// Structure for the response sent back, typed by the result of the request
+export interface Response<
+  TRequestMap extends Record<string, HandlerParameters<any, any>>,
+  K extends Extract<keyof TRequestMap, string>
+> {
   id: string; // Same unique ID to respond back to the correct request
-  response: TResponse; // Handler's response
+  result: TRequestMap[K]["result"]; // Result tied to the specific request's result
 }
 
 export interface MessageBroker<
-  TEvents extends EventHandlerMap,
-  TMessageEvent extends { data: Message<any> } = any
+  TRequestMap extends Record<string, HandlerParameters<any, any>>
 > {
-  attachHandler: AttachHandlerFunction<TEvents, TMessageEvent>;
-  onMessage: (event: TMessageEvent) => void;
+  attachHandler: AttachHandlerFunction<TRequestMap>;
+  handleRequest: <K extends Extract<keyof TRequestMap, string>>(
+    request: Request<TRequestMap, K>
+  ) => void;
 }
 
 export function createMessageBroker<
-  TEvents extends EventHandlerMap,
-  TMessageEvent extends { data: any },
+  TRequestMap extends Record<string, HandlerParameters<any, any>>,
   TResponse
 >(
-  postMessage: (message: any) => void,
-  _eventHandlers?: Map<string, EventHandler<any, any>>
-): MessageBroker<TEvents, TMessageEvent> {
-  // State to store event handlers
-  const eventHandlers: Map<string, EventHandler<any, any>> = _eventHandlers ??
-  new Map();
-
-  // The attachHandler function adds event handlers and updates the broker's types
-  const attachHandler: AttachHandlerFunction<TEvents, TMessageEvent> = <
+  requestHandlers: Map<string, RequestHandler<any, any>> = new Map()
+): MessageBroker<TRequestMap> {
+  // The attachHandler function adds request handlers and updates the broker's types
+  const attachHandler: AttachHandlerFunction<TRequestMap> = <
     K extends string,
     P,
     R
   >(
-    event: K,
-    handler: EventHandler<P, R>
+    type: K,
+    handler: RequestHandler<P, R>
   ) => {
-    eventHandlers.set(event, handler);
-    // Return a new broker instance with extended types (previous events + new event)
+    requestHandlers.set(type, handler);
+    // Return a new broker instance with extended types (previous request types + new request type)
     return createMessageBroker<
-      TEvents & { [key in K]: { payload: P; response: R } },
-      TMessageEvent,
+      TRequestMap & { [key in K]: { parameters: P; result: R } },
       TResponse
-    >(postMessage, eventHandlers);
+    >(requestHandlers);
   };
 
-  async function onMessage(event: TMessageEvent) {
-    const { id, event: eventType, payload } = event.data as Message<any>;
+  async function handleRequest<K extends Extract<keyof TRequestMap, string>>(
+    request: Request<TRequestMap, K>
+  ) {
+    const { id, type, parameters } = request;
 
-    // Check if a handler exists for this event
-    const handler = eventHandlers.get(eventType);
+    // Check if a handler exists for this request type
+    const handler = requestHandlers.get(type);
 
     if (handler) {
       // Call the handler with the unwrapped payload
-      const response = await handler(payload);
+      const handlerResult = await handler(parameters);
 
-      // Send the response back, wrapping it in the ResponseMessage structure
-      const responseMessage: ResponseMessage<any> = {
-        id: id + "-response", // Use the same ID to match the original request
-        response,
+      // Send the response back, wrapping it in the Response structure
+      const response: Response<TRequestMap, K> = {
+        id, // Use the same ID to match the original request
+        result: handlerResult,
       };
 
-      postMessage(responseMessage);
+      return response;
     }
   }
 
   // Return the broker with attachHandler, startListening, and stopListening methods
   return {
     attachHandler,
-    onMessage,
+    handleRequest,
   };
 }
+
+export type BrokerType<
+  TGetBroker extends (...params: any[]) => MessageBroker<any>
+> = ReturnType<TGetBroker> extends MessageBroker<infer T> ? T : never;

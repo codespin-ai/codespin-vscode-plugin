@@ -9,14 +9,13 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
+import { createMessageBrokerClient } from "../../../../messaging/messageBrokerClient.js";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
 import {
   AddDepsEvent,
-  CopyToClipboardEvent,
   GenerateEvent,
   IncludeFilesEvent,
-  ModelChangeEvent,
   OpenFileEvent,
   UIPropsUpdateEvent
 } from "../../../panels/generate/types.js";
@@ -24,21 +23,6 @@ import { CSFormField } from "../../components/CSFormField.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
 import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
-
-const promptSuffix = `
-When you generate a file, it should start with:
-
-  File path:./src/handlers/keepalive.ts
-  ^ showing the path to the project root.
-  Immediately followed by a code block contain the file content
-
-  example:
-  File path:./src/handlers/keepalive.ts
-  \`\`\`ts
-  code goes here...
-  \`\`\`
-
-The project root is "/home/john/project/sheep" but that's not relevant.`;
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -63,6 +47,12 @@ export function Generate() {
   );
 
   const [showCopied, setShowCopied] = useState(false);
+
+  const messageBrokerClient = createMessageBrokerClient(
+    (message: unknown) => {
+      vsCodeApi.postMessage(message);
+    }
+  );
 
   useEffect(() => {
     if (files.length >= 1) {
@@ -128,26 +118,28 @@ export function Generate() {
 
   function onModelChange(e: React.ChangeEvent<Dropdown>) {
     setModel(e.target.value);
-    const modelChangeMessage: ModelChangeEvent = {
-      type: "modelChange",
+
+    const modelChangeMessage = {
+      type: "modelChange" as const,
       model: e.target.value,
     };
-    vsCodeApi.postMessage(modelChangeMessage);
+
+    messageBrokerClient.send("modelChange", modelChangeMessage);
   }
 
   function onGenerateButtonClick() {
     generate({});
   }
 
-  function copyToClipboard() {
-    const message: CopyToClipboardEvent = {
-      type: "copyToClipboard",
+  async function copyToClipboard() {
+    const message = {
+      type: "copyToClipboard" as const,
       includedFiles: files,
       prompt,
       codingConvention,
     };
 
-    vsCodeApi.postMessage(message);
+    await messageBrokerClient.send("copyToClipboard", message);
 
     setShowCopied(true);
     setTimeout(() => {

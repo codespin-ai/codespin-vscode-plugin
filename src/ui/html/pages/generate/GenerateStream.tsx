@@ -5,7 +5,7 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
-import { EventTemplate } from "../../../EventTemplate.js";
+import { MessageTemplate } from "../../../MessageTemplate.js";
 import {
   PromptCreatedEvent,
   ResponseStreamEvent,
@@ -25,7 +25,7 @@ export function GenerateStream() {
   const [prompt, setPrompt] = React.useState("");
 
   React.useEffect(() => {
-    function listeners(event: MessageEvent<EventTemplate>) {
+    function listeners(event: MessageEvent<MessageTemplate>) {
       const incomingMessage = event.data;
       switch (incomingMessage.type) {
         case "promptCreated":
