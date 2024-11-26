@@ -4,13 +4,12 @@ import {
   VSCodeProgressRing,
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
-import { EventTemplate } from "../../../EventTemplate.js";
-import {
-  PromptCreatedEvent,
-  ResponseStreamEvent,
-} from "../../../panels/generate/types.js";
-import { CSFormField } from "../../components/CSFormField.js";
+import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
+import { GeneratePanelBrokerType } from "../../../../panels/generate/getMessageBroker.js";
+import { CSFormField } from "../../../components/CSFormField.js";
+import { getMessageBroker } from "./getMessageBroker.js";
+import { BrowserEvent, MessageTemplate } from "../../../../types.js";
 
 type GenerateStreamArgs = {
   provider: string;
@@ -25,28 +24,33 @@ export function GenerateStream() {
   const [prompt, setPrompt] = React.useState("");
 
   React.useEffect(() => {
-    function listeners(event: MessageEvent<EventTemplate>) {
-      const incomingMessage = event.data;
-      switch (incomingMessage.type) {
-        case "promptCreated":
-          const { prompt } = incomingMessage as PromptCreatedEvent;
-          setPrompt(prompt);
-          return;
-        case "responseStream":
-          const { data: chunk } = incomingMessage as ResponseStreamEvent;
-          data = data + chunk;
-          setData(data);
-          setBytesReceived(data.length);
-          return;
+    const pageMessageBroker = getMessageBroker({
+      setPrompt,
+      setData,
+      setBytesReceived,
+    });
+
+    function listeners(event: BrowserEvent) {
+      const message = event.data;
+
+      if (pageMessageBroker.canHandle(message.type)) {
+        pageMessageBroker.handleRequest(message as any);
       }
     }
+
     window.addEventListener("message", listeners);
+
     getVSCodeApi().postMessage({ type: "webviewReady" });
+
     return () => window.removeEventListener("message", listeners);
   }, []);
 
   function cancel() {
-    getVSCodeApi().postMessage({ type: "cancel" });
+    const generatePanelMessageClient =
+      createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
+        getVSCodeApi().postMessage(message);
+      });
+    generatePanelMessageClient.send("cancel", undefined);
   }
 
   return (

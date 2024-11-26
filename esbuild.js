@@ -3,7 +3,7 @@ const { build } = require("esbuild");
 const baseConfig = {
   bundle: true,
   minify: process.env.NODE_ENV === "production",
-  sourcemap: process.env.NODE_ENV !== "production",
+  sourcemap: process.env.NODE_ENV !== "production" ? "inline" : false,
 };
 
 const extensionConfig = {

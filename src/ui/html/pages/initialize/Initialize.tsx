@@ -1,13 +1,13 @@
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
-import { EventTemplate } from "../../../EventTemplate.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
+import { MessageTemplate } from "../../../types.js";
 
 export function Initialize() {
   const vsCodeApi = getVSCodeApi();
 
   function initializeProject() {
-    const message: EventTemplate<"initialize"> = {
+    const message: MessageTemplate<"initialize"> = {
       type: "initialize",
     };
     vsCodeApi.postMessage(message);

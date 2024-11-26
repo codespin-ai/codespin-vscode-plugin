@@ -6,18 +6,20 @@ import {
 } from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useEffect, useState } from "react";
-import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
+import { GenerateUserInput } from "../../../../panels/generate/types.js";
 import {
   CommitEvent,
   GenerateCommitMessageEvent,
-  GeneratedCommitMessageEvent,
   RegenerateEvent,
-} from "../../../panels/historyEntry/types.js";
-import { CancelEvent } from "../../../types.js";
-import { FullHistoryEntry } from "../../../viewProviders/history/types.js";
-import { CSFormField } from "../../components/CSFormField.js";
-import { GenerateUserInput } from "../../../panels/generate/types.js";
-import { CodeSnippet } from "../../components/CodeSnippet.js";
+} from "../../../../panels/historyEntry/types.js";
+import { BrowserEvent, CancelEvent } from "../../../../types.js";
+import { FullHistoryEntry } from "../../../../viewProviders/history/types.js";
+import { CodeSnippet } from "../../../components/CodeSnippet.js";
+import { CSFormField } from "../../../components/CSFormField.js";
+import { getMessageBroker } from "./getMessageBroker.js";
+import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { HistoryEntryPanelBrokerType } from "../../../../panels/historyEntry/getMessageBroker.js";
 
 export type HistoryEntryPageFile = {
   filePath: string;
@@ -56,17 +58,24 @@ export function HistoryEntry() {
     return codegenUserInput;
   };
 
+  const historyEntryPanelMessageClient =
+    createMessageClient<HistoryEntryPanelBrokerType>((message: unknown) => {
+      getVSCodeApi().postMessage(message);
+    });
+
   const onEditClick = () => {
-    const generateCommandEvent: RegenerateEvent = {
+    const regenerateEvent: RegenerateEvent = {
       type: "regenerate",
       args: gatherArgsForRegenerateCommand(),
     };
-    getVSCodeApi().postMessage(generateCommandEvent);
+
+    historyEntryPanelMessageClient.send("regenerate", regenerateEvent);
 
     const cancelEvent: CancelEvent = {
       type: "cancel",
     };
-    getVSCodeApi().postMessage(cancelEvent);
+
+    historyEntryPanelMessageClient.send("cancel", cancelEvent);
   };
 
   const onGenerateCommitMessage = () => {
@@ -75,7 +84,8 @@ export function HistoryEntry() {
       prompt: args.entry.userInput.prompt,
       model: args.entry.userInput.model,
     };
-    getVSCodeApi().postMessage(message);
+
+    historyEntryPanelMessageClient.send("generateCommitMessage", message);
   };
 
   const onCommitClick = () => {
@@ -83,24 +93,28 @@ export function HistoryEntry() {
       type: "commit",
       message: commitMessage,
     };
-    getVSCodeApi().postMessage(message);
+
+    historyEntryPanelMessageClient.send("commit", message);
   };
 
   useEffect(() => {
-    const messageListener = (event: any) => {
-      if (event.data.type === "generatedCommitMessage") {
-        const incomingMessage: GeneratedCommitMessageEvent = event.data;
-        setCommitMessage(incomingMessage.message);
-        setShowCommitMessage(true);
-      } else if (event.data.type === "committed") {
-        setIsCommitted(true);
-      }
-    };
+    const historyEntryPageMessageBroker = getMessageBroker({
+      setCommitMessage,
+      setShowCommitMessage,
+      setIsCommitted,
+    });
 
-    window.addEventListener("message", messageListener);
+    function listener(event: BrowserEvent) {
+      const message = event.data;
+      if (historyEntryPageMessageBroker.canHandle(message.type)) {
+        historyEntryPageMessageBroker.handleRequest(message as any);
+      }
+    }
+
+    window.addEventListener("message", listener);
 
     return () => {
-      window.removeEventListener("message", messageListener);
+      window.removeEventListener("message", listener);
     };
   }, []);
 

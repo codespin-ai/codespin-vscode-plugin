@@ -3,12 +3,12 @@ import { getHistory } from "../../../settings/history/getHistory.js";
 import { initialize } from "../../../settings/initialize.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
-import { EventTemplate } from "../../EventTemplate.js";
 import { ViewProvider } from "../ViewProvider.js";
 import { HistoryPageArgs } from "../../html/pages/history/History.js";
 import { UpdateHistoryEvent } from "./types.js";
 import { EventEmitter } from "events";
 import { navigateTo } from "../../navigateTo.js";
+import { MessageTemplate } from "../../types.js";
 
 export class HistoryViewProvider extends ViewProvider {
   constructor(
@@ -24,9 +24,9 @@ export class HistoryViewProvider extends ViewProvider {
     await this.webviewReadyEvent();
   }
 
-  async onMessage(data: EventTemplate) {
+  async onMessage(message: MessageTemplate) {
     const workspaceRoot = getWorkspaceRoot(this.context);
-    switch (data.type) {
+    switch (message.type) {
       case "webviewReady": {
         const initialized = await isInitialized(workspaceRoot);
 
@@ -48,6 +48,7 @@ export class HistoryViewProvider extends ViewProvider {
         };
 
         const webview = this.getWebview();
+        
         if (webview) {
           webview.postMessage(updateHistoryEvent);
         }

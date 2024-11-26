@@ -11,34 +11,20 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
 import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
+import type { GeneratePanelBrokerType } from "../../../panels/generate/getMessageBroker.js";
 import {
   AddDepsEvent,
-  CopyToClipboardEvent,
   GenerateEvent,
-  IncludeFilesEvent,
-  ModelChangeEvent,
   OpenFileEvent,
-  UIPropsUpdateEvent
+  UIPropsUpdateEvent,
 } from "../../../panels/generate/types.js";
 import { CSFormField } from "../../components/CSFormField.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
 import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
-
-const promptSuffix = `
-When you generate a file, it should start with:
-
-  File path:./src/handlers/keepalive.ts
-  ^ showing the path to the project root.
-  Immediately followed by a code block contain the file content
-
-  example:
-  File path:./src/handlers/keepalive.ts
-  \`\`\`ts
-  code goes here...
-  \`\`\`
-
-The project root is "/home/john/project/sheep" but that's not relevant.`;
+import { getMessageBroker } from "./getMessageBroker.js";
+import { createMessageClient } from "../../../../messaging/messageClient.js";
+import { BrowserEvent } from "../../../types.js";
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -63,6 +49,11 @@ export function Generate() {
   );
 
   const [showCopied, setShowCopied] = useState(false);
+
+  const generatePanelMessageClient =
+    createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
+      vsCodeApi.postMessage(message);
+    });
 
   useEffect(() => {
     if (files.length >= 1) {
@@ -95,26 +86,13 @@ export function Generate() {
       setInitialWidth(promptTextArea.clientWidth);
     }
 
-    function listener(event: unknown) {
-      const message = (event as any).data;
-      switch (message.type) {
-        case "includeFiles":
-          setFiles((files) => {
-            const includeFilesMessage: IncludeFilesEvent = message;
+    const generatePageMessageBroker = getMessageBroker(setFiles);
 
-            const newFiles = includeFilesMessage.files.filter((x) =>
-              files.every((file) => file.path !== x.path)
-            );
+    function listener(event: BrowserEvent) {
+      const message = event.data;
 
-            return files.concat(
-              newFiles.map((file) => ({
-                path: file.path,
-                includeOption: "source",
-                size: file.size,
-              }))
-            );
-          });
-          break;
+      if (generatePageMessageBroker.canHandle(message.type)) {
+        generatePageMessageBroker.handleRequest(message as any);
       }
     }
 
@@ -128,26 +106,28 @@ export function Generate() {
 
   function onModelChange(e: React.ChangeEvent<Dropdown>) {
     setModel(e.target.value);
-    const modelChangeMessage: ModelChangeEvent = {
-      type: "modelChange",
+
+    const modelChangeMessage = {
+      type: "modelChange" as const,
       model: e.target.value,
     };
-    vsCodeApi.postMessage(modelChangeMessage);
+
+    generatePanelMessageClient.send("modelChange", modelChangeMessage);
   }
 
   function onGenerateButtonClick() {
     generate({});
   }
 
-  function copyToClipboard() {
-    const message: CopyToClipboardEvent = {
-      type: "copyToClipboard",
+  async function copyToClipboard() {
+    const message = {
+      type: "copyToClipboard" as const,
       includedFiles: files,
       prompt,
       codingConvention,
     };
 
-    vsCodeApi.postMessage(message);
+    generatePanelMessageClient.send("copyToClipboard", message);
 
     setShowCopied(true);
     setTimeout(() => {
@@ -173,7 +153,8 @@ export function Generate() {
       codingConvention,
       ...args,
     };
-    vsCodeApi.postMessage(message);
+
+    generatePanelMessageClient.send("generate", message);
 
     const promptTextArea =
       promptRef.current!.shadowRoot!.querySelector("textarea")!;
@@ -187,7 +168,7 @@ export function Generate() {
         promptTextAreaWidth: promptTextArea.clientWidth,
       };
 
-      vsCodeApi.postMessage(uiPropsUpdate);
+      generatePanelMessageClient.send("uiPropsUpdate", uiPropsUpdate);
     }
   }
 
@@ -201,7 +182,7 @@ export function Generate() {
       file: filePath,
       model,
     };
-    vsCodeApi.postMessage(message);
+    generatePanelMessageClient.send("addDeps", message);
   }
 
   function onFileClick(filePath: string) {
@@ -209,7 +190,7 @@ export function Generate() {
       type: "openFile",
       file: filePath,
     };
-    vsCodeApi.postMessage(message);
+    generatePanelMessageClient.send("openFile", message);
   }
 
   function getTotalFileSize(): number {

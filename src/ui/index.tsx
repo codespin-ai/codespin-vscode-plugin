@@ -4,20 +4,22 @@ import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
 import { getVSCodeApi } from "../vscode/getVSCodeApi.js";
 import { Generate } from "./html/pages/generate/Generate.js";
-import { GenerateStream } from "./html/pages/generate/GenerateStream.js";
-import { EditConfig } from "./html/pages/provider/EditConfig.js";
-import { HistoryEntry } from "./html/pages/history/HistoryEntry.js";
-import { Initialize } from "./html/pages/initialize/Initialize.js";
+import { GenerateStream } from "./html/pages/generate/invoke/GenerateStream.js";
+import { HistoryEntry } from "./html/pages/history/entry/HistoryEntry.js";
 import { History } from "./html/pages/history/History.js";
-import { NavigateEvent } from "./types.js";
+import { Initialize } from "./html/pages/initialize/Initialize.js";
+import { EditConfig } from "./html/pages/provider/EditConfig.js";
+import { BrowserEvent, NavigateEvent } from "./types.js";
 
 function App() {
+  console.log("CodeSpin.AI extension started.");
   React.useEffect(() => {
-    function listeners(event: unknown) {
-      const incomingMessage = (event as any).data;
-      switch (incomingMessage.type) {
+    function listeners(event: BrowserEvent) {
+      const message = event.data;
+
+      switch (message.type) {
         case "navigate":
-          const eventArgs = incomingMessage as NavigateEvent;
+          const eventArgs = message as NavigateEvent;
           navigate(eventArgs.url, { state: eventArgs.state });
           getVSCodeApi().postMessage({
             type: "navigated",
@@ -26,7 +28,9 @@ function App() {
       }
     }
     window.addEventListener("message", listeners);
+
     getVSCodeApi().postMessage({ type: "webviewReady" });
+
     return () => window.removeEventListener("message", listeners);
   }, []);
 
