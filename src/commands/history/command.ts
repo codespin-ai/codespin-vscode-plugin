@@ -19,10 +19,6 @@ export function getSelectHistoryEntryCommand(
   return async function selectHistoryItemCommand(
     args: SelectHistoryEntryArgs
   ): Promise<void> {
-    if (!(await validateConfig(context))) {
-      return;
-    }
-
     if (!args.itemId) {
       vscode.window.showErrorMessage("No history item ID provided.");
       return;

@@ -1,15 +1,14 @@
-import * as path from "path";
 import { promises as fs } from "fs";
+import * as path from "path";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
-import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { GeneratePanel } from "./GeneratePanel.js";
 import { IncludeFilesEvent } from "./types.js";
 
 export async function includeFiles(
   generatePanel: GeneratePanel,
-  filePaths: string[]
+  filePaths: string[],
+  workspaceRoot: string
 ) {
-  const workspaceRoot = getWorkspaceRoot(generatePanel.context);
   const allPaths = await getFilesRecursive(filePaths, workspaceRoot);
 
   const message: IncludeFilesEvent = {
@@ -21,5 +20,6 @@ export async function includeFiles(
       }))
     ),
   };
+
   generatePanel.panel.webview.postMessage(message);
 }

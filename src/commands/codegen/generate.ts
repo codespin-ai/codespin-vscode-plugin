@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import { GeneratePanel } from "../../ui/panels/generate/GeneratePanel.js";
 import { EventEmitter } from "events";
 import { validateConfig } from "../../config/validateConfig.js";
+import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 
 export function getGenerateCommand(
   context: vscode.ExtensionContext,
@@ -11,7 +12,9 @@ export function getGenerateCommand(
     _: unknown,
     args: vscode.Uri[]
   ): Promise<void> {
-    if (!(await validateConfig(context))) {
+    const workspaceRoot = await getWorkspaceRoot(context);
+
+    if (!(await validateConfig(workspaceRoot))) {
       return;
     }
 

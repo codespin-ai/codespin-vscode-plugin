@@ -32,6 +32,7 @@ export async function addDeps(
             return fileExists ? fullPath : undefined;
           })
       )
-    ).filter(Boolean) as string[]
+    ).filter(Boolean) as string[],
+    workspaceRoot
   );
 }

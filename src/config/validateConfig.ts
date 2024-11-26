@@ -1,15 +1,10 @@
-import * as vscode from "vscode";
-import { initialize } from "../settings/initialize.js";
-import { getWorkspaceRoot } from "../vscode/getWorkspaceRoot.js";
 import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
 import { TypedError } from "codespin/dist/TypedError.js";
+import * as vscode from "vscode";
+import { initialize } from "../settings/initialize.js";
 import { isInitialized } from "../settings/isInitialized.js";
 
-export async function validateConfig(
-  context: vscode.ExtensionContext
-): Promise<boolean> {
-  const workspaceRoot = await getWorkspaceRoot(context);
-
+export async function validateConfig(workspaceRoot: string): Promise<boolean> {
   if (await isInitialized(workspaceRoot)) {
     try {
       await readCodeSpinConfig(undefined, workspaceRoot);
