@@ -127,7 +127,7 @@ export function Generate() {
       codingConvention,
     };
 
-    await generatePanelMessageClient.send("copyToClipboard", message);
+    generatePanelMessageClient.send("copyToClipboard", message);
 
     setShowCopied(true);
     setTimeout(() => {

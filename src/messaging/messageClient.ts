@@ -13,6 +13,10 @@ export interface MessageClient<
   send<K extends keyof TRequestMap>(
     type: K,
     parameters: TRequestMap[K]["parameters"]
+  ): void;
+  wait<K extends keyof TRequestMap>(
+    type: K,
+    parameters: TRequestMap[K]["parameters"]
   ): Promise<TRequestMap[K]["result"]>;
   onResponse: <K extends keyof TRequestMap>(
     response: Response<TRequestMap, K>
@@ -35,6 +39,14 @@ export function createMessageClient<
   const generateSequentialId = () => `${uniquePrefix}-${currentId++}`;
 
   const send = <K extends keyof TRequestMap>(
+    type: K,
+    parameters: TRequestMap[K]["parameters"]
+  ): void => {
+    const id = generateSequentialId();
+    sendRequest({ id, type, parameters });
+  };
+
+  const wait = <K extends keyof TRequestMap>(
     type: K,
     parameters: TRequestMap[K]["parameters"]
   ): Promise<TRequestMap[K]["result"]> => {
@@ -60,5 +72,5 @@ export function createMessageClient<
     }
   }
 
-  return { send, onResponse };
+  return { send, wait, onResponse };
 }
