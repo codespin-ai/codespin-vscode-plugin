@@ -16,7 +16,7 @@ type GenerateStreamArgs = {
   model: string;
 };
 
-export function GenerateStream() {
+export function Chat() {
   const args: GenerateStreamArgs = history.state;
 
   const [bytesReceived, setBytesReceived] = React.useState(0);

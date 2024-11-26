@@ -11,7 +11,7 @@ import { navigateTo } from "../../navigateTo.js";
 import { GeneratePanel } from "./GeneratePanel.js";
 import { PromptCreatedEvent, ResponseStreamEvent } from "./types.js";
 import { createMessageClient } from "../../../messaging/messageClient.js";
-import { InvokePageBrokerType } from "../../html/pages/generate/invoke/getMessageBroker.js";
+import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
@@ -45,7 +45,7 @@ export async function invokeGeneration(
     workspaceRoot
   );
 
-  await navigateTo(generatePanel, `/generate/invoke`, {
+  await navigateTo(generatePanel, `/generate/chat`, {
     model: argsForGeneration.args.model,
   });
 
