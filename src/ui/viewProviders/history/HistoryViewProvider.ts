@@ -48,6 +48,7 @@ export class HistoryViewProvider extends ViewProvider {
         };
 
         const webview = this.getWebview();
+        
         if (webview) {
           webview.postMessage(updateHistoryEvent);
         }
