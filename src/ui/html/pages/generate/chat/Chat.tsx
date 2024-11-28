@@ -7,41 +7,54 @@ import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { GeneratePanelBrokerType } from "../../../../panels/generate/getMessageBroker.js";
 import { BrowserEvent } from "../../../../types.js";
+import { ContentBlock } from "./ContentBlock.js";
+import { handleStreamingResult } from "./fileStreamProcessor.js"; // Import processing functions
 import { getMessageBroker } from "./getMessageBroker.js";
-import { GenerateEvent } from "../../../../panels/generate/types.js";
 
 type GenerateStreamArgs = {
   provider: string;
   model: string;
 };
 
+type ContentBlock = {
+  id: string;
+  type: "file" | "text" | "html";
+  content: string;
+  path?: string;
+};
+
 type Message = {
   role: "user" | "assistant";
-  content: string;
+  content: ContentBlock[];
 };
 
 export function Chat() {
   const args: GenerateStreamArgs = history.state;
 
   const [messages, setMessages] = React.useState<Message[]>([]);
-  const [currentMessage, setCurrentMessage] = React.useState("");
+  const [currentBlock, setCurrentBlock] = React.useState<ContentBlock | null>(
+    null
+  );
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [newMessage, setNewMessage] = React.useState("");
-  const [bytesReceived, setBytesReceived] = React.useState(0);
   const chatEndRef = React.useRef<HTMLDivElement>(null);
+
+  const generateBlockId = () => Math.random().toString(36).substr(2, 9);
 
   React.useEffect(() => {
     const pageMessageBroker = getMessageBroker({
-      setCurrentMessage: (fullResponse: string) => {
-        setCurrentMessage(fullResponse);
-      },
-      setBytesReceived,
       setIsGenerating,
+      onFileResult: (result) =>
+        handleStreamingResult(result, {
+          currentBlock,
+          setCurrentBlock,
+          setMessages,
+          generateBlockId,
+        }), // Delegate handling to the utility function
     });
 
     function listeners(event: BrowserEvent) {
       const message = event.data;
-
       if (pageMessageBroker.canHandle(message.type)) {
         pageMessageBroker.handleRequest(message as any);
       }
@@ -51,36 +64,35 @@ export function Chat() {
     getVSCodeApi().postMessage({ type: "webviewReady" });
 
     return () => window.removeEventListener("message", listeners);
-  }, []);
+  }, [currentBlock]);
 
-  // When streaming stops, add the complete message to chat history
-  React.useEffect(() => {
-    if (!isGenerating && currentMessage) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: currentMessage },
-      ]);
-      setCurrentMessage("");
-    }
-  }, [isGenerating]);
-
-  // Auto-scroll to bottom when messages change
   React.useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, currentMessage]);
+  }, [messages]);
 
   function sendMessage() {
     if (!newMessage.trim() || isGenerating) return;
 
-    // Add user message to chat
-    setMessages((prev) => [...prev, { role: "user", content: newMessage }]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "user",
+        content: [
+          {
+            id: generateBlockId(),
+            type: "text",
+            content: newMessage,
+          },
+        ],
+      },
+    ]);
 
     const generatePanelMessageClient =
       createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
         getVSCodeApi().postMessage(message);
       });
 
-    const generateEvent: GenerateEvent = {
+    const generateEvent = {
       type: "generate",
       model: args.model,
       prompt: newMessage,
@@ -92,13 +104,9 @@ export function Chat() {
     setNewMessage("");
   }
 
-  function cancel() {
-    const generatePanelMessageClient =
-      createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
-        getVSCodeApi().postMessage(message);
-      });
-    generatePanelMessageClient.send("cancel", undefined);
-  }
+  const renderBlock = (block: ContentBlock) => {
+    return <ContentBlock key={block.id} block={block} />;
+  };
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -106,11 +114,6 @@ export function Chat() {
         <h2>
           Chat ({args.provider}:{args.model})
         </h2>
-        {isGenerating && (
-          <div style={{ marginBottom: "1em" }}>
-            <VSCodeButton onClick={cancel}>Cancel</VSCodeButton>
-          </div>
-        )}
       </div>
 
       <div
@@ -127,55 +130,27 @@ export function Chat() {
           <div
             key={index}
             style={{
-              backgroundColor:
-                message.role === "assistant"
-                  ? "var(--vscode-editor-background)"
-                  : "var(--vscode-button-background)",
-              padding: "1em",
-              borderRadius: "8px",
-              maxWidth: "80%",
+              display: "flex",
+              flexDirection: "column",
               alignSelf:
                 message.role === "assistant" ? "flex-start" : "flex-end",
-              border: "1px solid var(--vscode-panel-border)",
+              maxWidth: "80%",
             }}
           >
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                margin: 0,
-                fontFamily: "var(--vscode-editor-font-family)",
-                color:
-                  message.role === "user"
-                    ? "var(--vscode-button-foreground)"
-                    : "var(--vscode-editor-foreground)",
-              }}
-            >
-              {message.content}
-            </pre>
+            {message.content.map(renderBlock)}
           </div>
         ))}
 
-        {isGenerating && currentMessage && (
+        {currentBlock && (
           <div
             style={{
-              backgroundColor: "var(--vscode-editor-background)",
-              padding: "1em",
-              borderRadius: "8px",
-              maxWidth: "80%",
+              display: "flex",
+              flexDirection: "column",
               alignSelf: "flex-start",
-              border: "1px solid var(--vscode-panel-border)",
+              maxWidth: "80%",
             }}
           >
-            <pre
-              style={{
-                whiteSpace: "pre-wrap",
-                margin: 0,
-                fontFamily: "var(--vscode-editor-font-family)",
-                color: "var(--vscode-editor-foreground)",
-              }}
-            >
-              {currentMessage}
-            </pre>
+            {renderBlock(currentBlock)}
           </div>
         )}
         <div ref={chatEndRef} />

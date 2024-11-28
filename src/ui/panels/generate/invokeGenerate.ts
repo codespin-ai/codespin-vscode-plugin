@@ -17,6 +17,7 @@ import {
 import { createMessageClient } from "../../../messaging/messageClient.js";
 import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
+import { processStreamingFileParseResult } from "./processStreamingFileParseResult.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
@@ -86,7 +87,7 @@ export async function invokeGeneration(
     invokePageMessageClient.send("responseStream", responseStreamEvent);
   };
 
-  argsForGeneration.args.fileResultStreamCallback = (
+  argsForGeneration.args.fileResultStreamCallback = async (
     data: StreamingFileParseResult
   ) => {
     const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
@@ -97,8 +98,10 @@ export async function invokeGeneration(
 
     const responseStreamEvent: FileResultStreamEvent = {
       type: "fileResultStream",
-      data,
+      data: await processStreamingFileParseResult(data),
     };
+
+    console.log(JSON.stringify(responseStreamEvent, null, 2));
 
     invokePageMessageClient.send("fileResultStream", responseStreamEvent);
   };

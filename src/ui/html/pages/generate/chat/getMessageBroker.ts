@@ -4,44 +4,36 @@ import {
 } from "../../../../../messaging/messageBroker.js";
 import {
   FileResultStreamEvent,
+  ProcessedStreamingFileParseResult,
   PromptCreatedEvent,
   ResponseStreamEvent,
 } from "../../../../panels/generate/types.js";
 
 export function getMessageBroker({
-  setCurrentMessage,
-  setBytesReceived,
   setIsGenerating,
+  onFileResult,
 }: {
-  setCurrentMessage: (value: string) => void;
-  setBytesReceived: (value: React.SetStateAction<number>) => void;
   setIsGenerating: (value: boolean) => void;
+  onFileResult: (result: ProcessedStreamingFileParseResult) => void;
 }) {
-  let accumulatedResponse = "";
-
   return createMessageBroker()
     .attachHandler("promptCreated", async (message: PromptCreatedEvent) => {
-      // Reset accumulated response when new prompt starts
-      accumulatedResponse = "";
-      setCurrentMessage("");
-      setBytesReceived(0);
       setIsGenerating(true);
     })
     .attachHandler("responseStream", async (message: ResponseStreamEvent) => {
-      const { data: chunk } = message;
-      accumulatedResponse += chunk;
-      setCurrentMessage(accumulatedResponse);
-      setBytesReceived(accumulatedResponse.length);
+      onFileResult({
+        type: "text",
+        content: message.data,
+      });
     })
-    .attachHandler("fileResultStream", async (message: FileResultStreamEvent) => {
-      // FIXME
-    })
-
+    .attachHandler(
+      "fileResultStream",
+      async (message: FileResultStreamEvent) => {
+        onFileResult(message.data);
+      }
+    )
     .attachHandler("done", async () => {
       setIsGenerating(false);
-      // Final accumulated response is already set via responseStream
-      // Reset for next message
-      accumulatedResponse = "";
     });
 }
 
