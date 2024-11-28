@@ -1,21 +1,16 @@
 import * as React from "react";
-
-type ContentBlock = {
-  id: string;
-  type: "file" | "text" | "html";
-  content: string;
-  path?: string;
-};
+import { ContentItem } from "./types.js";
 
 type Props = {
-  block: ContentBlock;
+  block: ContentItem;
 };
 
 export function ContentBlock({ block }: Props) {
   switch (block.type) {
-    case "file":
+    case "file-heading":
       return (
         <div
+          data-block-type="file"
           style={{
             backgroundColor: "var(--vscode-editor-background)",
             padding: "1em",
@@ -45,9 +40,10 @@ export function ContentBlock({ block }: Props) {
         </div>
       );
 
-    case "html":
+    case "code":
       return (
         <div
+          data-block-type="html"
           style={{
             backgroundColor: "var(--vscode-editor-background)",
             padding: "1em",
@@ -55,8 +51,6 @@ export function ContentBlock({ block }: Props) {
             marginBottom: "1em",
             border: "1px solid var(--vscode-panel-border)",
           }}
-          // Since we're ignoring markdown, html blocks are treated as text
-          // If you later decide to handle HTML, ensure it's sanitized
           dangerouslySetInnerHTML={{ __html: block.content }}
         />
       );
@@ -65,6 +59,7 @@ export function ContentBlock({ block }: Props) {
     default:
       return (
         <div
+          data-block-type="text"
           style={{
             backgroundColor: "var(--vscode-editor-background)",
             padding: "1em",

@@ -1,18 +1,9 @@
-type ContentBlock = {
-  id: string;
-  type: "file" | "text" | "html";
-  content: string;
-  path?: string;
-};
+import { ContentItem, Message } from "./types.js";
 
-type Message = {
-  role: "user" | "assistant";
-  content: ContentBlock[];
-};
 
 type FileBlockProcessorArgs = {
-  currentBlock: ContentBlock | null;
-  setCurrentBlock: React.Dispatch<React.SetStateAction<ContentBlock | null>>;
+  currentBlock: ContentItem | null;
+  setCurrentBlock: React.Dispatch<React.SetStateAction<ContentItem | null>>;
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
   generateBlockId: () => string;
 };
@@ -40,25 +31,19 @@ function finalizeCurrentBlock(args: FileBlockProcessorArgs) {
 export function appendText(content: string, args: FileBlockProcessorArgs) {
   const { currentBlock, setCurrentBlock, generateBlockId } = args;
 
-  if (currentBlock) {
-    // Append to "text" or "file" blocks
-    if (currentBlock.type === "text" || currentBlock.type === "file") {
-      setCurrentBlock({
-        ...currentBlock,
-        content: currentBlock.content + content,
-      });
-      return;
-    }
-
-    // If the current block is not "text" or "file", finalize it
+  if (currentBlock && currentBlock.type !== "text") {
+    // Finalize current block if it's not a text block
     finalizeCurrentBlock(args);
   }
 
-  // Start a new "text" block if no current block exists
-  setCurrentBlock({
-    id: generateBlockId(),
-    type: "text",
-    content,
+  setCurrentBlock((prev) => {
+    return prev && prev.type === "text"
+      ? { ...prev, content: prev.content + content }
+      : {
+          id: generateBlockId(),
+          type: "text",
+          content,
+        };
   });
 }
 
@@ -71,7 +56,7 @@ export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
   const { setCurrentBlock, generateBlockId } = args;
   setCurrentBlock({
     id: generateBlockId(),
-    type: "file",
+    type: "file-heading",
     content: "",
     path,
   });
@@ -86,15 +71,14 @@ export function endFileBlock(
 ) {
   const { currentBlock, setMessages, setCurrentBlock, generateBlockId } = args;
 
-  if (currentBlock && currentBlock.type === "file") {
-    const htmlBlock: ContentBlock = {
+  if (currentBlock && currentBlock.type === "file-heading") {
+    const htmlBlock: ContentItem = {
       id: generateBlockId(),
-      type: "html",
+      type: "code",
       content: htmlContent,
       path: currentBlock.path,
     };
 
-    // Add the HTML block to messages
     setMessages((prevMessages) => [
       ...prevMessages,
       {
@@ -107,9 +91,9 @@ export function endFileBlock(
 }
 
 /**
- * Replaces the current block with a markdown (HTML) block.
+ * Handles a markdown block, finalizing the current block and replacing it.
  */
-export function replaceWithMarkdownBlock(
+export function handleMarkdownBlock(
   markdownContent: string,
   args: FileBlockProcessorArgs
 ) {
@@ -118,7 +102,7 @@ export function replaceWithMarkdownBlock(
   const { setCurrentBlock, generateBlockId } = args;
   setCurrentBlock({
     id: generateBlockId(),
-    type: "html",
+    type: "markdown",
     content: markdownContent,
   });
 }
@@ -146,7 +130,7 @@ export function handleStreamingResult(
       break;
 
     case "markdown":
-      if (html) replaceWithMarkdownBlock(html, args);
+      if (content) handleMarkdownBlock(content, args);
       break;
 
     default:

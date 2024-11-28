@@ -7,32 +7,21 @@ import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { GeneratePanelBrokerType } from "../../../../panels/generate/getMessageBroker.js";
 import { BrowserEvent } from "../../../../types.js";
-import { ContentBlock } from "./ContentBlock.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js"; // Import processing functions
 import { getMessageBroker } from "./getMessageBroker.js";
+import { ContentItem, Message } from "./types.js";
+import { ContentBlock } from "./ContentBlock.js";
 
 type GenerateStreamArgs = {
   provider: string;
   model: string;
 };
 
-type ContentBlock = {
-  id: string;
-  type: "file" | "text" | "html";
-  content: string;
-  path?: string;
-};
-
-type Message = {
-  role: "user" | "assistant";
-  content: ContentBlock[];
-};
-
 export function Chat() {
   const args: GenerateStreamArgs = history.state;
 
   const [messages, setMessages] = React.useState<Message[]>([]);
-  const [currentBlock, setCurrentBlock] = React.useState<ContentBlock | null>(
+  const [currentBlock, setCurrentBlock] = React.useState<ContentItem | null>(
     null
   );
   const [isGenerating, setIsGenerating] = React.useState(false);
@@ -104,7 +93,7 @@ export function Chat() {
     setNewMessage("");
   }
 
-  const renderBlock = (block: ContentBlock) => {
+  const renderBlock = (block: ContentItem) => {
     return <ContentBlock key={block.id} block={block} />;
   };
 
