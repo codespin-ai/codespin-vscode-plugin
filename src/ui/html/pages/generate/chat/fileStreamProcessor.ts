@@ -9,24 +9,6 @@ type FileBlockProcessorArgs = {
 };
 
 /**
- * Finalizes the current block by appending it to messages and clearing the current block.
- */
-function finalizeCurrentBlock(args: FileBlockProcessorArgs) {
-  const { currentBlock, setCurrentBlock, setMessages } = args;
-
-  if (currentBlock) {
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        role: "assistant",
-        content: currentBlock,
-      },
-    ]);
-    setCurrentBlock(null);
-  }
-}
-
-/**
  * Handles incoming text content. Appends to the current block or creates a new one.
  */
 export function appendText(content: string, args: FileBlockProcessorArgs) {
@@ -47,8 +29,6 @@ export function appendText(content: string, args: FileBlockProcessorArgs) {
  * Starts a new file block, finalizing the current block if needed.
  */
 export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
-  finalizeCurrentBlock(args);
-
   const { setCurrentBlock, generateBlockId } = args;
 
   setCurrentBlock({
@@ -76,13 +56,15 @@ export function endFileBlock(
     path,
   };
 
-  setMessages((prevMessages) => [
-    ...prevMessages,
-    {
-      role: "assistant",
-      content: codeBlock,
-    },
-  ]);
+  setMessages((prevMessages) => {
+    return [
+      ...prevMessages,
+      {
+        role: "assistant",
+        content: codeBlock,
+      },
+    ];
+  });
 
   setCurrentBlock(null);
 }
@@ -102,13 +84,15 @@ export function handleMarkdownBlock(
     content: markdownContent,
   };
 
-  setMessages((prevMessages) => [
-    ...prevMessages,
-    {
-      role: "assistant",
-      content: markdownBlock,
-    },
-  ]);
+  setMessages((prevMessages) => {
+    return [
+      ...prevMessages,
+      {
+        role: "assistant",
+        content: markdownBlock,
+      },
+    ];
+  });
 
   setCurrentBlock(null);
 }

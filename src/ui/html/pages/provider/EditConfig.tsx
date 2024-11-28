@@ -8,7 +8,6 @@ export type EditConfigPageArgs = {
 };
 
 export function EditConfig() {
-  debugger;
   const args: EditConfigPageArgs = history.state;
   const Page: any =
     args.provider === "anthropic"

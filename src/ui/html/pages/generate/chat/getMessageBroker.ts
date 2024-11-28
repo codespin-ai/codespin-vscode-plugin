@@ -20,12 +20,6 @@ export function getMessageBroker({
     .attachHandler("promptCreated", async (message: PromptCreatedEvent) => {
       setIsGenerating(true);
     })
-    .attachHandler("responseStream", async (message: ResponseStreamEvent) => {
-      onFileResult({
-        type: "text",
-        content: message.data,
-      });
-    })
     .attachHandler(
       "fileResultStream",
       async (message: FileResultStreamEvent) => {

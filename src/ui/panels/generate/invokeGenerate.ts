@@ -72,21 +72,6 @@ export async function invokeGeneration(
     await writeHistoryItem(prompt, "raw-prompt.txt", dirName, workspaceRoot);
   };
 
-  argsForGeneration.args.responseStreamCallback = (text: string) => {
-    const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
-      (message) => {
-        generatePanel.getWebview().postMessage(message);
-      }
-    );
-
-    const responseStreamEvent: ResponseStreamEvent = {
-      type: "responseStream",
-      data: text,
-    };
-
-    invokePageMessageClient.send("responseStream", responseStreamEvent);
-  };
-
   argsForGeneration.args.fileResultStreamCallback = async (
     data: StreamingFileParseResult
   ) => {
@@ -96,14 +81,12 @@ export async function invokeGeneration(
       }
     );
 
-    const responseStreamEvent: FileResultStreamEvent = {
+    const fileResultStreamEvent: FileResultStreamEvent = {
       type: "fileResultStream",
       data: await processStreamingFileParseResult(data),
     };
 
-    console.log(JSON.stringify(responseStreamEvent, null, 2));
-
-    invokePageMessageClient.send("fileResultStream", responseStreamEvent);
+    invokePageMessageClient.send("fileResultStream", fileResultStreamEvent);
   };
 
   // FIXME
