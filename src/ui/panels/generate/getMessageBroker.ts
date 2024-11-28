@@ -76,7 +76,6 @@ export function getMessageBroker(
               type: "newHistoryEntry",
             };
             generatePanel.globalEventEmitter.emit("message", newHistoryEntry);
-            generatePanel.dispose();
           }
           break;
         case "missing_config":

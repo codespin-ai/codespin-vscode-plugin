@@ -125,7 +125,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/ws": "^8.5.13",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.230",
+    "codespin": "^0.0.233",
     "diff2html": "^3.4.48",
     "gray-matter": "^4.0.3",
     "ignore": "^6.0.2",

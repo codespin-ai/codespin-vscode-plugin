@@ -41,7 +41,7 @@ export async function getGenerateArgs(
     const codespinGenerateArgs: CodeSpinGenerateArgs = {
       promptFile: promptFilePath,
       model: userInputFromPanel.model,
-      write: true,
+      write: false,
       include: userInputFromPanel.includedFiles.map((f) => f.path),
       spec: userInputFromPanel.codingConvention
         ? await getCodingConventionPath(

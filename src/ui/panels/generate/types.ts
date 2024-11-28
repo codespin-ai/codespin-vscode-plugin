@@ -1,3 +1,4 @@
+import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { CodingConvention } from "../../../settings/conventions/CodingConvention.js";
 
 export type FileVersions = "current" | "HEAD";
@@ -33,9 +34,21 @@ export type ResponseStreamEvent = {
   type: "responseStream";
 } & ResponseStreamArgs;
 
+export type FileResultStreamArgs = {
+  data: StreamingFileParseResult;
+};
+
+export type FileResultStreamEvent = {
+  type: "fileResultStream";
+} & FileResultStreamArgs;
+
 export type AddDepsArgs = {
   file: string;
   model: string;
+};
+
+export type DoneEvent = {
+  type: "done";
 };
 
 export type AddDepsEvent = {

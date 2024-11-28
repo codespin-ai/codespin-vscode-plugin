@@ -9,9 +9,14 @@ import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFil
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
 import { navigateTo } from "../../navigateTo.js";
 import { GeneratePanel } from "./GeneratePanel.js";
-import { PromptCreatedEvent, ResponseStreamEvent } from "./types.js";
+import {
+  FileResultStreamEvent,
+  PromptCreatedEvent,
+  ResponseStreamEvent,
+} from "./types.js";
 import { createMessageClient } from "../../../messaging/messageClient.js";
 import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
+import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
@@ -81,13 +86,31 @@ export async function invokeGeneration(
     invokePageMessageClient.send("responseStream", responseStreamEvent);
   };
 
-  argsForGeneration.args.responseCallback = async (text: string) => {
-    await writeHistoryItem(text, "raw-response.txt", dirName, workspaceRoot);
+  argsForGeneration.args.fileResultStreamCallback = (
+    data: StreamingFileParseResult
+  ) => {
+    const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
+      (message) => {
+        generatePanel.getWebview().postMessage(message);
+      }
+    );
+
+    const responseStreamEvent: FileResultStreamEvent = {
+      type: "fileResultStream",
+      data,
+    };
+
+    invokePageMessageClient.send("fileResultStream", responseStreamEvent);
   };
 
-  argsForGeneration.args.parseCallback = async (files: any) => {
-    await writeGeneratedFiles(files, dirName, workspaceRoot);
-  };
+  // FIXME
+  // argsForGeneration.args.responseCallback = async (text: string) => {
+  //   await writeHistoryItem(text, "raw-response.txt", dirName, workspaceRoot);
+  // };
+
+  // argsForGeneration.args.parseCallback = async (files: any) => {
+  //   await writeGeneratedFiles(files, dirName, workspaceRoot);
+  // };
 
   await codespinGenerate(argsForGeneration.args, {
     workingDir: workspaceRoot,
