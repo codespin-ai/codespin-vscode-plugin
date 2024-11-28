@@ -9,9 +9,15 @@ import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFil
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
 import { navigateTo } from "../../navigateTo.js";
 import { GeneratePanel } from "./GeneratePanel.js";
-import { PromptCreatedEvent, ResponseStreamEvent } from "./types.js";
+import {
+  FileResultStreamEvent,
+  PromptCreatedEvent,
+  ResponseStreamEvent,
+} from "./types.js";
 import { createMessageClient } from "../../../messaging/messageClient.js";
-import { InvokePageBrokerType } from "../../html/pages/generate/invoke/getMessageBroker.js";
+import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
+import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
+import { processStreamingFileParseResult } from "./processStreamingFileParseResult.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
@@ -45,7 +51,7 @@ export async function invokeGeneration(
     workspaceRoot
   );
 
-  await navigateTo(generatePanel, `/generate/invoke`, {
+  await navigateTo(generatePanel, `/generate/chat`, {
     model: argsForGeneration.args.model,
   });
 
@@ -66,28 +72,31 @@ export async function invokeGeneration(
     await writeHistoryItem(prompt, "raw-prompt.txt", dirName, workspaceRoot);
   };
 
-  argsForGeneration.args.responseStreamCallback = (text: string) => {
+  argsForGeneration.args.fileResultStreamCallback = async (
+    data: StreamingFileParseResult
+  ) => {
     const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
       (message) => {
         generatePanel.getWebview().postMessage(message);
       }
     );
 
-    const responseStreamEvent: ResponseStreamEvent = {
-      type: "responseStream",
-      data: text,
+    const fileResultStreamEvent: FileResultStreamEvent = {
+      type: "fileResultStream",
+      data: await processStreamingFileParseResult(data),
     };
 
-    invokePageMessageClient.send("responseStream", responseStreamEvent);
+    invokePageMessageClient.send("fileResultStream", fileResultStreamEvent);
   };
 
-  argsForGeneration.args.responseCallback = async (text: string) => {
-    await writeHistoryItem(text, "raw-response.txt", dirName, workspaceRoot);
-  };
+  // FIXME
+  // argsForGeneration.args.responseCallback = async (text: string) => {
+  //   await writeHistoryItem(text, "raw-response.txt", dirName, workspaceRoot);
+  // };
 
-  argsForGeneration.args.parseCallback = async (files: any) => {
-    await writeGeneratedFiles(files, dirName, workspaceRoot);
-  };
+  // argsForGeneration.args.parseCallback = async (files: any) => {
+  //   await writeGeneratedFiles(files, dirName, workspaceRoot);
+  // };
 
   await codespinGenerate(argsForGeneration.args, {
     workingDir: workspaceRoot,
