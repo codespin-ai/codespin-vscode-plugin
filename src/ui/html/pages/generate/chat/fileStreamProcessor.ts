@@ -1,5 +1,5 @@
+import { ProcessedStreamingFileParseResult } from "../../../../panels/generate/types.js";
 import { ContentItem, Message } from "./types.js";
-
 
 type FileBlockProcessorArgs = {
   currentBlock: ContentItem | null;
@@ -13,12 +13,13 @@ type FileBlockProcessorArgs = {
  */
 function finalizeCurrentBlock(args: FileBlockProcessorArgs) {
   const { currentBlock, setCurrentBlock, setMessages } = args;
+
   if (currentBlock) {
     setMessages((prevMessages) => [
       ...prevMessages,
       {
         role: "assistant",
-        content: [currentBlock],
+        content: currentBlock,
       },
     ]);
     setCurrentBlock(null);
@@ -29,12 +30,7 @@ function finalizeCurrentBlock(args: FileBlockProcessorArgs) {
  * Handles incoming text content. Appends to the current block or creates a new one.
  */
 export function appendText(content: string, args: FileBlockProcessorArgs) {
-  const { currentBlock, setCurrentBlock, generateBlockId } = args;
-
-  if (currentBlock && currentBlock.type !== "text") {
-    // Finalize current block if it's not a text block
-    finalizeCurrentBlock(args);
-  }
+  const { setCurrentBlock, generateBlockId } = args;
 
   setCurrentBlock((prev) => {
     return prev && prev.type === "text"
@@ -54,6 +50,7 @@ export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
   finalizeCurrentBlock(args);
 
   const { setCurrentBlock, generateBlockId } = args;
+
   setCurrentBlock({
     id: generateBlockId(),
     type: "file-heading",
@@ -66,28 +63,28 @@ export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
  * Ends a file block by replacing it with an HTML block.
  */
 export function endFileBlock(
+  path: string,
   htmlContent: string,
   args: FileBlockProcessorArgs
 ) {
-  const { currentBlock, setMessages, setCurrentBlock, generateBlockId } = args;
+  const { setMessages, setCurrentBlock, generateBlockId } = args;
 
-  if (currentBlock && currentBlock.type === "file-heading") {
-    const htmlBlock: ContentItem = {
-      id: generateBlockId(),
-      type: "code",
-      content: htmlContent,
-      path: currentBlock.path,
-    };
+  const codeBlock: ContentItem = {
+    id: generateBlockId(),
+    type: "code",
+    content: htmlContent,
+    path,
+  };
 
-    setMessages((prevMessages) => [
-      ...prevMessages,
-      {
-        role: "assistant",
-        content: [htmlBlock],
-      },
-    ]);
-    setCurrentBlock(null);
-  }
+  setMessages((prevMessages) => [
+    ...prevMessages,
+    {
+      role: "assistant",
+      content: codeBlock,
+    },
+  ]);
+
+  setCurrentBlock(null);
 }
 
 /**
@@ -97,44 +94,47 @@ export function handleMarkdownBlock(
   markdownContent: string,
   args: FileBlockProcessorArgs
 ) {
-  finalizeCurrentBlock(args);
+  const { setMessages, setCurrentBlock, generateBlockId } = args;
 
-  const { setCurrentBlock, generateBlockId } = args;
-  setCurrentBlock({
+  const markdownBlock: ContentItem = {
     id: generateBlockId(),
     type: "markdown",
     content: markdownContent,
-  });
+  };
+
+  setMessages((prevMessages) => [
+    ...prevMessages,
+    {
+      role: "assistant",
+      content: markdownBlock,
+    },
+  ]);
+
+  setCurrentBlock(null);
 }
 
 /**
  * Handles incoming streaming results dynamically.
  */
 export function handleStreamingResult(
-  result: { type: string; content?: string; path?: string; html?: string },
+  result: ProcessedStreamingFileParseResult,
   args: FileBlockProcessorArgs
 ) {
-  const { type, content, path, html } = result;
-
-  switch (type) {
+  switch (result.type) {
     case "text":
-      if (content) appendText(content, args);
+      appendText(result.content, args);
       break;
 
     case "start-file-block":
-      if (path) startFileBlock(path, args);
+      startFileBlock(result.path, args);
       break;
 
     case "end-file-block":
-      if (html) endFileBlock(html, args);
+      endFileBlock(result.file.path, result.html, args);
       break;
 
     case "markdown":
-      if (content) handleMarkdownBlock(content, args);
-      break;
-
-    default:
-      console.warn(`Unhandled block type: ${type}`);
+      handleMarkdownBlock(result.content, args);
       break;
   }
 }

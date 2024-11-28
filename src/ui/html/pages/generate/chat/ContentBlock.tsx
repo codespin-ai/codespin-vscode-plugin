@@ -10,7 +10,7 @@ export function ContentBlock({ block }: Props) {
     case "file-heading":
       return (
         <div
-          data-block-type="file"
+          data-block-type="file-heading"
           style={{
             backgroundColor: "var(--vscode-editor-background)",
             padding: "1em",
@@ -43,7 +43,7 @@ export function ContentBlock({ block }: Props) {
     case "code":
       return (
         <div
-          data-block-type="html"
+          data-block-type="code"
           style={{
             backgroundColor: "var(--vscode-editor-background)",
             padding: "1em",

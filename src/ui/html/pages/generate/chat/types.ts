@@ -9,5 +9,5 @@ export type ContentItem = {
 
 export type Message = {
   role: "user" | "assistant";
-  content: ContentItem[];
+  content: ContentItem;
 };

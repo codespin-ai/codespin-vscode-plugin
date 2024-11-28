@@ -66,13 +66,11 @@ export function Chat() {
       ...prev,
       {
         role: "user",
-        content: [
-          {
-            id: generateBlockId(),
-            type: "text",
-            content: newMessage,
-          },
-        ],
+        content: {
+          id: generateBlockId(),
+          type: "text",
+          content: newMessage,
+        },
       },
     ]);
 
@@ -126,7 +124,7 @@ export function Chat() {
               maxWidth: "80%",
             }}
           >
-            {message.content.map(renderBlock)}
+            {renderBlock(message.content)}
           </div>
         ))}
 
