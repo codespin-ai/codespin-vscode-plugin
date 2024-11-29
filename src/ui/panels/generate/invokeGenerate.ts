@@ -89,10 +89,11 @@ export async function invokeGeneration(
     invokePageMessageClient.send("fileResultStream", fileResultStreamEvent);
   };
 
-  // FIXME
-  // argsForGeneration.args.responseCallback = async (text: string) => {
-  //   await writeHistoryItem(text, "raw-response.txt", dirName, workspaceRoot);
-  // };
+  // FIXME. The foll is incorrect.
+  
+  argsForGeneration.args.responseCallback = async (text: string) => {
+    await writeHistoryItem(text, `raw-response-${Date.now()}.txt`, dirName, workspaceRoot);
+  };
 
   // argsForGeneration.args.parseCallback = async (files: any) => {
   //   await writeGeneratedFiles(files, dirName, workspaceRoot);

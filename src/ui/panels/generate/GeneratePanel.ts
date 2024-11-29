@@ -2,14 +2,15 @@ import { EventEmitter } from "events";
 import * as vscode from "vscode";
 import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
 import { getUIProps } from "../../../settings/ui/getUIProps.js";
+import { getMessageBroker as getSourceAnalysisMessageBroker } from "../../../sourceAnalysis/getMessageBroker.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { GeneratePageArgs } from "../../html/pages/generate/GeneratePageArgs.js";
 import { navigateTo } from "../../navigateTo.js";
+import { MessageTemplate } from "../../types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getPageArgs } from "./getPageArgs.js";
 import { GenerateEvent, GenerateUserInput } from "./types.js";
-import { MessageTemplate } from "../../types.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
 type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
@@ -26,6 +27,9 @@ export class GeneratePanel extends UIPanel {
   dirName: string | undefined = undefined;
   cancelGeneration: (() => void) | undefined;
   messageBroker: ReturnType<typeof getMessageBroker>;
+  sourceAnalysisMessageBroker: ReturnType<
+    typeof getSourceAnalysisMessageBroker
+  >;
 
   constructor(
     context: vscode.ExtensionContext,
@@ -34,6 +38,7 @@ export class GeneratePanel extends UIPanel {
     super({}, context, globalEventEmitter);
     const workspaceRoot = getWorkspaceRoot(context);
     this.messageBroker = getMessageBroker(this, workspaceRoot);
+    this.sourceAnalysisMessageBroker = getSourceAnalysisMessageBroker();
   }
 
   async init(initArgs: InitArgs) {
@@ -58,6 +63,9 @@ export class GeneratePanel extends UIPanel {
   async onMessage(message: MessageTemplate) {
     if (this.messageBroker.canHandle(message.type)) {
       this.messageBroker.handleRequest(message as any);
+    }
+    if (this.sourceAnalysisMessageBroker.canHandle(message.type)) {
+      this.sourceAnalysisMessageBroker.handleRequest(message as any);
     }
   }
 
