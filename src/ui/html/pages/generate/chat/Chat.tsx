@@ -1,3 +1,4 @@
+// Chat.tsx
 import * as React from "react";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
@@ -92,9 +93,9 @@ export function Chat() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-zinc-900">
-      <div className="p-4 border-b border-zinc-700">
-        <h2 className="text-xl font-semibold text-zinc-100">
+    <div className="h-screen flex flex-col bg-vscode-editor-background">
+      <div className="p-4 border-b border-vscode-panel-border">
+        <h2 className="text-xl font-semibold text-vscode-editor-foreground">
           Chat ({args.provider}:{args.model})
         </h2>
       </div>
@@ -119,12 +120,13 @@ export function Chat() {
         <div ref={chatEndRef} />
       </div>
 
-      <div className="p-4 border-t border-zinc-700 bg-zinc-900">
+      <div className="p-4 border-t border-vscode-panel-border bg-vscode-editor-background">
         <div className="flex gap-4">
           <textarea
-            className="flex-1 min-h-[44px] max-h-[200px] resize-none rounded-lg bg-zinc-800 
-                       text-zinc-100 p-3 border border-zinc-700 focus:outline-none 
-                       focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="flex-1 min-h-[44px] max-h-[200px] resize-none rounded-lg 
+                       bg-vscode-input-background text-vscode-input-foreground 
+                       p-3 border border-vscode-input-border focus:outline-none 
+                       focus:ring-2 focus:ring-vscode-focusBorder focus:border-transparent"
             value={newMessage}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
               setNewMessage(e.target.value)
@@ -140,9 +142,9 @@ export function Chat() {
           <button
             onClick={sendMessage}
             disabled={isGenerating || !newMessage.trim()}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium
-                     hover:bg-blue-700 focus:outline-none focus:ring-2 
-                     focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-zinc-900
+            className="px-6 py-2 bg-vscode-button-background text-vscode-button-foreground 
+                     rounded-lg font-medium hover:bg-vscode-button-hover-background 
+                     focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder
                      disabled:opacity-50 disabled:cursor-not-allowed
                      transition-colors duration-200"
           >

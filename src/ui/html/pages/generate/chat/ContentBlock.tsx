@@ -1,3 +1,4 @@
+// ContentBlock.tsx
 import * as React from "react";
 import { ContentItem } from "./types.js";
 
@@ -7,14 +8,14 @@ type Props = {
 
 export function ContentBlock({ block }: Props) {
   const baseBlockStyles =
-    "rounded-lg p-4 mb-4 border bg-zinc-800 border-zinc-700 text-zinc-100";
+    "rounded-lg p-4 mb-4 border bg-vscode-input-background border-vscode-input-border text-vscode-input-foreground";
 
   switch (block.type) {
     case "file-heading":
       return (
         <div data-block-type="file-heading" className={baseBlockStyles}>
-          <div className="mb-2 font-mono">File: {block.path}</div>
-          <pre className="whitespace-pre-wrap m-0 font-mono">
+          <div className="mb-2 font-vscode-editor">File: {block.path}</div>
+          <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
             {block.content}
           </pre>
         </div>
@@ -23,7 +24,7 @@ export function ContentBlock({ block }: Props) {
     case "code":
       return (
         <div data-block-type="code" className={baseBlockStyles}>
-          <pre className="m-0 font-mono">{block.content}</pre>
+          <pre className="m-0 font-vscode-editor">{block.content}</pre>
         </div>
       );
 
@@ -31,7 +32,7 @@ export function ContentBlock({ block }: Props) {
     default:
       return (
         <div data-block-type="text" className={baseBlockStyles}>
-          <pre className="whitespace-pre-wrap m-0 font-mono">
+          <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
             {block.content}
           </pre>
         </div>
