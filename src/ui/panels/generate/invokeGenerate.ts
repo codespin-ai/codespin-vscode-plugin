@@ -89,9 +89,15 @@ export async function invokeGeneration(
     invokePageMessageClient.send("fileResultStream", fileResultStreamEvent);
   };
 
-  // FIXME
+  // FIXME. The following is incorrect.
+
   // argsForGeneration.args.responseCallback = async (text: string) => {
-  //   await writeHistoryItem(text, "raw-response.txt", dirName, workspaceRoot);
+  //   await writeHistoryItem(
+  //     text,
+  //     `raw-response-${Date.now()}.txt`,
+  //     dirName,
+  //     workspaceRoot
+  //   );
   // };
 
   // argsForGeneration.args.parseCallback = async (files: any) => {

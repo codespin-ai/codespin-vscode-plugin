@@ -1,12 +1,3 @@
-import { Dropdown, TextArea } from "@vscode/webview-ui-toolkit";
-import {
-  VSCodeButton,
-  VSCodeDivider,
-  VSCodeDropdown,
-  VSCodeLink,
-  VSCodeOption,
-  VSCodeTextArea,
-} from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { formatFileSize } from "../../../../text/formatFileSize.js";
@@ -18,7 +9,6 @@ import {
   OpenFileEvent,
   UIPropsUpdateEvent,
 } from "../../../panels/generate/types.js";
-import { CSFormField } from "../../components/CSFormField.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
 import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
@@ -29,7 +19,7 @@ import { BrowserEvent } from "../../../types.js";
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
   const args: GeneratePageArgs = history.state;
-  const promptRef = useRef<TextArea>(null);
+  const promptRef = useRef<HTMLTextAreaElement>(null);
 
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>(args.prompt ?? "");
@@ -71,19 +61,19 @@ export function Generate() {
       }
     }
 
-    const promptTextArea =
-      promptRef.current!.shadowRoot!.querySelector("textarea")!;
-    promptTextArea.focus();
-    promptTextArea.addEventListener("keydown", onPromptTextAreaKeyDown);
+    if (promptRef.current) {
+      promptRef.current.focus();
+      promptRef.current.addEventListener("keydown", onPromptTextAreaKeyDown);
 
-    if (args.uiProps?.promptTextAreaHeight) {
-      promptTextArea.style.height = `${args.uiProps.promptTextAreaHeight}px`;
-      setInitialHeight(promptTextArea.clientHeight);
-    }
+      if (args.uiProps?.promptTextAreaHeight) {
+        promptRef.current.style.height = `${args.uiProps.promptTextAreaHeight}px`;
+        setInitialHeight(promptRef.current.clientHeight);
+      }
 
-    if (args.uiProps?.promptTextAreaWidth) {
-      promptTextArea.style.width = `${args.uiProps.promptTextAreaWidth}px`;
-      setInitialWidth(promptTextArea.clientWidth);
+      if (args.uiProps?.promptTextAreaWidth) {
+        promptRef.current.style.width = `${args.uiProps.promptTextAreaWidth}px`;
+        setInitialWidth(promptRef.current.clientWidth);
+      }
     }
 
     const generatePageMessageBroker = getMessageBroker(setFiles);
@@ -99,12 +89,15 @@ export function Generate() {
     window.addEventListener("message", listener);
 
     return () => {
-      promptTextArea.removeEventListener("keydown", onPromptTextAreaKeyDown);
+      promptRef.current?.removeEventListener(
+        "keydown",
+        onPromptTextAreaKeyDown
+      );
       window.removeEventListener("message", listener);
     };
   }, []);
 
-  function onModelChange(e: React.ChangeEvent<Dropdown>) {
+  function onModelChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setModel(e.target.value);
 
     const modelChangeMessage = {
@@ -140,7 +133,7 @@ export function Generate() {
       e.preventDefault();
       e.stopPropagation();
 
-      generate({ prompt: (e.currentTarget as any).value });
+      generate({ prompt: (e.currentTarget as HTMLTextAreaElement).value });
     }
   }
 
@@ -156,19 +149,19 @@ export function Generate() {
 
     generatePanelMessageClient.send("generate", message);
 
-    const promptTextArea =
-      promptRef.current!.shadowRoot!.querySelector("textarea")!;
-    if (
-      promptTextArea.clientHeight !== initialHeight ||
-      promptTextArea.clientWidth !== initialWidth
-    ) {
-      const uiPropsUpdate: UIPropsUpdateEvent = {
-        type: "uiPropsUpdate",
-        promptTextAreaHeight: promptTextArea.clientHeight,
-        promptTextAreaWidth: promptTextArea.clientWidth,
-      };
+    if (promptRef.current) {
+      if (
+        promptRef.current.clientHeight !== initialHeight ||
+        promptRef.current.clientWidth !== initialWidth
+      ) {
+        const uiPropsUpdate: UIPropsUpdateEvent = {
+          type: "uiPropsUpdate",
+          promptTextAreaHeight: promptRef.current.clientHeight,
+          promptTextAreaWidth: promptRef.current.clientWidth,
+        };
 
-      generatePanelMessageClient.send("uiPropsUpdate", uiPropsUpdate);
+        generatePanelMessageClient.send("uiPropsUpdate", uiPropsUpdate);
+      }
     }
   }
 
@@ -198,133 +191,134 @@ export function Generate() {
   }
 
   return (
-    <div>
-      <h1>Start Chatting</h1>
-      <form id="mainform">
-        <CSFormField label={{ text: "Model" }}>
-          <VSCodeDropdown
-            items={args.models.map((x) => ({
-              text: x.alias ?? x.name,
-              value: x.alias ?? x.name,
-            }))}
-            currentValue={model}
-            style={{ width: "180px" }}
+    <div className="p-6 bg-vscode-editor-background">
+      <h1 className="text-2xl font-bold text-vscode-editor-foreground mb-6">
+        Start Generating
+      </h1>
+      <form id="mainform" className="space-y-6">
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-vscode-editor-foreground">
+            Model
+          </label>
+          <select
+            value={model}
             onChange={onModelChange}
+            className="w-48 px-3 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
           >
             {args.models.map((x) => (
-              <VSCodeOption key={x.alias ?? x.name} value={x.alias ?? x.name}>
+              <option key={x.alias ?? x.name} value={x.alias ?? x.name}>
                 {x.alias ?? x.name}
-              </VSCodeOption>
+              </option>
             ))}
-          </VSCodeDropdown>
-        </CSFormField>
-        <CSFormField label={{ text: "Prompt:" }}>
-          <VSCodeTextArea
-            ref={promptRef as React.RefObject<any>}
-            rows={10}
-            cols={50}
-            style={{ fontFamily: "var(--vscode-editor-font-family)" }}
-            resize="both"
-            onChange={(e: React.FormEvent<HTMLTextAreaElement>) =>
-              setPrompt(e.currentTarget.value)
-            }
-            className="prompt-textarea"
-            value={prompt}
-          ></VSCodeTextArea>
-        </CSFormField>
-        <CSFormField>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
-            <VSCodeButton
-              style={{ width: "172px" }}
-              onClick={onGenerateButtonClick}
-            >
-              <GenerateIcon />
-              Start Chatting
-            </VSCodeButton>
+          </select>
+        </div>
 
-            {/* Copy to clipboard */}
-            <VSCodeButton
-              onClick={copyToClipboard}
-              style={{ marginLeft: "8px", width: "172px" }}
-            >
-              {!showCopied ? <CopyIcon /> : <></>}
-              {!showCopied ? "Copy To Clipboard" : "Copied"}
-            </VSCodeButton>
-          </div>
-        </CSFormField>
-        {getTotalFileSize() > 50000 ? (
-          <p style={{ color: "red" }}>
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-vscode-editor-foreground">
+            Prompt:
+          </label>
+          <textarea
+            ref={promptRef}
+            rows={10}
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            className="w-full px-3 py-2 bg-vscode-input-background border border-vscode-input-border rounded text-vscode-input-foreground font-vscode-editor resize-both focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+          />
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            type="button"
+            onClick={onGenerateButtonClick}
+            className="flex items-center px-6 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
+          >
+            <GenerateIcon />
+            Start Generating
+          </button>
+
+          <button
+            type="button"
+            onClick={copyToClipboard}
+            className="flex items-center px-6 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
+          >
+            {!showCopied && <CopyIcon />}
+            {showCopied ? "Copied" : "Copy To Clipboard"}
+          </button>
+        </div>
+
+        {getTotalFileSize() > 50000 && (
+          <p className="text-red-500">
             WARN: You have included {formatFileSize(getTotalFileSize())} of file
-            content.{" "}
+            content.
           </p>
-        ) : (
-          <></>
         )}
 
-        <VSCodeDivider />
-        <h3>Additional Options</h3>
-        <CSFormField label={{ text: "Coding Conventions:" }}>
-          <VSCodeDropdown
-            style={{ width: "180px" }}
-            onChange={(e: React.FormEvent<Dropdown>) =>
+        <div className="border-t border-vscode-panel-border my-6" />
+
+        <h3 className="text-lg font-medium text-vscode-editor-foreground">
+          Additional Options
+        </h3>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-vscode-editor-foreground">
+            Coding Conventions:
+          </label>
+          <select
+            value={codingConvention}
+            onChange={(e) =>
               setCodingConvention(
-                e.currentTarget.value === "None"
-                  ? undefined
-                  : e.currentTarget.value
+                e.target.value === "None" ? undefined : e.target.value
               )
             }
-            currentValue={codingConvention}
+            className="w-48 px-3 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
           >
-            <VSCodeOption key="none" value="None">
-              None
-            </VSCodeOption>
+            <option value="None">None</option>
             {args.codingConventions.map((item) => (
-              <VSCodeOption key={item.filename} value={item.filename}>
+              <option key={item.filename} value={item.filename}>
                 {item.description}
-              </VSCodeOption>
+              </option>
             ))}
-          </VSCodeDropdown>
-        </CSFormField>
-        <CSFormField
-          label={{
-            text: `Included Files (${formatFileSize(getTotalFileSize())}):`,
-          }}
-        >
-          {files.map((file) => (
-            <div
-              key={file.path}
-              style={{
-                marginBottom: "4px",
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "center",
-              }}
-            >
-              <VSCodeLink onClick={() => onFileClick(file.path)}>
-                {file.path}
-              </VSCodeLink>
-              <span style={{ marginLeft: "4px", marginRight: "1em" }}>
-                {file.size ? `(${formatFileSize(file.size)})` : ""}
-              </span>
-              <VSCodeLink onClick={() => onAddDeps(file.path)}>
-                Add deps
-              </VSCodeLink>
-              <VSCodeLink
-                onClick={() => handleDeleteFile(file.path)}
-                style={{ marginLeft: "10px", cursor: "pointer" }}
+          </select>
+        </div>
+
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-vscode-editor-foreground">
+            Included Files ({formatFileSize(getTotalFileSize())}):
+          </label>
+          <div className="space-y-2">
+            {files.map((file) => (
+              <div
+                key={file.path}
+                className="flex items-center gap-4 text-vscode-editor-foreground"
               >
-                Delete
-              </VSCodeLink>
-              <br />
-            </div>
-          ))}
-        </CSFormField>
+                <button
+                  type="button"
+                  onClick={() => onFileClick(file.path)}
+                  className="text-vscode-textLink-foreground hover:text-vscode-textLink-activeForeground"
+                >
+                  {file.path}
+                </button>
+                <span className="text-vscode-editor-foreground opacity-60">
+                  {file.size ? `(${formatFileSize(file.size)})` : ""}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onAddDeps(file.path)}
+                  className="text-vscode-textLink-foreground hover:text-vscode-textLink-activeForeground"
+                >
+                  Add deps
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDeleteFile(file.path)}
+                  className="text-vscode-textLink-foreground hover:text-vscode-textLink-activeForeground"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
       </form>
     </div>
   );

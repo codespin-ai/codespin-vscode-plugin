@@ -43,7 +43,7 @@ export interface MessageBroker<
   attachHandler: AttachHandlerFunction<TRequestMap>; // Register a new handler
   handleRequest: <K extends keyof TRequestMap & string>(
     request: Request<TRequestMap, K>
-  ) => void; // Handle incoming requests
+  ) => Promise<Response<TRequestMap, K> | undefined>;
   canHandle: (type: string) => boolean; // Check if a handler exists for a type
 }
 
