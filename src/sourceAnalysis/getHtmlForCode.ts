@@ -1,4 +1,8 @@
-import { getSingletonHighlighter, type BundledTheme } from "shiki";
+import {
+  bundledLanguages,
+  getSingletonHighlighter,
+  type BundledTheme,
+} from "shiki";
 import * as vscode from "vscode";
 
 function getCurrentVSCodeTheme(): BundledTheme {
@@ -24,13 +28,18 @@ export async function getHtmlForCode(
   code: string,
   lang: string
 ): Promise<string> {
-  const currentTheme = getCurrentVSCodeTheme();
-  const highlighter = await getSingletonHighlighter({
-    themes: [currentTheme],
-  });
+  try {
+    const currentTheme = getCurrentVSCodeTheme();
+    const highlighter = await getSingletonHighlighter({
+      themes: [currentTheme],
+      langs: Object.keys(bundledLanguages),
+    });
 
-  return highlighter.codeToHtml(code, {
-    lang,
-    theme: currentTheme,
-  });
+    return highlighter.codeToHtml(code, {
+      lang,
+      theme: currentTheme,
+    });
+  } catch (ex: any) {
+    return code;
+  }
 }

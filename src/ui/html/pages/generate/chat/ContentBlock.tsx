@@ -1,3 +1,4 @@
+// ContentBlock.tsx
 import * as React from "react";
 import { ContentItem } from "./types.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
@@ -15,32 +16,33 @@ export function ContentBlock({ block }: Props) {
   const baseBlockStyles =
     "rounded p-4 mb-4 border bg-vscode-input-background border-vscode-input-border text-vscode-input-foreground";
 
-  // React.useEffect(() => {
-  //   const sourceAnalysisMessageClient =
-  //     createMessageClient<SourceAnalysisBrokerType>((message) =>
-  //       vsCodeApi.postMessage(message)
-  //     );
+  React.useEffect(() => {
+    const sourceAnalysisMessageClient =
+      createMessageClient<SourceAnalysisBrokerType>((message) =>
+        vsCodeApi.postMessage(message)
+      );
 
-  //   if (block.type === "code") {
-  //     sourceAnalysisMessageClient
-  //       .wait("applyStyling", {
-  //         code: block.content,
-  //         filename: block.path,
-  //       })
-  //       .then((html) => {
-  //         setHighlightedCode(html);
-  //       });
-  //   }
+    function listeners(event: BrowserEvent) {
+      sourceAnalysisMessageClient.onResponse(
+        event.data as MessageTemplate<string, any>
+      );
+    }
 
-  //   function listeners(event: BrowserEvent) {
-  //     sourceAnalysisMessageClient.onResponse(
-  //       event.data as MessageTemplate<string, any>
-  //     );
-  //   }
+    window.addEventListener("message", listeners);
 
-  //   window.addEventListener("message", listeners);
-  //   return () => window.removeEventListener("message", listeners);
-  // }, [block.content, block.type]);
+    if (block.type === "code") {
+      sourceAnalysisMessageClient
+        .wait("applyStyling", {
+          code: block.content,
+          filename: block.path,
+        })
+        .then((html) => {
+          setHighlightedCode(html);
+        });
+    }
+
+    return () => window.removeEventListener("message", listeners);
+  }, [block.content, block.type]);
 
   switch (block.type) {
     case "file-heading":
@@ -54,19 +56,16 @@ export function ContentBlock({ block }: Props) {
       );
     case "code":
       return (
-        <div data-block-type="code" className={baseBlockStyles}>
-          (<pre className="m-0 font-vscode-editor">{block.content}</pre>)
+        <div
+          data-block-type="code"
+          className="mb-4 bg-vscode-input-background font-vscode-editor [&_pre]:p-4"
+        >
+          {highlightedCode ? (
+            <div dangerouslySetInnerHTML={{ __html: highlightedCode }} />
+          ) : (
+            <pre className="m-0 p-4">{block.content}</pre>
+          )}
         </div>
-        // <div data-block-type="code" className={baseBlockStyles}>
-        //   {highlightedCode ? (
-        //     <div
-        //       className="font-vscode-editor"
-        //       dangerouslySetInnerHTML={{ __html: highlightedCode }}
-        //     />
-        //   ) : (
-        //     <pre className="m-0 font-vscode-editor">{block.content}</pre>
-        //   )}
-        // </div>
       );
     case "text":
     default:

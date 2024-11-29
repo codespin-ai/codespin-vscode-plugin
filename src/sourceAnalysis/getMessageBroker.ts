@@ -10,6 +10,7 @@ export function getMessageBroker() {
       return getHtmlForCode(params.code, lang);
     }
   );
+
   return messageBroker;
 }
 

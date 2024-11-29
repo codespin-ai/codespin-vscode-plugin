@@ -65,7 +65,10 @@ export class GeneratePanel extends UIPanel {
       this.messageBroker.handleRequest(message as any);
     }
     if (this.sourceAnalysisMessageBroker.canHandle(message.type)) {
-      this.sourceAnalysisMessageBroker.handleRequest(message as any);
+      const result = await this.sourceAnalysisMessageBroker.handleRequest(
+        message as any
+      );
+      this.getWebview().postMessage(result);
     }
   }
 
