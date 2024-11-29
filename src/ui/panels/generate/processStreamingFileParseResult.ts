@@ -8,7 +8,7 @@ export async function processStreamingFileParseResult(
 ): Promise<ProcessedStreamingFileParseResult> {
   if (input.type === "end-file-block") {
     const html = await getHtmlForCode(
-      input.file.contents,
+      input.file.content,
       getLangFromFilename(input.file.path)
     ); // Assuming "javascript" as the language. Adjust as needed.
     return {

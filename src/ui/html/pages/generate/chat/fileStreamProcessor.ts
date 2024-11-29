@@ -44,7 +44,7 @@ export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
  */
 export function endFileBlock(
   path: string,
-  htmlContent: string,
+  content: string,
   args: FileBlockProcessorArgs
 ) {
   const { setMessages, setCurrentBlock, generateBlockId } = args;
@@ -52,7 +52,7 @@ export function endFileBlock(
   const codeBlock: ContentItem = {
     id: generateBlockId(),
     type: "code",
-    content: htmlContent,
+    content,
     path,
   };
 
@@ -114,7 +114,7 @@ export function handleStreamingResult(
       break;
 
     case "end-file-block":
-      endFileBlock(result.file.path, result.html, args);
+      endFileBlock(result.file.path, result.file.content, args);
       break;
 
     case "markdown":

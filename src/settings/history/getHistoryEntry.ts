@@ -11,8 +11,8 @@ import { GenerateUserInput } from "../../ui/panels/generate/types.js";
 import { pathExists } from "../../fs/pathExists.js";
 
 async function readJsonFile<T>(filePath: string): Promise<T> {
-  const fileContents = await fs.readFile(filePath, "utf8");
-  return JSON.parse(fileContents) as T;
+  const fileContent = await fs.readFile(filePath, "utf8");
+  return JSON.parse(fileContent) as T;
 }
 
 async function readTextFile(filePath: string): Promise<string> {

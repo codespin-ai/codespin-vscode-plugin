@@ -18,8 +18,8 @@ export async function getConventions(
           .filter((file) => file.endsWith(".md")) // Select only Markdown files
           .map(async (file) => {
             const filePath = join(conventionsDir, file);
-            const fileContents = await readFile(filePath, "utf8");
-            const parsedContent = matter(fileContents);
+            const fileContent = await readFile(filePath, "utf8");
+            const parsedContent = matter(fileContent);
             const autoSelectedConvention = autoSelectConvention(file);
 
             return parsedContent.data
