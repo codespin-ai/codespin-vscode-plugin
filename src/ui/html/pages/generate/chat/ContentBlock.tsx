@@ -51,8 +51,9 @@ export function ContentBlock({ block }: Props) {
             marginBottom: "1em",
             border: "1px solid var(--vscode-panel-border)",
           }}
-          dangerouslySetInnerHTML={{ __html: block.content }}
-        />
+        >
+          <pre>{block.content}</pre>
+        </div>
       );
 
     case "text":
