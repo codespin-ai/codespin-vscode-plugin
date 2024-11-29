@@ -203,7 +203,7 @@ export function Generate() {
           <select
             value={model}
             onChange={onModelChange}
-            className="w-48 px-3 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded-lg text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+            className="w-48 px-3 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
           >
             {args.models.map((x) => (
               <option key={x.alias ?? x.name} value={x.alias ?? x.name}>
@@ -222,7 +222,7 @@ export function Generate() {
             rows={10}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="w-full px-3 py-2 bg-vscode-input-background border border-vscode-input-border rounded-lg text-vscode-input-foreground font-vscode-editor resize-both focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+            className="w-full px-3 py-2 bg-vscode-input-background border border-vscode-input-border rounded text-vscode-input-foreground font-vscode-editor resize-both focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
           />
         </div>
 
@@ -230,7 +230,7 @@ export function Generate() {
           <button
             type="button"
             onClick={onGenerateButtonClick}
-            className="flex items-center px-6 py-2 bg-vscode-button-background text-vscode-button-foreground rounded-lg font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
+            className="flex items-center px-6 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
           >
             <GenerateIcon />
             Start Generating
@@ -239,7 +239,7 @@ export function Generate() {
           <button
             type="button"
             onClick={copyToClipboard}
-            className="flex items-center px-6 py-2 bg-vscode-button-background text-vscode-button-foreground rounded-lg font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
+            className="flex items-center px-6 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
           >
             {!showCopied && <CopyIcon />}
             {showCopied ? "Copied" : "Copy To Clipboard"}
@@ -270,7 +270,7 @@ export function Generate() {
                 e.target.value === "None" ? undefined : e.target.value
               )
             }
-            className="w-48 px-3 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded-lg text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+            className="w-48 px-3 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
           >
             <option value="None">None</option>
             {args.codingConventions.map((item) => (

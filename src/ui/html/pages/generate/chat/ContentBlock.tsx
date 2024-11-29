@@ -8,7 +8,7 @@ type Props = {
 
 export function ContentBlock({ block }: Props) {
   const baseBlockStyles =
-    "rounded-lg p-4 mb-4 border bg-vscode-input-background border-vscode-input-border text-vscode-input-foreground";
+    "rounded p-4 mb-4 border bg-vscode-input-background border-vscode-input-border text-vscode-input-foreground";
 
   switch (block.type) {
     case "file-heading":

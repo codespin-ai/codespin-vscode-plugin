@@ -16,13 +16,12 @@ const truncatePrompt = (prompt: string): string => {
     return prompt;
   }
 
-  let truncated = prompt.slice(0, 101); // Include one extra character to ensure we're over 100
-  const lastSpaceIndex = truncated.lastIndexOf(" "); // Find the last space in the truncated string
+  let truncated = prompt.slice(0, 101);
+  const lastSpaceIndex = truncated.lastIndexOf(" ");
 
   if (lastSpaceIndex > -1) {
     truncated = truncated.slice(0, lastSpaceIndex) + "...";
   } else {
-    // In case there's a very long word without spaces, we'll just truncate at 100
     truncated = prompt.slice(0, 100) + "...";
   }
 
@@ -31,8 +30,8 @@ const truncatePrompt = (prompt: string): string => {
 
 export function History() {
   const args: HistoryPageArgs = history.state;
-
   const [entries, setEntries] = React.useState(args.entries);
+  const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
 
   const formatRelativeTime = (timestamp: number): string => {
     const now = Date.now();
@@ -71,17 +70,11 @@ export function History() {
     return date === today ? "Today" : date === yesterday ? "Yesterday" : date;
   };
 
-  const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
-
   const onItemClick = (timestamp: number) => {
     const vsCodeApi = getVSCodeApi();
     const message: SelectHistoryEntryCommandEvent = {
       type: "command:codespin-ai.selectHistoryEntry",
-      args: [
-        {
-          itemId: timestamp.toString(),
-        },
-      ],
+      args: [{ itemId: timestamp.toString() }],
     };
     vsCodeApi.postMessage(message);
   };
@@ -99,28 +92,25 @@ export function History() {
 
     function listener(event: BrowserEvent) {
       const message = event.data;
-
       if (historyPageMessageBroker.canHandle(message.type)) {
         historyPageMessageBroker.handleRequest(message as any);
       }
     }
 
     window.addEventListener("message", listener);
-
-    return () => {
-      window.removeEventListener("message", listener);
-    };
+    return () => window.removeEventListener("message", listener);
   }, []);
 
   return (
-    <div>
+    <div className="p-6 bg-vscode-editor-background text-vscode-editor-foreground min-h-screen">
       {Object.keys(groupedEntries).length > 0 ? (
         Object.entries(groupedEntries).map(([date, entries], dateIndex) => (
           <React.Fragment key={dateIndex}>
-            <h3>{toHumanReadableDate(date)}</h3>
-            <ul style={{ listStyle: "none", padding: 0 }}>
+            <h3 className="text-xl font-semibold mb-4 text-vscode-editor-foreground">
+              {toHumanReadableDate(date)}
+            </h3>
+            <ul className="space-y-4 mb-8">
               {entries.map((entry, entryIndex) => {
-                // Generate a unique identifier for each list item
                 const itemId = `${dateIndex}-${entryIndex}`;
                 return (
                   <li
@@ -128,22 +118,19 @@ export function History() {
                     onMouseEnter={() => setHoveredItemId(itemId)}
                     onMouseLeave={() => setHoveredItemId(null)}
                     onClick={() => onItemClick(entry.timestamp)}
-                    style={{
-                      marginBottom: "1em",
-                      cursor: "pointer",
-                      filter:
-                        hoveredItemId === itemId ? "brightness(2)" : undefined,
-                    }}
+                    className={`p-4 rounded border border-vscode-panel-border 
+                              bg-vscode-input-background cursor-pointer
+                              ${
+                                hoveredItemId === itemId
+                                  ? "ring-2 ring-vscode-focusBorder"
+                                  : ""
+                              }`}
                   >
-                    <div>{truncatePrompt(entry.prompt)}</div>
+                    <div className="text-vscode-input-foreground">
+                      {truncatePrompt(entry.prompt)}
+                    </div>
 
-                    <div
-                      style={{
-                        fontStyle: "italic",
-                        fontSize: "smaller",
-                        marginTop: "4px",
-                      }}
-                    >
+                    <div className="mt-2 text-sm text-vscode-editor-foreground opacity-60">
                       <span>{formatRelativeTime(entry.timestamp)}</span>
                       <span>
                         {(() => {
@@ -152,14 +139,12 @@ export function History() {
                           );
 
                           return filePaths.length > 0 ? (
-                            <span style={{ marginLeft: "1em" }}>
+                            <span className="ml-4">
                               {filePaths.length <= 3
                                 ? filePaths.join(", ")
                                 : filePaths.slice(0, 2).join(", ") + " etc"}
                             </span>
-                          ) : (
-                            <></>
-                          );
+                          ) : null;
                         })()}
                       </span>
                     </div>
@@ -170,7 +155,9 @@ export function History() {
           </React.Fragment>
         ))
       ) : (
-        <div>No history entries found.</div>
+        <div className="text-vscode-editor-foreground">
+          No history entries found.
+        </div>
       )}
     </div>
   );

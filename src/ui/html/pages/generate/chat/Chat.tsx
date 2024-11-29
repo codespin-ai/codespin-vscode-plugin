@@ -123,7 +123,7 @@ export function Chat() {
       <div className="p-4 border-t border-vscode-panel-border bg-vscode-editor-background">
         <div className="flex gap-4">
           <textarea
-            className="flex-1 min-h-[44px] max-h-[200px] resize-none rounded-lg 
+            className="flex-1 min-h-[44px] max-h-[200px] resize-none rounded 
                        bg-vscode-input-background text-vscode-input-foreground 
                        p-3 border border-vscode-input-border focus:outline-none 
                        focus:ring-2 focus:ring-vscode-focusBorder focus:border-transparent"
@@ -143,7 +143,7 @@ export function Chat() {
             onClick={sendMessage}
             disabled={isGenerating || !newMessage.trim()}
             className="px-6 py-2 bg-vscode-button-background text-vscode-button-foreground 
-                     rounded-lg font-medium hover:bg-vscode-button-hover-background 
+                     rounded font-medium hover:bg-vscode-button-hover-background 
                      focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder
                      disabled:opacity-50 disabled:cursor-not-allowed
                      transition-colors duration-200"

@@ -1,9 +1,3 @@
-import {
-  VSCodeButton,
-  VSCodePanelTab,
-  VSCodePanelView,
-  VSCodePanels,
-} from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useEffect, useState } from "react";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
@@ -16,7 +10,6 @@ import {
 import { BrowserEvent, CancelEvent } from "../../../../types.js";
 import { FullHistoryEntry } from "../../../../viewProviders/history/types.js";
 import { CodeSnippet } from "../../../components/CodeSnippet.js";
-import { CSFormField } from "../../../components/CSFormField.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { HistoryEntryPanelBrokerType } from "../../../../panels/historyEntry/getMessageBroker.js";
@@ -40,7 +33,7 @@ export type HistoryEntryPageArgs = {
 
 export function HistoryEntry() {
   const args: HistoryEntryPageArgs = history.state;
-
+  const [activeTab, setActiveTab] = useState("prompt");
   const [commitMessage, setCommitMessage] = useState<string>("");
   const [showCommitMessage, setShowCommitMessage] = useState<boolean>(false);
   const [isCommitted, setIsCommitted] = useState<boolean>(false);
@@ -118,159 +111,184 @@ export function HistoryEntry() {
     };
   }, []);
 
-  return (
-    <div>
-      <VSCodePanels>
-        <VSCodePanelTab>PROMPT</VSCodePanelTab>
-        <VSCodePanelTab>RAW</VSCodePanelTab>
-        <VSCodePanelTab>DIFF</VSCodePanelTab>
-        <VSCodePanelTab>COMMIT</VSCodePanelTab>
-        <VSCodePanelView>
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <>
-              <CSFormField>
-                <div
-                  style={{
-                    fontFamily: "var(--vscode-editor-font-family)",
-                    borderRadius: "4px",
-                  }}
-                >
-                  <pre style={{ margin: "0px", padding: "0px" }}>
-                    {args.entry.prompt}
-                  </pre>
-                </div>
-              </CSFormField>
-              <CSFormField>
-                <VSCodeButton onClick={onEditClick}>Edit Prompt</VSCodeButton>
-              </CSFormField>
+  const tabs = [
+    { id: "prompt", label: "PROMPT" },
+    { id: "raw", label: "RAW" },
+    { id: "diff", label: "DIFF" },
+    { id: "commit", label: "COMMIT" },
+  ];
 
-              <h2 style={{ fontSize: "14px", marginTop: "1em" }}>
-                Generated Files
-              </h2>
+  return (
+    <div className="bg-vscode-editor-background min-h-screen text-vscode-editor-foreground">
+      {/* Tab Navigation */}
+      <div className="border-b border-vscode-panel-border">
+        <div className="flex">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-2 font-medium focus:outline-none 
+                ${
+                  activeTab === tab.id
+                    ? "border-b-2 border-vscode-button-background text-vscode-button-background"
+                    : "text-vscode-editor-foreground hover:text-vscode-button-foreground"
+                }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="p-6">
+        {/* PROMPT Tab */}
+        {activeTab === "prompt" && (
+          <div className="space-y-6">
+            <div className="rounded p-4 bg-vscode-input-background border border-vscode-input-border">
+              <pre className="font-vscode-editor whitespace-pre-wrap m-0">
+                {args.entry.prompt}
+              </pre>
+            </div>
+
+            <button
+              onClick={onEditClick}
+              className="px-4 py-2 bg-vscode-button-background text-vscode-button-foreground 
+                       rounded-md hover:bg-vscode-button-hover-background 
+                       focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+            >
+              Edit Prompt
+            </button>
+
+            <h2 className="text-lg font-medium mt-6">Generated Files</h2>
+            <div className="space-y-4">
               {args.files.length ? (
-                Array.from(
-                  args.files.map((file) => (
-                    <CodeSnippet
-                      filePath={file.filePath}
-                      code={file.generatedHtml}
-                      codeHtml={file.generatedHtml}
-                    />
-                  ))
-                )
+                args.files.map((file) => (
+                  <CodeSnippet
+                    key={file.filePath}
+                    filePath={file.filePath}
+                    code={file.generatedHtml}
+                    codeHtml={file.generatedHtml}
+                  />
+                ))
               ) : (
                 <div>No files were generated.</div>
               )}
-            </>
+            </div>
           </div>
-        </VSCodePanelView>
-        <VSCodePanelView>
-          <div
-            style={{
-              fontFamily: "var(--vscode-editor-font-family)",
-            }}
-          >
-            <h3>Prompt</h3>
-            <pre>{<div>{args.entry.rawPrompt}</div>}</pre>
-            <h3>Response</h3>
-            <pre>{<div>{args.entry.rawResponse}</div>}</pre>
-          </div>
-        </VSCodePanelView>
+        )}
 
-        <VSCodePanelView>
-          {args.files.length ? (
-            args.files.map((file) => (
-              <div key={`file-diff-${file.filePath}`}>
-                <h2 style={{ fontSize: "14px", marginTop: "1em" }}>Diff</h2>
-                <h3 style={{ fontSize: "14px", fontWeight: "normal" }}>
-                  {file.filePath}
-                </h3>
-                <div
-                  style={{
-                    padding: "0.5em 1em 0.5em 1em",
-                    borderRadius: "4px",
-                  }}
-                >
-                  <pre>{file.diffHtml}</pre>
-                </div>
+        {/* RAW Tab */}
+        {activeTab === "raw" && (
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg font-medium mb-2">Prompt</h3>
+              <div className="rounded p-4 bg-vscode-input-background border border-vscode-input-border">
+                <pre className="font-vscode-editor whitespace-pre-wrap">
+                  {args.entry.rawPrompt}
+                </pre>
               </div>
-            ))
-          ) : (
-            <div>No files were generated.</div>
-          )}
-        </VSCodePanelView>
+            </div>
+            <div>
+              <h3 className="text-lg font-medium mb-2">Response</h3>
+              <div className="rounded p-4 bg-vscode-input-background border border-vscode-input-border">
+                <pre className="font-vscode-editor whitespace-pre-wrap">
+                  {args.entry.rawResponse}
+                </pre>
+              </div>
+            </div>
+          </div>
+        )}
 
-        <VSCodePanelView>
-          <div style={{ display: "flex", flexDirection: "column" }}>
+        {/* DIFF Tab */}
+        {activeTab === "diff" && (
+          <div>
+            {args.files.length ? (
+              args.files.map((file) => (
+                <div key={file.filePath} className="mb-6">
+                  <h3 className="text-lg font-medium mb-2">
+                    Diff: {file.filePath}
+                  </h3>
+                  <div className="rounded p-4 bg-vscode-input-background border border-vscode-input-border">
+                    <pre className="font-vscode-editor whitespace-pre-wrap">
+                      {file.diffHtml}
+                    </pre>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div>No files were generated.</div>
+            )}
+          </div>
+        )}
+
+        {/* COMMIT Tab */}
+        {activeTab === "commit" && (
+          <div className="space-y-6">
             {args.git.files.length ? (
-              <div>
-                <div
-                  style={{
-                    fontFamily: "var(--vscode-editor-font-family)",
-                    borderRadius: "4px",
-                  }}
-                >
-                  <pre style={{ margin: "0px", padding: "0px" }}>
+              <>
+                <div className="rounded p-4 bg-vscode-input-background border border-vscode-input-border">
+                  <pre className="font-vscode-editor whitespace-pre-wrap">
                     {args.entry.prompt}
                   </pre>
                 </div>
+
                 {!showCommitMessage && (
-                  <div style={{ marginTop: "1em" }}>
-                    <VSCodeButton onClick={onGenerateCommitMessage}>
-                      Generate Commit Message
-                    </VSCodeButton>
-                  </div>
+                  <button
+                    onClick={onGenerateCommitMessage}
+                    className="px-4 py-2 bg-vscode-button-background text-vscode-button-foreground 
+                             rounded-md hover:bg-vscode-button-hover-background 
+                             focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+                  >
+                    Generate Commit Message
+                  </button>
                 )}
+
                 {showCommitMessage && (
-                  <div style={{ marginTop: "1em" }}>
-                    <h3>Generated Commit Message</h3>
-                    <div
-                      style={{
-                        fontFamily: "var(--vscode-editor-font-family)",
-                        borderRadius: "4px",
-                      }}
-                    >
-                      {commitMessage}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium">
+                      Generated Commit Message
+                    </h3>
+                    <div className="rounded p-4 bg-vscode-input-background border border-vscode-input-border">
+                      <pre className="font-vscode-editor whitespace-pre-wrap">
+                        {commitMessage}
+                      </pre>
                     </div>
-                    {!isCommitted ? (
-                      <VSCodeButton
+
+                    {!isCommitted && (
+                      <button
                         onClick={onCommitClick}
-                        style={{ marginTop: "1em" }}
+                        className="px-4 py-2 bg-vscode-button-background text-vscode-button-foreground 
+                                 rounded-md hover:bg-vscode-button-hover-background 
+                                 focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
                       >
                         Commit Files
-                      </VSCodeButton>
-                    ) : (
-                      <></>
+                      </button>
                     )}
                   </div>
                 )}
-                <div style={{ marginTop: "1em" }}>
-                  <h3>
+
+                <div>
+                  <h3 className="text-lg font-medium mb-2">
                     {isCommitted
                       ? "✅ The following files were committed"
                       : "Files in commit:"}
                   </h3>
-                  {
-                    <ul
-                      style={{
-                        padding: "0px",
-                        margin: "0px",
-                      }}
-                    >
-                      {args.git.files.map((file, i) => (
-                        <li key={`file-commit-${file.filePath}`}>
-                          {i + 1}. {file.filePath} ({file.change})
-                        </li>
-                      ))}
-                    </ul>
-                  }
+                  <ul className="space-y-1">
+                    {args.git.files.map((file, i) => (
+                      <li key={file.filePath} className="font-vscode-editor">
+                        {i + 1}. {file.filePath} ({file.change})
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              </div>
+              </>
             ) : (
               <div>There are no files to be committed.</div>
             )}
           </div>
-        </VSCodePanelView>
-      </VSCodePanels>
+        )}
+      </div>
     </div>
   );
 }
