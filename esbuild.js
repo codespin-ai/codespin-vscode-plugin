@@ -36,10 +36,11 @@ const watchConfig = {
 const webviewConfig = {
   ...baseConfig,
   target: "es2020",
-  format: "esm",
-  entryPoints: ["./src/webview/main.ts"],
-  outfile: "./out/webview.js",
-};
+  format: "esm", 
+  entryPoints: ["./src/webview/main.ts", "./src/ui/html/styles/tailwind.css"],
+  outdir: "./out/webview",
+  loader: { ".css": "copy" },
+ };
 
 (async () => {
   const args = process.argv.slice(2);

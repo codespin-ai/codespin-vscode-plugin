@@ -11,6 +11,7 @@ export function getWebviewContent(
   options: WebviewOptions
 ) {
   const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
+  const cssUri = getUri(webview, extensionUri, ["out", "styles.css"]);
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -22,6 +23,7 @@ export function getWebviewContent(
           body { font-family: var(--font-family); }
           ${options.style || ""}
         </style>        
+        <link href="${cssUri}" rel="stylesheet">
       </head>
       <body>
         <div id="root"></div>
