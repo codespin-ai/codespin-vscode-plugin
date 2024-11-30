@@ -17,6 +17,7 @@ export type CodeContentItem = {
   id: string;
   path: string;
   content: string;
+  html: string;
 };
 
 export type MarkdownContentItem = {
