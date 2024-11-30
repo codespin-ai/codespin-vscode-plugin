@@ -6,7 +6,7 @@ import { GeneratePanelBrokerType } from "../../../../panels/generate/getMessageB
 import { BrowserEvent } from "../../../../types.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { ContentItem, Message } from "./types.js";
+import { ContentItem, Message, UserMessage } from "./types.js";
 import { ContentBlock } from "./ContentBlock.js";
 
 type GenerateStreamArgs = {
@@ -59,17 +59,17 @@ export function Chat() {
   function sendMessage() {
     if (!newMessage.trim() || isGenerating) return;
 
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "user",
-        content: {
-          id: generateBlockId(),
+    const userMessage: UserMessage = {
+      role: "user",
+      content: [
+        {
           type: "text",
-          content: newMessage,
+          text: newMessage,
         },
-      },
-    ]);
+      ],
+    };
+
+    setMessages((prev) => [...prev, userMessage]);
 
     const generatePanelMessageClient =
       createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
@@ -82,15 +82,37 @@ export function Chat() {
       prompt: newMessage,
       codingConvention: undefined,
       includedFiles: [],
+      messages, // Pass entire conversation history
     };
 
     generatePanelMessageClient.send("generate", generateEvent);
     setNewMessage("");
   }
 
-  const renderBlock = (block: ContentItem) => {
-    return <ContentBlock key={block.id} block={block} />;
+  const renderMessage = (message: Message) => {
+    if (message.role === "user") {
+      return message.content.map((content, idx) => {
+        if (content.type === "text") {
+          return (
+            <div key={idx} className={`${baseBlockStyles}`}>
+              <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
+                {content.text}
+              </pre>
+            </div>
+          );
+        }
+        // Handle image content if needed
+        return null;
+      });
+    } else {
+      return message.content.map((block) => (
+        <ContentBlock key={block.id} block={block} />
+      ));
+    }
   };
+
+  const baseBlockStyles =
+    "rounded p-4 mb-4 border bg-vscode-input-background border-vscode-input-border text-vscode-input-foreground";
 
   return (
     <div className="h-screen flex flex-col bg-vscode-editor-background">
@@ -108,13 +130,13 @@ export function Chat() {
               message.role === "assistant" ? "self-start" : "self-end"
             }`}
           >
-            {renderBlock(message.content)}
+            {renderMessage(message)}
           </div>
         ))}
 
         {currentBlock && (
           <div className="flex flex-col self-start max-w-[80%]">
-            {renderBlock(currentBlock)}
+            <ContentBlock key={currentBlock.id} block={currentBlock} />
           </div>
         )}
         <div ref={chatEndRef} />

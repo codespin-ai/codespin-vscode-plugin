@@ -11,14 +11,7 @@ export function ContentBlock({ block }: Props) {
 
   switch (block.type) {
     case "file-heading":
-      return (
-        <div data-block-type="file-heading" className={baseBlockStyles}>
-          <div className="mb-2 font-vscode-editor">File: {block.path}</div>
-          <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
-            {block.content}
-          </pre>
-        </div>
-      );
+      return <></>;
     case "code":
       return (
         <div
@@ -29,9 +22,16 @@ export function ContentBlock({ block }: Props) {
         </div>
       );
     case "text":
-    default:
       return (
         <div data-block-type="text" className={baseBlockStyles}>
+          <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
+            {block.content}
+          </pre>
+        </div>
+      );
+    case "markdown":
+      return (
+        <div data-block-type="markdown" className={baseBlockStyles}>
           <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
             {block.content}
           </pre>

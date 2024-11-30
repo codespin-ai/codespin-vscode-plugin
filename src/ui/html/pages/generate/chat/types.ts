@@ -1,4 +1,4 @@
-// types.ts
+// types.ts - showing full file content
 export type FileHeadingContentItem = {
   type: "file-heading";
   id: string;
@@ -32,7 +32,24 @@ export type ContentItem =
   | CodeContentItem
   | MarkdownContentItem;
 
-export type Message = {
-  role: "user" | "assistant";
-  content: ContentItem;
+export type UserMessageContent =
+  | {
+      type: "text";
+      text: string;
+    }
+  | {
+      type: "image";
+      path: string;
+    };
+
+export type UserMessage = {
+  role: "user";
+  content: UserMessageContent[];
 };
+
+export type AssistantMessage = {
+  role: "assistant";
+  content: ContentItem[];
+};
+
+export type Message = UserMessage | AssistantMessage;

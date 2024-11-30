@@ -1,5 +1,5 @@
 import { ProcessedStreamingFileParseResult } from "../../../../panels/generate/types.js";
-import { ContentItem, Message } from "./types.js";
+import { ContentItem, Message, AssistantMessage } from "./types.js";
 
 type FileBlockProcessorArgs = {
   currentBlock: ContentItem | null;
@@ -40,7 +40,7 @@ export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
 }
 
 /**
- * Ends a file block by replacing it with an HTML block.
+ * Ends a file block by creating a code block and adding it to messages
  */
 export function endFileBlock(
   path: string,
@@ -59,20 +59,31 @@ export function endFileBlock(
   };
 
   setMessages((prevMessages) => {
-    return [
-      ...prevMessages,
-      {
+    // Find the last assistant message or create a new one
+    let lastAssistantMessage = prevMessages[prevMessages.length - 1];
+    if (!lastAssistantMessage || lastAssistantMessage.role !== "assistant") {
+      
+      const newAssistantMessage: AssistantMessage = {
         role: "assistant",
-        content: codeBlock,
-      },
-    ];
+        content: [codeBlock],
+      };
+      return [...prevMessages, newAssistantMessage];
+    }
+
+    // Clone messages array and add new code block to last assistant message
+    const newMessages = [...prevMessages];
+    const lastMessage = { ...lastAssistantMessage };
+    lastMessage.content = [...lastMessage.content, codeBlock];
+    newMessages[newMessages.length - 1] = lastMessage;
+    debugger;
+    return newMessages;
   });
 
   setCurrentBlock(null);
 }
 
 /**
- * Handles a markdown block, finalizing the current block and replacing it.
+ * Handles a markdown block, adding it to the last assistant message or creating a new one
  */
 export function handleMarkdownBlock(
   markdownContent: string,
@@ -87,13 +98,22 @@ export function handleMarkdownBlock(
   };
 
   setMessages((prevMessages) => {
-    return [
-      ...prevMessages,
-      {
+    // Find the last assistant message or create a new one
+    let lastAssistantMessage = prevMessages[prevMessages.length - 1];
+    if (!lastAssistantMessage || lastAssistantMessage.role !== "assistant") {
+      const newAssistantMessage: AssistantMessage = {
         role: "assistant",
-        content: markdownBlock,
-      },
-    ];
+        content: [markdownBlock],
+      };
+      return [...prevMessages, newAssistantMessage];
+    }
+
+    // Clone messages array and add new markdown block to last assistant message
+    const newMessages = [...prevMessages];
+    const lastMessage = { ...lastAssistantMessage };
+    lastMessage.content = [...lastMessage.content, markdownBlock];
+    newMessages[newMessages.length - 1] = lastMessage;
+    return newMessages;
   });
 
   setCurrentBlock(null);
