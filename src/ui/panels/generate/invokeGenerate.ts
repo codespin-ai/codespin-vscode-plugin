@@ -2,22 +2,20 @@ import {
   GenerateArgs as CodeSpinGenerateArgs,
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
+import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { mkdir } from "fs/promises";
 import { pathExists } from "../../../fs/pathExists.js";
+import { createMessageClient } from "../../../messaging/messageClient.js";
 import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
-import { writeGeneratedFiles } from "../../../settings/history/writeGeneratedFiles.js";
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
+import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
 import { navigateTo } from "../../navigateTo.js";
 import { GeneratePanel } from "./GeneratePanel.js";
+import { processStreamingFileParseResult } from "./processStreamingFileParseResult.js";
 import {
   FileResultStreamEvent,
-  PromptCreatedEvent,
-  ResponseStreamEvent,
+  PromptCreatedEvent
 } from "./types.js";
-import { createMessageClient } from "../../../messaging/messageClient.js";
-import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
-import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
-import { processStreamingFileParseResult } from "./processStreamingFileParseResult.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
