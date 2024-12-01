@@ -5,12 +5,12 @@ import * as path from "path";
 import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
 import { InitArgs } from "./ChatPanel.js";
 import { getFilesRecursive } from "../../fs/getFilesRecursive.js";
+import { CodingConvention } from "../../settings/conventions/CodingConvention.js";
 
 export async function getPageArgs(
   initArgs: InitArgs,
   workspaceRoot: string,
-  conventions: any,
-  uiProps: any
+  conventions: CodingConvention[],
 ): Promise<StartChatPageArgs> {
   const codespinConfig = await readCodeSpinConfig(undefined, workspaceRoot);
   const selectedModel = await getModel([codespinConfig.model], codespinConfig);
@@ -36,6 +36,5 @@ export async function getPageArgs(
     selectedModel: selectedModel.alias ?? selectedModel.name,
     prompt: initArgs.prompt ?? "",
     codingConvention: undefined,
-    uiProps,
   };
 }

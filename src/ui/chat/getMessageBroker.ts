@@ -1,31 +1,32 @@
 import * as path from "path";
 import * as vscode from "vscode";
+import {
+  BrokerType,
+  createMessageBroker,
+} from "../../messaging/messageBroker.js";
+import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
+import { editAnthropicConfig } from "../../settings/provider/editAnthropicConfig.js";
+import { editOpenAIConfig } from "../../settings/provider/editOpenAIConfig.js";
+import {
+  EditAnthropicConfigEvent,
+  EditOpenAIConfigEvent,
+} from "../../settings/provider/types.js";
 import { navigateTo } from "../navigateTo.js";
 import { addDeps } from "./addDeps.js";
-import { copyToClipboard } from "./copyToClipboard.js";
 import { ChatPanel } from "./ChatPanel.js";
+import { copyToClipboard } from "./copyToClipboard.js";
 import { getStartChatArgs } from "./getStartChatArgs.js";
 import { invokeGenerate } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
-  StartChatEvent,
   ModelChangeEvent,
   NewConversationEvent,
   OpenFileEvent,
-  UIPropsUpdateEvent,
+  StartChatEvent,
 } from "./types.js";
-import { BrokerType, createMessageBroker } from "../../messaging/messageBroker.js";
-import { EditAnthropicConfigEvent, EditOpenAIConfigEvent } from "../../settings/provider/types.js";
-import { editAnthropicConfig } from "../../settings/provider/editAnthropicConfig.js";
-import { editOpenAIConfig } from "../../settings/provider/editOpenAIConfig.js";
-import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
-import { saveUIProps } from "./saveUIProps.js";
 
-export function getMessageBroker(
-  chatPanel: ChatPanel,
-  workspaceRoot: string
-) {
+export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
   const messageBroker = createMessageBroker()
     .attachHandler("addDeps", async (message: AddDepsEvent) => {
       await addDeps(chatPanel, message, workspaceRoot);
@@ -79,16 +80,6 @@ export function getMessageBroker(
     .attachHandler("modelChange", async (message: ModelChangeEvent) => {
       await setDefaultModel(message.model, workspaceRoot);
       return 100;
-    })
-    .attachHandler("uiPropsUpdate", async (message: UIPropsUpdateEvent) => {
-      const event = message;
-      saveUIProps(
-        {
-          promptTextAreaHeight: event.promptTextAreaHeight,
-          promptTextAreaWidth: event.promptTextAreaWidth,
-        },
-        workspaceRoot
-      );
     })
     .attachHandler("openFile", async (message: OpenFileEvent) => {
       const filePath = path.resolve(workspaceRoot, message.file);

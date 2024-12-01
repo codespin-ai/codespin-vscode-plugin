@@ -102,7 +102,7 @@ export function Conversations() {
             <h3 className="text-xl font-semibold mb-4 text-vscode-editor-foreground">
               {toHumanReadableDate(date)}
             </h3>
-            <ul className="space-y-4 mb-8">
+            <ul className="mb-8">
               {entries.map((entry, entryIndex) => {
                 const itemId = `${dateIndex}-${entryIndex}`;
 

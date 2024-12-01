@@ -7,11 +7,14 @@ import { MessageTemplate } from "../types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getPageArgs } from "./getPageArgs.js";
-import { getUIProps } from "./getUIProps.js";
 import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
 import { StartChatEvent } from "./types.js";
 
-export type InitArgs = { type: "files"; prompt: string | undefined; args: string[] };
+export type InitArgs = {
+  type: "files";
+  prompt: string | undefined;
+  args: string[];
+};
 
 let activePanel: ChatPanel | undefined = undefined;
 
@@ -40,13 +43,10 @@ export class ChatPanel extends UIPanel {
 
     const conventions = await getConventions(workspaceRoot);
 
-    const uiProps = await getUIProps(workspaceRoot);
-
     const startChatPageArgs: StartChatPageArgs = await getPageArgs(
       initArgs,
       workspaceRoot,
-      conventions,
-      uiProps
+      conventions
     );
 
     await navigateTo(this, "/start", startChatPageArgs);

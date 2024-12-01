@@ -103,15 +103,6 @@ export type CopyToClipboardEvent = {
   type: "copyToClipboard";
 } & CopyToClipboardUserInput;
 
-export type UIPropsUpdateArgs = {
-  promptTextAreaWidth?: number;
-  promptTextAreaHeight?: number;
-};
-
-export type UIPropsUpdateEvent = {
-  type: "uiPropsUpdate";
-} & UIPropsUpdateArgs;
-
 export type NewConversationEvent = {
   type: "newConversation";
 };

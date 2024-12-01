@@ -8,8 +8,9 @@ import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { BrowserEvent } from "../../../../types.js";
 import { formatFileSize } from "../../../../../fs/formatFileSize.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
-import { AddDepsEvent, StartChatEvent, OpenFileEvent, UIPropsUpdateEvent } from "../../../types.js";
+import { AddDepsEvent, StartChatEvent, OpenFileEvent } from "../../../types.js";
 import { StartChatPageArgs } from "./StartChatPageArgs.js";
+import { ChatIcon } from "../../components/icons/ChatIcon.js";
 
 export function StartChat() {
   const vsCodeApi = getVSCodeApi();
@@ -25,20 +26,13 @@ export function StartChat() {
     args.includedFiles
   );
 
-  const [initialHeight, setInitialHeight] = useState(
-    args.uiProps?.promptTextAreaHeight ?? 0
-  );
-
-  const [initialWidth, setInitialWidth] = useState(
-    args.uiProps?.promptTextAreaWidth ?? 0
-  );
-
   const [showCopied, setShowCopied] = useState(false);
 
-  const chatPanelMessageClient =
-    createMessageClient<ChatPanelBrokerType>((message: unknown) => {
+  const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
+    (message: unknown) => {
       vsCodeApi.postMessage(message);
-    });
+    }
+  );
 
   useEffect(() => {
     if (files.length >= 1) {
@@ -59,16 +53,6 @@ export function StartChat() {
     if (promptRef.current) {
       promptRef.current.focus();
       promptRef.current.addEventListener("keydown", onPromptTextAreaKeyDown);
-
-      if (args.uiProps?.promptTextAreaHeight) {
-        promptRef.current.style.height = `${args.uiProps.promptTextAreaHeight}px`;
-        setInitialHeight(promptRef.current.clientHeight);
-      }
-
-      if (args.uiProps?.promptTextAreaWidth) {
-        promptRef.current.style.width = `${args.uiProps.promptTextAreaWidth}px`;
-        setInitialWidth(promptRef.current.clientWidth);
-      }
     }
 
     const startChatPageMessageBroker = getMessageBroker(setFiles);
@@ -143,21 +127,6 @@ export function StartChat() {
     };
 
     chatPanelMessageClient.send("startChat", message);
-
-    if (promptRef.current) {
-      if (
-        promptRef.current.clientHeight !== initialHeight ||
-        promptRef.current.clientWidth !== initialWidth
-      ) {
-        const uiPropsUpdate: UIPropsUpdateEvent = {
-          type: "uiPropsUpdate",
-          promptTextAreaHeight: promptRef.current.clientHeight,
-          promptTextAreaWidth: promptRef.current.clientWidth,
-        };
-
-        chatPanelMessageClient.send("uiPropsUpdate", uiPropsUpdate);
-      }
-    }
   }
 
   function handleDeleteFile(filePath: string) {
@@ -190,15 +159,15 @@ export function StartChat() {
       <h1 className="text-2xl font-bold text-vscode-editor-foreground mb-6">
         Start Generating
       </h1>
-      <form id="mainform" className="space-y-6">
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-vscode-editor-foreground">
+      <form id="mainform">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-vscode-editor-foreground mb-1">
             Model
           </label>
           <select
             value={model}
             onChange={onModelChange}
-            className="w-48 px-3 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+            className="w-48 px-1 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
           >
             {args.models.map((x) => (
               <option key={x.alias ?? x.name} value={x.alias ?? x.name}>
@@ -208,8 +177,8 @@ export function StartChat() {
           </select>
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-vscode-editor-foreground">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-vscode-editor-foreground mb-1">
             Prompt:
           </label>
           <textarea
@@ -217,27 +186,31 @@ export function StartChat() {
             rows={10}
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="w-full px-3 py-2 bg-vscode-input-background border border-vscode-input-border rounded text-vscode-input-foreground font-vscode-editor resize-both focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+            className="max-w-3xl w-full px-3 py-2 bg-vscode-input-background border border-vscode-input-border rounded text-vscode-input-foreground font-vscode-editor resize-both focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
           />
         </div>
 
-        <div className="flex gap-4">
+        <div className="flex gap-4 mb-4">
           <button
+            style={{ width: "180px" }}
             type="button"
             onClick={onGenerateButtonClick}
-            className="flex items-center px-6 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
+            className="flex justify-center items-center py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
           >
-            <GenerateIcon />
-            Start Generating
+            <ChatIcon height="24px" width="24px" />
+            <span className="ml-2">Start Chatting</span>
           </button>
 
           <button
+            style={{ width: "180px" }}
             type="button"
             onClick={copyToClipboard}
-            className="flex items-center px-6 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
+            className="flex justify-center items-center py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
           >
-            {!showCopied && <CopyIcon />}
-            {showCopied ? "Copied" : "Copy To Clipboard"}
+            {!showCopied && <CopyIcon height="24px" width="24px" />}
+            <span className="ml-2">
+              {showCopied ? "Copied" : "Copy To Clipboard"}
+            </span>
           </button>
         </div>
 
@@ -248,14 +221,10 @@ export function StartChat() {
           </p>
         )}
 
-        <div className="border-t border-vscode-panel-border my-6" />
+        <div className="border-t border-vscode-panel-border mt-6 mb-2" />
 
-        <h3 className="text-lg font-medium text-vscode-editor-foreground">
-          Additional Options
-        </h3>
-
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-vscode-editor-foreground">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-vscode-editor-foreground mb-1">
             Coding Conventions:
           </label>
           <select
@@ -265,7 +234,7 @@ export function StartChat() {
                 e.target.value === "None" ? undefined : e.target.value
               )
             }
-            className="w-48 px-3 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+            className="w-48 px-1 py-2 bg-vscode-dropdown-background border border-vscode-dropdown-border rounded text-vscode-editor-foreground focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
           >
             <option value="None">None</option>
             {args.codingConventions.map((item) => (
@@ -276,11 +245,11 @@ export function StartChat() {
           </select>
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-sm font-medium text-vscode-editor-foreground">
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-vscode-editor-foreground mb-1">
             Included Files ({formatFileSize(getTotalFileSize())}):
           </label>
-          <div className="space-y-2">
+          <div>
             {files.map((file) => (
               <div
                 key={file.path}
