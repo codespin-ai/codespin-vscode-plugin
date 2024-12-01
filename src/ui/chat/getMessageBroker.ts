@@ -3,13 +3,13 @@ import * as vscode from "vscode";
 import { navigateTo } from "../navigateTo.js";
 import { addDeps } from "./addDeps.js";
 import { copyToClipboard } from "./copyToClipboard.js";
-import { GeneratePanel } from "./GeneratePanel.js";
+import { ChatPanel } from "./ChatPanel.js";
 import { getGenerateArgs } from "./getGenerateArgs.js";
 import { invokeGeneration } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
-  GenerateEvent,
+  StartChatEvent,
   ModelChangeEvent,
   NewConversationEvent,
   OpenFileEvent,
@@ -23,7 +23,7 @@ import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
 import { saveUIProps } from "./saveUIProps.js";
 
 export function getMessageBroker(
-  generatePanel: GeneratePanel,
+  generatePanel: ChatPanel,
   workspaceRoot: string
 ) {
   const messageBroker = createMessageBroker()
@@ -40,7 +40,7 @@ export function getMessageBroker(
       generatePanel.globalEventEmitter.emit("message", newConversations);
     })
     .attachHandler("generate", async (message: unknown) => {
-      generatePanel.userInput = message as GenerateEvent;
+      generatePanel.userInput = message as StartChatEvent;
 
       const generateArgs = await getGenerateArgs(generatePanel, workspaceRoot);
 

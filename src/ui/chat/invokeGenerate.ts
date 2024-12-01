@@ -6,7 +6,7 @@ import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamin
 import { marked } from "marked";
 import { InvokePageBrokerType } from "./html/pages/generate/chat/getMessageBroker.js";
 import { navigateTo } from "../navigateTo.js";
-import { GeneratePanel } from "./GeneratePanel.js";
+import { ChatPanel } from "./ChatPanel.js";
 import { UserMessage } from "../../conversations/types.js";
 import { saveConversation } from "../../conversations/saveConversation.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
@@ -14,7 +14,7 @@ import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 
 export async function invokeGeneration(
-  generatePanel: GeneratePanel,
+  generatePanel: ChatPanel,
   argsForGeneration: { args: CodeSpinGenerateArgs },
   workspaceRoot: string
 ) {

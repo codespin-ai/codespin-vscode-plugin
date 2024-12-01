@@ -1,7 +1,7 @@
 import { GenerateArgs as CodeSpinGenerateArgs } from "codespin/dist/commands/generate/index.js";
 import { getModel } from "codespin/dist/settings/getModel.js";
 import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
-import { GeneratePanel } from "./GeneratePanel.js";
+import { ChatPanel } from "./ChatPanel.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 
@@ -16,7 +16,7 @@ type GetGenerateArgsResult =
     };
 
 export async function getGenerateArgs(
-  generatePanel: GeneratePanel,
+  generatePanel: ChatPanel,
   workspaceRoot: string
 ): Promise<GetGenerateArgsResult> {
   const userInputFromPanel = generatePanel.userInput!;

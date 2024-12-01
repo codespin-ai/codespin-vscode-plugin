@@ -78,11 +78,11 @@ export type ModelChangeEvent = {
   type: "modelChange";
 } & ModelChange;
 
-export type GenerateEvent = {
-  type: "generate";
-} & GenerateUserInput;
+export type StartChatEvent = {
+  type: "startChat";
+} & StartChatUserInput;
 
-export type GenerateUserInput = {
+export type StartChatUserInput = {
   model: string;
   prompt: string;
   codingConvention: string | undefined;

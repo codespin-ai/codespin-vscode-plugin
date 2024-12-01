@@ -9,7 +9,7 @@ import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { BrowserEvent } from "../../../../types.js";
 import { formatFileSize } from "../../../../../fs/formatFileSize.js";
 import { GeneratePanelBrokerType } from "../../../getMessageBroker.js";
-import { AddDepsEvent, GenerateEvent, OpenFileEvent, UIPropsUpdateEvent } from "../../../types.js";
+import { AddDepsEvent, StartChatEvent, OpenFileEvent, UIPropsUpdateEvent } from "../../../types.js";
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
@@ -132,9 +132,9 @@ export function Generate() {
     }
   }
 
-  function generate(args: Partial<GenerateEvent>) {
-    const message: GenerateEvent = {
-      type: "generate",
+  function generate(args: Partial<StartChatEvent>) {
+    const message: StartChatEvent = {
+      type: "startChat",
       includedFiles: files,
       model,
       prompt,

@@ -5,24 +5,24 @@ import { navigateTo } from "../navigateTo.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getPageArgs } from "./getPageArgs.js";
-import { GenerateEvent, GenerateUserInput } from "./types.js";
+import { StartChatEvent, StartChatUserInput } from "./types.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { getConventions } from "../../settings/conventions/getCodingConventions.js";
 import { getUIProps } from "./getUIProps.js";
 import { MessageTemplate } from "../types.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
-type RegenerateArgs = { type: "regenerate"; args: GenerateUserInput };
+type RegenerateArgs = { type: "regenerate"; args: StartChatUserInput };
 export type InitArgs = JustFiles | RegenerateArgs;
 
-let activePanel: GeneratePanel | undefined = undefined;
+let activePanel: ChatPanel | undefined = undefined;
 
 export function getActivePanel() {
   return activePanel;
 }
 
-export class GeneratePanel extends UIPanel {
-  userInput: GenerateEvent | undefined;
+export class ChatPanel extends UIPanel {
+  userInput: StartChatEvent | undefined;
   cancelGeneration: (() => void) | undefined;
   messageBroker: ReturnType<typeof getMessageBroker>;
 
@@ -51,7 +51,7 @@ export class GeneratePanel extends UIPanel {
       uiProps
     );
 
-    await navigateTo(this, "/generate", generatePageArgs);
+    await navigateTo(this, "/start", generatePageArgs);
   }
 
   async onMessage(message: MessageTemplate) {

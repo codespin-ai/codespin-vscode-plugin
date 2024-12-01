@@ -2,7 +2,7 @@ import * as vscode from "vscode";
 import { EventEmitter } from "events";
 import { validateConfig } from "../../config/validateConfig.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { GeneratePanel } from "../../ui/chat/GeneratePanel.js";
+import { ChatPanel } from "../../ui/chat/ChatPanel.js";
 
 export function getGenerateCommand(
   context: vscode.ExtensionContext,
@@ -33,7 +33,7 @@ export function getGenerateCommand(
           )
         : undefined;
 
-    const panel = new GeneratePanel(context, globalEventEmitter);
+    const panel = new ChatPanel(context, globalEventEmitter);
     await panel.init({ type: "files", prompt, args: filePaths });
   };
 }

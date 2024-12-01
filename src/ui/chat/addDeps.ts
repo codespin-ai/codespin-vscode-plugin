@@ -3,10 +3,10 @@ import * as path from "path";
 import { AddDepsEvent } from "./types.js";
 import { includeFiles } from "./includeFiles.js";
 import { pathExists } from "../../fs/pathExists.js";
-import { GeneratePanel } from "./GeneratePanel.js";
+import { ChatPanel } from "./ChatPanel.js";
 
 export async function addDeps(
-  generatePanel: GeneratePanel,
+  generatePanel: ChatPanel,
   message: AddDepsEvent,
   workspaceRoot: string
 ) {

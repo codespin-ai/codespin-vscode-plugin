@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { getActivePanel } from "../../ui/chat/GeneratePanel.js";
+import { getActivePanel } from "../../ui/chat/ChatPanel.js";
 import { includeFiles } from "../../ui/chat/includeFiles.js";
 
 export function getIncludeFilesCommand(context: vscode.ExtensionContext) {

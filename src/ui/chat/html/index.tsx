@@ -35,8 +35,8 @@ function App() {
   return (
     <>
       <Switch>
-        <Route path="/generate" component={Generate} />
-        <Route path="/generate/chat" component={Chat} />
+        <Route path="/start" component={Generate} />
+        <Route path="/chat" component={Chat} />
         <Route path="/provider/config/edit" component={EditConfig} />
         <Route path="/initialize" component={Initialize} />
       </Switch>
