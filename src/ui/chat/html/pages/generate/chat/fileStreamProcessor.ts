@@ -1,5 +1,5 @@
 import { AssistantMessage, CodeContent, FileHeadingContent, MarkdownContent, Message, TextContent } from "../../../../../../conversations/types.js";
-import { ProcessedStreamingFileParseResult } from "../../../../panels/generate/types.js";
+import { ProcessedStreamingFileParseResult } from "../../../../types.js";
 
 type FileBlockProcessorArgs = {
   currentBlock:

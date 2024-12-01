@@ -1,5 +1,4 @@
 import * as React from "react";
-import { GeneratePanelBrokerType } from "../../../../panels/generate/getMessageBroker.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { ContentBlock } from "./ContentBlock.js";
 import {
@@ -15,6 +14,7 @@ import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { BrowserEvent } from "../../../../../types.js";
 import { getVSCodeApi } from "../../../../../../vscode/getVSCodeApi.js";
 import { createMessageClient } from "../../../../../../messaging/messageClient.js";
+import { GeneratePanelBrokerType } from "../../../../getMessageBroker.js";
 
 type GenerateStreamArgs = {
   provider: string;

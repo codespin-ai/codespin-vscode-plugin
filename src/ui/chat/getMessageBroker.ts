@@ -20,7 +20,7 @@ import { EditAnthropicConfigEvent, EditOpenAIConfigEvent } from "../../settings/
 import { editAnthropicConfig } from "../../settings/provider/editAnthropicConfig.js";
 import { editOpenAIConfig } from "../../settings/provider/editOpenAIConfig.js";
 import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
-import { saveUIProps } from "../../settings/ui/saveUIProps.js";
+import { saveUIProps } from "./saveUIProps.js";
 
 export function getMessageBroker(
   generatePanel: GeneratePanel,

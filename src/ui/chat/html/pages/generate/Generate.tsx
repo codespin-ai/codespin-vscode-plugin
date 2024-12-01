@@ -1,12 +1,5 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import type { GeneratePanelBrokerType } from "../../../panels/generate/getMessageBroker.js";
-import {
-  AddDepsEvent,
-  GenerateEvent,
-  OpenFileEvent,
-  UIPropsUpdateEvent,
-} from "../../../panels/generate/types.js";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
 import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { GeneratePageArgs } from "./GeneratePageArgs.js";
@@ -14,7 +7,9 @@ import { getMessageBroker } from "./getMessageBroker.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { BrowserEvent } from "../../../../types.js";
-import { formatFileSize } from "../../../../../text/formatFileSize.js";
+import { formatFileSize } from "../../../../../fs/formatFileSize.js";
+import { GeneratePanelBrokerType } from "../../../getMessageBroker.js";
+import { AddDepsEvent, GenerateEvent, OpenFileEvent, UIPropsUpdateEvent } from "../../../types.js";
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();

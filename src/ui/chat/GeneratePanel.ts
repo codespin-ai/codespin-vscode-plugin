@@ -8,7 +8,7 @@ import { getPageArgs } from "./getPageArgs.js";
 import { GenerateEvent, GenerateUserInput } from "./types.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { getConventions } from "../../settings/conventions/getCodingConventions.js";
-import { getUIProps } from "../../settings/ui/getUIProps.js";
+import { getUIProps } from "./getUIProps.js";
 import { MessageTemplate } from "../types.js";
 
 type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };

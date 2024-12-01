@@ -1,5 +1,5 @@
 import { BrokerType, createMessageBroker } from "../../../../../messaging/messageBroker.js";
-import { IncludeFilesEvent } from "../../../panels/generate/types.js";
+import { IncludeFilesEvent } from "../../../types.js";
 
 export function getMessageBroker(
   setFiles: (
