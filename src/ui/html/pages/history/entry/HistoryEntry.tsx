@@ -145,7 +145,7 @@ export function HistoryEntry() {
         {/* PROMPT Tab */}
         {activeTab === "prompt" && (
           <div className="space-y-6">
-            <div className="rounded p-4 bg-vscode-input-background border border-vscode-input-border">
+            <div className="rounded p-4 bg-vscode-input-background border border-vscode-input-border max-w-3xl ">
               <pre className="font-vscode-editor whitespace-pre-wrap m-0">
                 {args.entry.prompt}
               </pre>

@@ -79,7 +79,6 @@ export function endFileBlock(
     const lastMessage = { ...lastAssistantMessage };
     lastMessage.content = [...lastMessage.content, codeBlock];
     newMessages[newMessages.length - 1] = lastMessage;
-    debugger;
     return newMessages;
   });
 

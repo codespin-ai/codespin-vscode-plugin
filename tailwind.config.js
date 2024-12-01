@@ -44,7 +44,7 @@ export default {
             "--tw-prose-td-borders": "var(--vscode-panel-border)",
             p: {
               fontSize: "1em",
-              lineHeight: "1",
+              lineHeight: "1.25",
               margin: "0 0 0.25em 0",
               padding: 0,
             },
