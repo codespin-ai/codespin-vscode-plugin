@@ -13,14 +13,14 @@ import { createMessageClient } from "../../messaging/messageClient.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 
-export async function invokeGeneration(
-  generatePanel: ChatPanel,
+export async function invokeGenerate(
+  chatPanel: ChatPanel,
   argsForGeneration: { args: CodeSpinGenerateArgs },
   workspaceRoot: string
 ) {
-  const userInputFromPanel = generatePanel.userInput!;
+  const userInputFromPanel = chatPanel.userInput!;
 
-  await navigateTo(generatePanel, `/generate/chat`, {
+  await navigateTo(chatPanel, `/generate/chat`, {
     model: argsForGeneration.args.model,
   });
 
@@ -50,7 +50,7 @@ export async function invokeGeneration(
 
   const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
     (message) => {
-      generatePanel.getWebview().postMessage(message);
+      chatPanel.getWebview().postMessage(message);
     }
   );
 

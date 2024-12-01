@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
-import { Generate } from "./pages/generate/Generate.js";
+import { StartChat } from "./pages/generate/StartChat.js";
 import { Chat } from "./pages/generate/chat/Chat.js";
 import { Initialize } from "./pages/initialize/Initialize.js";
 import { EditConfig } from "./pages/provider/EditConfig.js";
@@ -35,7 +35,7 @@ function App() {
   return (
     <>
       <Switch>
-        <Route path="/start" component={Generate} />
+        <Route path="/start" component={StartChat} />
         <Route path="/chat" component={Chat} />
         <Route path="/provider/config/edit" component={EditConfig} />
         <Route path="/initialize" component={Initialize} />

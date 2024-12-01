@@ -5,7 +5,7 @@ import { addDeps } from "./addDeps.js";
 import { copyToClipboard } from "./copyToClipboard.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { getStartChatArgs } from "./getStartChatArgs.js";
-import { invokeGeneration } from "./invokeGenerate.js";
+import { invokeGenerate } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
@@ -42,12 +42,12 @@ export function getMessageBroker(
     .attachHandler("generate", async (message: unknown) => {
       chatPanel.userInput = message as StartChatEvent;
 
-      const generateArgs = await getStartChatArgs(chatPanel, workspaceRoot);
+      const startChatArgs = await getStartChatArgs(chatPanel, workspaceRoot);
 
-      switch (generateArgs.status) {
+      switch (startChatArgs.status) {
         case "can_start_chat":
           try {
-            await invokeGeneration(chatPanel, generateArgs, workspaceRoot);
+            await invokeGenerate(chatPanel, startChatArgs, workspaceRoot);
           } finally {
             const newConversation: NewConversationEvent = {
               type: "newConversation",
@@ -57,7 +57,7 @@ export function getMessageBroker(
           break;
         case "missing_config":
           await navigateTo(chatPanel, `/provider/config/edit`, {
-            provider: generateArgs.provider,
+            provider: startChatArgs.provider,
           });
           break;
       }
