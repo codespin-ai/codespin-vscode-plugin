@@ -2,18 +2,18 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { CopyIcon } from "../../components/icons/CopyIcon.js";
 import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
-import { GeneratePageArgs } from "./GeneratePageArgs.js";
+import { StartChatPageArgs } from "./StartChatPageArgs.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { BrowserEvent } from "../../../../types.js";
 import { formatFileSize } from "../../../../../fs/formatFileSize.js";
-import { GeneratePanelBrokerType } from "../../../getMessageBroker.js";
+import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { AddDepsEvent, StartChatEvent, OpenFileEvent, UIPropsUpdateEvent } from "../../../types.js";
 
 export function Generate() {
   const vsCodeApi = getVSCodeApi();
-  const args: GeneratePageArgs = history.state;
+  const args: StartChatPageArgs = history.state;
   const promptRef = useRef<HTMLTextAreaElement>(null);
 
   const [model, setModel] = useState(args.selectedModel);
@@ -35,8 +35,8 @@ export function Generate() {
 
   const [showCopied, setShowCopied] = useState(false);
 
-  const generatePanelMessageClient =
-    createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
+  const chatPanelMessageClient =
+    createMessageClient<ChatPanelBrokerType>((message: unknown) => {
       vsCodeApi.postMessage(message);
     });
 
@@ -100,7 +100,7 @@ export function Generate() {
       model: e.target.value,
     };
 
-    generatePanelMessageClient.send("modelChange", modelChangeMessage);
+    chatPanelMessageClient.send("modelChange", modelChangeMessage);
   }
 
   function onGenerateButtonClick() {
@@ -115,7 +115,7 @@ export function Generate() {
       codingConvention,
     };
 
-    generatePanelMessageClient.send("copyToClipboard", message);
+    chatPanelMessageClient.send("copyToClipboard", message);
 
     setShowCopied(true);
     setTimeout(() => {
@@ -142,7 +142,7 @@ export function Generate() {
       ...args,
     };
 
-    generatePanelMessageClient.send("generate", message);
+    chatPanelMessageClient.send("generate", message);
 
     if (promptRef.current) {
       if (
@@ -155,7 +155,7 @@ export function Generate() {
           promptTextAreaWidth: promptRef.current.clientWidth,
         };
 
-        generatePanelMessageClient.send("uiPropsUpdate", uiPropsUpdate);
+        chatPanelMessageClient.send("uiPropsUpdate", uiPropsUpdate);
       }
     }
   }
@@ -170,7 +170,7 @@ export function Generate() {
       file: filePath,
       model,
     };
-    generatePanelMessageClient.send("addDeps", message);
+    chatPanelMessageClient.send("addDeps", message);
   }
 
   function onFileClick(filePath: string) {
@@ -178,7 +178,7 @@ export function Generate() {
       type: "openFile",
       file: filePath,
     };
-    generatePanelMessageClient.send("openFile", message);
+    chatPanelMessageClient.send("openFile", message);
   }
 
   function getTotalFileSize(): number {

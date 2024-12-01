@@ -3,7 +3,7 @@
 import * as vscode from "vscode";
 
 import { EventEmitter } from "events";
-import { getGenerateCommand } from "./commands/codegen/generate.js";
+import { getStartChatCommand } from "./commands/codegen/startChat.js";
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { getInitCommand } from "./commands/init/command.js";
 import { ConversationsViewProvider } from "./ui/conversations/ConversationsViewProvider.js";
@@ -27,12 +27,12 @@ export async function activate(context: vscode.ExtensionContext) {
     )
   );
 
-  const generateCommand = vscode.commands.registerCommand(
-    "codespin-ai.generate",
-    getGenerateCommand(context, globalEventEmitter)
+  const startChatCommand = vscode.commands.registerCommand(
+    "codespin-ai.startChat",
+    getStartChatCommand(context, globalEventEmitter)
   );
 
-  context.subscriptions.push(generateCommand);
+  context.subscriptions.push(startChatCommand);
 
   const initCommand = vscode.commands.registerCommand(
     "codespin-ai.init",

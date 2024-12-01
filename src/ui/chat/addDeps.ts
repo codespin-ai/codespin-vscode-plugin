@@ -6,7 +6,7 @@ import { pathExists } from "../../fs/pathExists.js";
 import { ChatPanel } from "./ChatPanel.js";
 
 export async function addDeps(
-  generatePanel: ChatPanel,
+  chatPanel: ChatPanel,
   message: AddDepsEvent,
   workspaceRoot: string
 ) {
@@ -21,7 +21,7 @@ export async function addDeps(
   });
 
   includeFiles(
-    generatePanel,
+    chatPanel,
     (
       await Promise.all(
         dependenciesResult.dependencies

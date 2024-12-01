@@ -8,7 +8,7 @@ export function getIncludeFilesCommand(context: vscode.ExtensionContext) {
     _: unknown,
     files: vscode.Uri[]
   ): Promise<void> {
-    // Get the active GeneratePanel
+    // Get the active ChatPanel
     const panel = getActivePanel();
 
     if (!panel) {

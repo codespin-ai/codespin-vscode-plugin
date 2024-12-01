@@ -14,7 +14,7 @@ import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { BrowserEvent } from "../../../../../types.js";
 import { getVSCodeApi } from "../../../../../../vscode/getVSCodeApi.js";
 import { createMessageClient } from "../../../../../../messaging/messageClient.js";
-import { GeneratePanelBrokerType } from "../../../../getMessageBroker.js";
+import { ChatPanelBrokerType } from "../../../../getMessageBroker.js";
 
 type GenerateStreamArgs = {
   provider: string;
@@ -77,8 +77,8 @@ export function Chat() {
 
     setMessages((prev) => [...prev, userMessage]);
 
-    const generatePanelMessageClient =
-      createMessageClient<GeneratePanelBrokerType>((message: unknown) => {
+    const chatPanelMessageClient =
+      createMessageClient<ChatPanelBrokerType>((message: unknown) => {
         getVSCodeApi().postMessage(message);
       });
 
@@ -91,7 +91,7 @@ export function Chat() {
       messages,
     };
 
-    generatePanelMessageClient.send("generate", generateEvent);
+    chatPanelMessageClient.send("generate", generateEvent);
     setNewMessage("");
   }
 

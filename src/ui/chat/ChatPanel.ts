@@ -1,19 +1,17 @@
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
-import { GeneratePageArgs } from "./html/pages/generate/GeneratePageArgs.js";
+import { getConventions } from "../../settings/conventions/getCodingConventions.js";
+import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { navigateTo } from "../navigateTo.js";
+import { MessageTemplate } from "../types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getPageArgs } from "./getPageArgs.js";
-import { StartChatEvent, StartChatUserInput } from "./types.js";
-import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { getConventions } from "../../settings/conventions/getCodingConventions.js";
 import { getUIProps } from "./getUIProps.js";
-import { MessageTemplate } from "../types.js";
+import { StartChatPageArgs } from "./html/pages/generate/StartChatPageArgs.js";
+import { StartChatEvent } from "./types.js";
 
-type JustFiles = { type: "files"; prompt: string | undefined; args: string[] };
-type RegenerateArgs = { type: "regenerate"; args: StartChatUserInput };
-export type InitArgs = JustFiles | RegenerateArgs;
+export type InitArgs = { type: "files"; prompt: string | undefined; args: string[] };
 
 let activePanel: ChatPanel | undefined = undefined;
 
@@ -44,7 +42,7 @@ export class ChatPanel extends UIPanel {
 
     const uiProps = await getUIProps(workspaceRoot);
 
-    const generatePageArgs: GeneratePageArgs = await getPageArgs(
+    const generatePageArgs: StartChatPageArgs = await getPageArgs(
       initArgs,
       workspaceRoot,
       conventions,

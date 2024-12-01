@@ -19,7 +19,7 @@
   "contributes": {
     "keybindings": [
       {
-        "command": "codespin-ai.generate",
+        "command": "codespin-ai.startChat",
         "key": "ctrl+shift+alt+g",
         "when": "editorTextFocus || explorerViewletVisible",
         "mac": "cmd+shift+alt+g"
@@ -27,7 +27,7 @@
     ],
     "commands": [
       {
-        "command": "codespin-ai.generate",
+        "command": "codespin-ai.startChat",
         "title": "CodeSpin.AI: Start Chatting"
       },
       {
@@ -42,7 +42,7 @@
     "menus": {
       "explorer/context": [
         {
-          "command": "codespin-ai.generate",
+          "command": "codespin-ai.startChat",
           "group": "codespin-ai"
         },
         {
@@ -58,13 +58,13 @@
       "editor/context": [
         {
           "when": "editorHasSelection",
-          "command": "codespin-ai.generate",
+          "command": "codespin-ai.startChat",
           "group": "codespin-ai"
         }
       ],
       "codespin-ai.more": [
         {
-          "command": "codespin-ai.generate",
+          "command": "codespin-ai.startChat",
           "group": "codespin-ai"
         },
         {

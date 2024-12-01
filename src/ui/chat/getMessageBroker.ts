@@ -4,7 +4,7 @@ import { navigateTo } from "../navigateTo.js";
 import { addDeps } from "./addDeps.js";
 import { copyToClipboard } from "./copyToClipboard.js";
 import { ChatPanel } from "./ChatPanel.js";
-import { getGenerateArgs } from "./getGenerateArgs.js";
+import { getStartChatArgs } from "./getStartChatArgs.js";
 import { invokeGeneration } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
@@ -23,12 +23,12 @@ import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
 import { saveUIProps } from "./saveUIProps.js";
 
 export function getMessageBroker(
-  generatePanel: ChatPanel,
+  chatPanel: ChatPanel,
   workspaceRoot: string
 ) {
   const messageBroker = createMessageBroker()
     .attachHandler("addDeps", async (message: AddDepsEvent) => {
-      await addDeps(generatePanel, message, workspaceRoot);
+      await addDeps(chatPanel, message, workspaceRoot);
     })
     .attachHandler("copyToClipboard", async (message: CopyToClipboardEvent) => {
       await copyToClipboard(message, workspaceRoot);
@@ -37,26 +37,26 @@ export function getMessageBroker(
         type: "newConversation",
       };
 
-      generatePanel.globalEventEmitter.emit("message", newConversations);
+      chatPanel.globalEventEmitter.emit("message", newConversations);
     })
     .attachHandler("generate", async (message: unknown) => {
-      generatePanel.userInput = message as StartChatEvent;
+      chatPanel.userInput = message as StartChatEvent;
 
-      const generateArgs = await getGenerateArgs(generatePanel, workspaceRoot);
+      const generateArgs = await getStartChatArgs(chatPanel, workspaceRoot);
 
       switch (generateArgs.status) {
         case "can_start_chat":
           try {
-            await invokeGeneration(generatePanel, generateArgs, workspaceRoot);
+            await invokeGeneration(chatPanel, generateArgs, workspaceRoot);
           } finally {
             const newConversation: NewConversationEvent = {
               type: "newConversation",
             };
-            generatePanel.globalEventEmitter.emit("message", newConversation);
+            chatPanel.globalEventEmitter.emit("message", newConversation);
           }
           break;
         case "missing_config":
-          await navigateTo(generatePanel, `/provider/config/edit`, {
+          await navigateTo(chatPanel, `/provider/config/edit`, {
             provider: generateArgs.provider,
           });
           break;
@@ -66,14 +66,14 @@ export function getMessageBroker(
       "editAnthropicConfig",
       async (message: EditAnthropicConfigEvent) => {
         await editAnthropicConfig(message);
-        await generatePanel.onMessage(generatePanel.userInput!);
+        await chatPanel.onMessage(chatPanel.userInput!);
       }
     )
     .attachHandler(
       "editOpenAIConfig",
       async (message: EditOpenAIConfigEvent) => {
         await editOpenAIConfig(message);
-        await generatePanel.onMessage(generatePanel.userInput!);
+        await chatPanel.onMessage(chatPanel.userInput!);
       }
     )
     .attachHandler("modelChange", async (message: ModelChangeEvent) => {
@@ -99,13 +99,13 @@ export function getMessageBroker(
       });
     })
     .attachHandler("cancel", async () => {
-      if (generatePanel.cancelGeneration) {
-        generatePanel.cancelGeneration();
+      if (chatPanel.cancelGeneration) {
+        chatPanel.cancelGeneration();
       }
-      generatePanel.dispose();
+      chatPanel.dispose();
     });
 
   return messageBroker;
 }
 
-export type GeneratePanelBrokerType = BrokerType<typeof getMessageBroker>;
+export type ChatPanelBrokerType = BrokerType<typeof getMessageBroker>;
