@@ -9,12 +9,12 @@ import {
   CodeContent,
   MarkdownContent,
   FileHeadingContent,
-} from "../../../../../../conversations/types.js";
+} from "../../../../../conversations/types.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
-import { BrowserEvent } from "../../../../../types.js";
-import { getVSCodeApi } from "../../../../../../vscode/getVSCodeApi.js";
-import { createMessageClient } from "../../../../../../messaging/messageClient.js";
-import { ChatPanelBrokerType } from "../../../../getMessageBroker.js";
+import { BrowserEvent } from "../../../../types.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
+import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 
 type GenerateStreamArgs = {
   provider: string;

@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
 import { getModel } from "codespin/dist/settings/getModel.js";
 import * as path from "path";
-import { StartChatPageArgs } from "./html/pages/generate/StartChatPageArgs.js";
+import { StartChatPageArgs } from "./html/pages/StartChatPageArgs.js";
 import { InitArgs } from "./ChatPanel.js";
 import { getFilesRecursive } from "../../fs/getFilesRecursive.js";
 

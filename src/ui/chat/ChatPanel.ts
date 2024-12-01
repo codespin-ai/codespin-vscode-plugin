@@ -8,7 +8,7 @@ import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getPageArgs } from "./getPageArgs.js";
 import { getUIProps } from "./getUIProps.js";
-import { StartChatPageArgs } from "./html/pages/generate/StartChatPageArgs.js";
+import { StartChatPageArgs } from "./html/pages/StartChatPageArgs.js";
 import { StartChatEvent } from "./types.js";
 
 export type InitArgs = { type: "files"; prompt: string | undefined; args: string[] };

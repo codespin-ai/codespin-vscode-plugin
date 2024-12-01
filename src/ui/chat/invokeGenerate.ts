@@ -4,7 +4,7 @@ import {
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { marked } from "marked";
-import { InvokePageBrokerType } from "./html/pages/generate/chat/getMessageBroker.js";
+import { InvokePageBrokerType } from "./html/pages/chat/getMessageBroker.js";
 import { navigateTo } from "../navigateTo.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { UserMessage } from "../../conversations/types.js";

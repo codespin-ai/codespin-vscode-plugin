@@ -2,7 +2,7 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { ChatPanel } from "./ChatPanel.js";
 import { IncludeFilesEvent } from "./types.js";
-import { GeneratePageBrokerType } from "./html/pages/generate/getMessageBroker.js";
+import { GeneratePageBrokerType } from "./html/pages/getMessageBroker.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
 import { getFilesRecursive } from "../../fs/getFilesRecursive.js";
 
