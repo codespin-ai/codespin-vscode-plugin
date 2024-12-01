@@ -4,7 +4,6 @@ import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
 import { StartChat } from "./pages/start/StartChat.js";
 import { Chat } from "./pages/chat/Chat.js";
-import { Initialize } from "./pages/initialize/Initialize.js";
 import { EditConfig } from "./pages/provider/EditConfig.js";
 import { BrowserEvent, NavigateEvent } from "../../types.js";
 import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
@@ -38,7 +37,6 @@ function App() {
         <Route path="/start" component={StartChat} />
         <Route path="/chat" component={Chat} />
         <Route path="/provider/config/edit" component={EditConfig} />
-        <Route path="/initialize" component={Initialize} />
       </Switch>
     </>
   );

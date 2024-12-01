@@ -5,6 +5,7 @@ import { navigate } from "wouter/use-browser-location";
 import { BrowserEvent, NavigateEvent } from "../../types.js";
 import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
 import { Conversations } from "./pages/conversations/Conversations.js";
+import { Initialize } from "./pages/initialize/Initialize.js";
 
 function App() {
   console.log("CodeSpin.AI extension started.");
@@ -33,6 +34,7 @@ function App() {
     <>
       <Switch>
         <Route path="/conversations" component={Conversations} />
+        <Route path="/initialize" component={Initialize} />
       </Switch>
     </>
   );
