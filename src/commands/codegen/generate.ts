@@ -1,8 +1,8 @@
 import * as vscode from "vscode";
-import { GeneratePanel } from "../../ui/panels/generate/GeneratePanel.js";
 import { EventEmitter } from "events";
 import { validateConfig } from "../../config/validateConfig.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
+import { GeneratePanel } from "../../ui/chat/panels/generate/GeneratePanel.js";
 
 export function getGenerateCommand(
   context: vscode.ExtensionContext,

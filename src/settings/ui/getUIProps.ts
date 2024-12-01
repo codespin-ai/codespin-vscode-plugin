@@ -2,7 +2,7 @@ import { readFile } from "fs/promises";
 import * as path from "path";
 import { getCodeSpinDir } from "../codespinDirs.js";
 import { pathExists } from "../../fs/pathExists.js";
-import { UIPropsUpdateArgs } from "../../ui/panels/generate/types.js";
+import { UIPropsUpdateArgs } from "../../ui/chat/panels/generate/types.js";
 
 export async function getUIProps(
   workspaceRoot: string

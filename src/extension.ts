@@ -6,7 +6,7 @@ import { EventEmitter } from "events";
 import { getGenerateCommand } from "./commands/codegen/generate.js";
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { getInitCommand } from "./commands/init/command.js";
-import { ConversationsViewProvider } from "./ui/viewProviders/conversations/ConversationsViewProvider.js";
+import { ConversationsViewProvider } from "./ui/conversations/ConversationsViewProvider.js";
 
 const globalEventEmitter = new EventEmitter();
 

@@ -33,12 +33,20 @@ const watchConfig = {
   },
 };
 
-const webviewConfig = {
+const conversationsWebviewConfig = {
   ...baseConfig,
   target: "es2020",
   format: "esm",
-  entryPoints: ["./src/webview/main.ts"],
-  outfile: "./out/webview.js",
+  entryPoints: ["./src/webview/conversations.ts"],
+  outfile: "./out/conversations.js",
+};
+
+const chatWebviewConfig = {
+  ...baseConfig,
+  target: "es2020",
+  format: "esm",
+  entryPoints: ["./src/webview/chat.ts"],
+  outfile: "./out/chat.js",
 };
 
 (async () => {
@@ -52,14 +60,16 @@ const webviewConfig = {
         ...watchConfig,
       });
       await build({
-        ...webviewConfig,
+        ...chatWebviewConfig,
+        ...conversationsWebviewConfig,
         ...watchConfig,
       });
       console.log("[watch] build finished");
     } else {
       // Build extension and webview code
       await build(extensionConfig);
-      await build(webviewConfig);
+      await build(chatWebviewConfig);
+      await build(conversationsWebviewConfig);
       console.log("build complete");
     }
   } catch (err) {

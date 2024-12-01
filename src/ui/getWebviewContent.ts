@@ -6,12 +6,14 @@ type WebviewOptions = {
 };
 
 export function getWebviewContent(
+  jsFile: string,
+  cssFile: string,
   webview: vscode.Webview,
   extensionUri: vscode.Uri,
   options: WebviewOptions
 ) {
-  const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
-  const cssUri = getUri(webview, extensionUri, ["out", "styles.css"]);
+  const webviewUri = getUri(webview, extensionUri, ["out", jsFile]);
+  const cssUri = getUri(webview, extensionUri, ["out", cssFile]);
   return `
     <!DOCTYPE html>
     <html lang="en">

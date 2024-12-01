@@ -99,9 +99,10 @@
     }
   },
   "scripts": {
-    "build:css": "tailwindcss -i ./src/ui/html/styles/tailwind.css -o ./out/styles.css",
+    "build:css": "tailwindcss -i ./src/ui/styles/tailwind.css -o ./out/styles.css",
     "vscode:prepublish": "npm run package",
-    "compile": "npm run build:css && node ./esbuild.js",
+    "clean": "rm -rf out",
+    "compile": "npm run clean && npm run build:css && node ./esbuild.js",
     "watch": "concurrently \"npm run watch:css\" \"node ./esbuild.js --watch\"",
     "watch:css": "tailwindcss -i ./src/ui/html/styles/tailwind.css -o ./out/styles.css --watch",
     "test": "node ./out/test/runTest.js",
