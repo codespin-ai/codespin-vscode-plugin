@@ -62,7 +62,6 @@ export function endFileBlock(
     // Find the last assistant message or create a new one
     let lastAssistantMessage = prevMessages[prevMessages.length - 1];
     if (!lastAssistantMessage || lastAssistantMessage.role !== "assistant") {
-      
       const newAssistantMessage: AssistantMessage = {
         role: "assistant",
         content: [codeBlock],
@@ -94,7 +93,7 @@ export function handleMarkdownBlock(
   const markdownBlock: ContentItem = {
     id: generateBlockId(),
     type: "markdown",
-    content: markdownContent,
+    content: markdownContent.trim(),
   };
 
   setMessages((prevMessages) => {
