@@ -24,6 +24,7 @@ export type MarkdownContentItem = {
   type: "markdown";
   id: string;
   content: string;
+  html: string;
 };
 
 export type ContentItem =

@@ -4,18 +4,17 @@ import {
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { mkdir } from "fs/promises";
+import { marked } from "marked";
 import { pathExists } from "../../../fs/pathExists.js";
 import { createMessageClient } from "../../../messaging/messageClient.js";
 import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
 import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
+import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
+import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
 import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
 import { navigateTo } from "../../navigateTo.js";
 import { GeneratePanel } from "./GeneratePanel.js";
-import { processStreamingFileParseResult } from "./processStreamingFileParseResult.js";
-import {
-  FileResultStreamEvent,
-  PromptCreatedEvent
-} from "./types.js";
+import { PromptCreatedEvent } from "./types.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
@@ -53,13 +52,15 @@ export async function invokeGeneration(
     model: argsForGeneration.args.model,
   });
 
-  argsForGeneration.args.promptCallback = async (prompt: string) => {
-    const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
-      (message) => {
-        generatePanel.getWebview().postMessage(message);
-      }
-    );
+  const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
+    (message) => {
+      generatePanel.getWebview().postMessage(message);
+    }
+  );
 
+  let currentTextBlock = "";
+
+  argsForGeneration.args.promptCallback = async (prompt: string) => {
     const promptCreated: PromptCreatedEvent = {
       type: "promptCreated",
       prompt,
@@ -71,32 +72,64 @@ export async function invokeGeneration(
   };
 
   argsForGeneration.args.fileResultStreamCallback = async (
-    data: StreamingFileParseResult
+    streamedBlock: StreamingFileParseResult
   ) => {
-    const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
-      (message) => {
-        generatePanel.getWebview().postMessage(message);
+    if (streamedBlock.type === "start-file-block") {
+      if (currentTextBlock !== "") {
+        invokePageMessageClient.send("fileResultStream", {
+          type: "fileResultStream",
+          data: streamedBlock,
+        });
       }
-    );
+      currentTextBlock = "";
 
-    const fileResultStreamEvent: FileResultStreamEvent = {
-      type: "fileResultStream",
-      data: await processStreamingFileParseResult(data),
-    };
+      invokePageMessageClient.send("fileResultStream", {
+        type: "fileResultStream",
+        data: streamedBlock,
+      });
+    } else if (streamedBlock.type === "end-file-block") {
+      currentTextBlock = "";
+      const lang = getLangFromFilename(streamedBlock.file.path);
+      const html = await getHtmlForCode(streamedBlock.file.content, lang);
 
-    invokePageMessageClient.send("fileResultStream", fileResultStreamEvent);
+      invokePageMessageClient.send("fileResultStream", {
+        type: "fileResultStream",
+        data: {
+          ...streamedBlock,
+          html,
+        },
+      });
+    } else if (streamedBlock.type === "text") {
+      currentTextBlock = currentTextBlock + streamedBlock.content;
+      invokePageMessageClient.send("fileResultStream", {
+        type: "fileResultStream",
+        data: streamedBlock,
+      });
+    } else if (streamedBlock.type === "text-block") {
+      const html = await marked(streamedBlock.content, {
+        gfm: true,
+        breaks: true,
+      });
+
+      invokePageMessageClient.send("fileResultStream", {
+        type: "fileResultStream",
+        data: {
+          type: "markdown",
+          content: streamedBlock.content,
+          html,
+        },
+      });
+    }
   };
 
-  // FIXME. The following is incorrect.
-
-  // argsForGeneration.args.responseCallback = async (text: string) => {
-  //   await writeHistoryItem(
-  //     text,
-  //     `raw-response-${Date.now()}.txt`,
-  //     dirName,
-  //     workspaceRoot
-  //   );
-  // };
+  argsForGeneration.args.responseCallback = async (text: string) => {
+    await writeHistoryItem(
+      text,
+      `raw-response-${Date.now()}.txt`,
+      dirName,
+      workspaceRoot
+    );
+  };
 
   // argsForGeneration.args.parseCallback = async (files: any) => {
   //   await writeGeneratedFiles(files, dirName, workspaceRoot);

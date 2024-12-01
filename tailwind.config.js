@@ -23,7 +23,29 @@ export default {
       fontFamily: {
         "vscode-editor": "var(--vscode-editor-font-family)",
       },
+      typography: {
+        DEFAULT: {
+          css: {
+            "--tw-prose-body": "var(--vscode-editor-foreground)",
+            "--tw-prose-headings": "var(--vscode-editor-foreground)",
+            "--tw-prose-lead": "var(--vscode-editor-foreground)",
+            "--tw-prose-links": "var(--vscode-textLink-foreground)",
+            "--tw-prose-bold": "var(--vscode-editor-foreground)",
+            "--tw-prose-counters": "var(--vscode-editor-foreground)",
+            "--tw-prose-bullets": "var(--vscode-editor-foreground)",
+            "--tw-prose-hr": "var(--vscode-panel-border)",
+            "--tw-prose-quotes": "var(--vscode-editor-foreground)",
+            "--tw-prose-quote-borders": "var(--vscode-panel-border)",
+            "--tw-prose-captions": "var(--vscode-editor-foreground)",
+            "--tw-prose-code": "var(--vscode-editor-foreground)",
+            "--tw-prose-pre-code": "var(--vscode-editor-foreground)",
+            "--tw-prose-pre-bg": "var(--vscode-input-background)",
+            "--tw-prose-th-borders": "var(--vscode-panel-border)",
+            "--tw-prose-td-borders": "var(--vscode-panel-border)",
+          },
+        },
+      },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };

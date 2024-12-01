@@ -5,6 +5,14 @@ type Props = {
   block: ContentItem;
 };
 
+declare module "react" {
+  namespace JSX {
+    interface IntrinsicElements {
+      "markdown-component": any;
+    }
+  }
+}
+
 export function ContentBlock({ block }: Props) {
   const baseBlockStyles =
     "rounded p-4 mb-4 border bg-vscode-input-background border-vscode-input-border text-vscode-input-foreground";
@@ -32,9 +40,13 @@ export function ContentBlock({ block }: Props) {
     case "markdown":
       return (
         <div data-block-type="markdown" className={baseBlockStyles}>
-          <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
-            {block.content}
-          </pre>
+          <div className="prose prose-invert max-w-none whitespace-pre-wrap m-0 font-vscode-editor">
+            <div
+              dangerouslySetInnerHTML={{
+                __html: `${block.html}`,
+              }}
+            />
+          </div>
         </div>
       );
   }

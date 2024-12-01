@@ -36,12 +36,24 @@ export type ResponseStreamEvent = {
 } & ResponseStreamArgs;
 
 export type ProcessedStreamingFileParseResult =
-  | (StreamingFileParseResult & {
+  | {
+      type: "text";
+      content: string;
+    }
+  | {
       type: "end-file-block";
       file: SourceFile;
       html: string;
-    })
-  | Exclude<StreamingFileParseResult, { type: "end-file-block" }>;
+    }
+  | {
+      type: "start-file-block";
+      path: string;
+    }
+  | {
+      type: "markdown";
+      content: string;
+      html: string;
+    };
 
 export type FileResultStreamArgs = {
   data: ProcessedStreamingFileParseResult;

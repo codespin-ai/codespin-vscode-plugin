@@ -1,5 +1,10 @@
 import { ProcessedStreamingFileParseResult } from "../../../../panels/generate/types.js";
-import { ContentItem, Message, AssistantMessage } from "./types.js";
+import {
+  ContentItem,
+  Message,
+  AssistantMessage,
+  MarkdownContentItem,
+} from "./types.js";
 
 type FileBlockProcessorArgs = {
   currentBlock: ContentItem | null;
@@ -86,14 +91,16 @@ export function endFileBlock(
  */
 export function handleMarkdownBlock(
   markdownContent: string,
+  html: string,
   args: FileBlockProcessorArgs
 ) {
   const { setMessages, setCurrentBlock, generateBlockId } = args;
 
-  const markdownBlock: ContentItem = {
+  const markdownBlock: MarkdownContentItem = {
     id: generateBlockId(),
     type: "markdown",
     content: markdownContent.trim(),
+    html,
   };
 
   setMessages((prevMessages) => {
@@ -139,7 +146,7 @@ export function handleStreamingResult(
       break;
 
     case "markdown":
-      handleMarkdownBlock(result.content, args);
+      handleMarkdownBlock(result.content, result.html, args);
       break;
   }
 }
