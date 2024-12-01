@@ -126,7 +126,7 @@ export function Chat() {
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex flex-col max-w-[80%] ${
+            className={`max-w-6xl flex flex-col ${
               message.role === "assistant" ? "self-start" : "self-end"
             }`}
           >
@@ -135,7 +135,7 @@ export function Chat() {
         ))}
 
         {currentBlock && (
-          <div className="flex flex-col self-start max-w-[80%]">
+          <div className="flex flex-col self-start">
             <ContentBlock key={currentBlock.id} block={currentBlock} />
           </div>
         )}

@@ -42,6 +42,50 @@ export default {
             "--tw-prose-pre-bg": "var(--vscode-input-background)",
             "--tw-prose-th-borders": "var(--vscode-panel-border)",
             "--tw-prose-td-borders": "var(--vscode-panel-border)",
+            p: {
+              fontSize: "1em",
+              lineHeight: "1",
+              margin: "0 0 0.25em 0",
+              padding: 0,
+            },
+            ul: {
+              margin: "0 0 0.25em 0",
+              lineHeight: "1",
+            },
+            ol: {
+              marginTop: "0.25em",
+              marginBottom: "0.25em",
+              lineHeight: "1",
+            },
+            li: {
+              marginTop: "0",
+              marginBottom: "0",
+              lineHeight: "1",
+            },
+            h1: {
+              lineHeight: "1",
+            },
+            h2: {
+              lineHeight: "1",
+            },
+            h3: {
+              lineHeight: "1",
+            },
+            h4: {
+              lineHeight: "1",
+            },
+            h5: {
+              lineHeight: "1",
+            },
+            h6: {
+              lineHeight: "1",
+            },
+            blockquote: {
+              lineHeight: "1",
+            },
+            "> * + *": {
+              marginTop: "0.25em",
+            },
           },
         },
       },

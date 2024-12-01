@@ -14,8 +14,7 @@ declare module "react" {
 }
 
 export function ContentBlock({ block }: Props) {
-  const baseBlockStyles =
-    "rounded p-4 mb-4 border bg-vscode-input-background border-vscode-input-border text-vscode-input-foreground";
+  const baseBlockStyles = "mt-4 mb-4";
 
   switch (block.type) {
     case "file-heading":
@@ -24,7 +23,7 @@ export function ContentBlock({ block }: Props) {
       return (
         <div
           data-block-type="code"
-          className="mb-4 bg-vscode-input-background font-vscode-editor [&_pre]:p-4"
+          className="mb-4 bg-vscode-input-background font-vscode-editor [&_pre]:p-4 overflow-x-auto"
         >
           <div dangerouslySetInnerHTML={{ __html: block.html }} />
         </div>
@@ -40,7 +39,7 @@ export function ContentBlock({ block }: Props) {
     case "markdown":
       return (
         <div data-block-type="markdown" className={baseBlockStyles}>
-          <div className="prose prose-invert max-w-none whitespace-pre-wrap m-0 font-vscode-editor">
+          <div className="prose prose-invert max-w-none whitespace-pre-wrap m-0 overflow-x-auto text-base leading-none">
             <div
               dangerouslySetInnerHTML={{
                 __html: `${block.html}`,
