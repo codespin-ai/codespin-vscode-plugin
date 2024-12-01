@@ -2,18 +2,18 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { ChatPanel } from "./ChatPanel.js";
 import { IncludeFilesEvent } from "./types.js";
-import { GeneratePageBrokerType } from "./html/pages/getMessageBroker.js";
+import { StartChatPageBrokerType } from "./html/pages/start/getMessageBroker.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
 import { getFilesRecursive } from "../../fs/getFilesRecursive.js";
 
 export async function includeFiles(
-  generatePanel: ChatPanel,
+  chatPanel: ChatPanel,
   filePaths: string[],
   workspaceRoot: string
 ) {
-  const generatePageMessageClient = createMessageClient<GeneratePageBrokerType>(
+  const startChatPageMessageClient = createMessageClient<StartChatPageBrokerType>(
     (message: unknown) => {
-      generatePanel.panel.webview.postMessage(message);
+      chatPanel.panel.webview.postMessage(message);
     }
   );
 
@@ -29,5 +29,5 @@ export async function includeFiles(
     ),
   };
 
-  generatePageMessageClient.send("includeFiles", message);
+  startChatPageMessageClient.send("includeFiles", message);
 }

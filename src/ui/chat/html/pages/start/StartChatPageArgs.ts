@@ -1,5 +1,5 @@
 import { ModelDescription } from "codespin/dist/settings/CodeSpinConfig.js";
-import { CodingConvention } from "../../../../settings/conventions/CodingConvention.js";
+import { CodingConvention } from "../../../../../settings/conventions/CodingConvention.js";
 
 export type StartChatPageArgs = {
   models: ModelDescription[],

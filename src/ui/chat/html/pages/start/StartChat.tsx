@@ -1,14 +1,14 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { CopyIcon } from "../components/icons/CopyIcon.js";
-import { GenerateIcon } from "../components/icons/GenerateIcon.js";
+import { CopyIcon } from "../../components/icons/CopyIcon.js";
+import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
-import { createMessageClient } from "../../../../messaging/messageClient.js";
-import { BrowserEvent } from "../../../types.js";
-import { formatFileSize } from "../../../../fs/formatFileSize.js";
-import { ChatPanelBrokerType } from "../../getMessageBroker.js";
-import { AddDepsEvent, StartChatEvent, OpenFileEvent, UIPropsUpdateEvent } from "../../types.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
+import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { BrowserEvent } from "../../../../types.js";
+import { formatFileSize } from "../../../../../fs/formatFileSize.js";
+import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
+import { AddDepsEvent, StartChatEvent, OpenFileEvent, UIPropsUpdateEvent } from "../../../types.js";
 import { StartChatPageArgs } from "./StartChatPageArgs.js";
 
 export function StartChat() {
@@ -71,13 +71,13 @@ export function StartChat() {
       }
     }
 
-    const generatePageMessageBroker = getMessageBroker(setFiles);
+    const startChatPageMessageBroker = getMessageBroker(setFiles);
 
     function listener(event: BrowserEvent) {
       const message = event.data;
 
-      if (generatePageMessageBroker.canHandle(message.type)) {
-        generatePageMessageBroker.handleRequest(message as any);
+      if (startChatPageMessageBroker.canHandle(message.type)) {
+        startChatPageMessageBroker.handleRequest(message as any);
       }
     }
 

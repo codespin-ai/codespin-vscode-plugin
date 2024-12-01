@@ -1,5 +1,5 @@
-import { BrokerType, createMessageBroker } from "../../../../messaging/messageBroker.js";
-import { IncludeFilesEvent } from "../../types.js";
+import { BrokerType, createMessageBroker } from "../../../../../messaging/messageBroker.js";
+import { IncludeFilesEvent } from "../../../types.js";
 
 export function getMessageBroker(
   setFiles: (
@@ -28,4 +28,4 @@ export function getMessageBroker(
   );
 }
 
-export type GeneratePageBrokerType = BrokerType<typeof getMessageBroker>;
+export type StartChatPageBrokerType = BrokerType<typeof getMessageBroker>;

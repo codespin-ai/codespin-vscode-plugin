@@ -20,7 +20,7 @@ export async function invokeGenerate(
 ) {
   const userInputFromPanel = chatPanel.userInput!;
 
-  await navigateTo(chatPanel, `/generate/chat`, {
+  await navigateTo(chatPanel, `/chat`, {
     model: argsForGeneration.args.model,
   });
 

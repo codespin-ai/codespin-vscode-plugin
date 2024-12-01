@@ -2,7 +2,7 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
-import { StartChat } from "./pages/StartChat.js";
+import { StartChat } from "./pages/start/StartChat.js";
 import { Chat } from "./pages/chat/Chat.js";
 import { Initialize } from "./pages/initialize/Initialize.js";
 import { EditConfig } from "./pages/provider/EditConfig.js";
