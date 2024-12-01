@@ -1,9 +1,9 @@
 import { dependencies as codespinDependencies } from "codespin/dist/commands/dependencies.js";
 import * as path from "path";
 import { AddDepsEvent } from "./types.js";
-import { GeneratePanel } from "./GeneratePanel.js";
 import { includeFiles } from "./includeFiles.js";
-import { pathExists } from "../../../fs/pathExists.js";
+import { pathExists } from "../../fs/pathExists.js";
+import { GeneratePanel } from "./GeneratePanel.js";
 
 export async function addDeps(
   generatePanel: GeneratePanel,

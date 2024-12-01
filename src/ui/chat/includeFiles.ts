@@ -2,9 +2,9 @@ import { promises as fs } from "fs";
 import * as path from "path";
 import { GeneratePanel } from "./GeneratePanel.js";
 import { IncludeFilesEvent } from "./types.js";
-import { GeneratePageBrokerType } from "../html/pages/generate/getMessageBroker.js";
-import { createMessageClient } from "../../../messaging/messageClient.js";
-import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
+import { GeneratePageBrokerType } from "./html/pages/generate/getMessageBroker.js";
+import { createMessageClient } from "../../messaging/messageClient.js";
+import { getFilesRecursive } from "../../fs/getFilesRecursive.js";
 
 export async function includeFiles(
   generatePanel: GeneratePanel,

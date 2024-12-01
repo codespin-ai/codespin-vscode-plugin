@@ -1,6 +1,6 @@
 import { FormatPromptArgs } from "codespin/dist/commands/formatPrompt/index.js";
 import { CopyToClipboardUserInput } from "./types.js";
-import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
+import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 
 export async function getPrintPromptArgs(
   argsFromPanel: CopyToClipboardUserInput,
