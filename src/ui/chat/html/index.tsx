@@ -2,12 +2,12 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
-import { Generate } from "./html/pages/generate/Generate.js";
-import { Chat } from "./html/pages/generate/chat/Chat.js";
-import { Initialize } from "./html/pages/initialize/Initialize.js";
-import { EditConfig } from "./html/pages/provider/EditConfig.js";
-import { BrowserEvent, NavigateEvent } from "../types.js";
-import { getVSCodeApi } from "../../vscode/getVSCodeApi.js";
+import { Generate } from "./pages/generate/Generate.js";
+import { Chat } from "./pages/generate/chat/Chat.js";
+import { Initialize } from "./pages/initialize/Initialize.js";
+import { EditConfig } from "./pages/provider/EditConfig.js";
+import { BrowserEvent, NavigateEvent } from "../../types.js";
+import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
 
 function App() {
   console.log("CodeSpin.AI extension started.");

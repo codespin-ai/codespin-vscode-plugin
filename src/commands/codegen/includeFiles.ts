@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { getActivePanel } from "../../ui/chat/panels/generate/GeneratePanel.js";
-import { includeFiles } from "../../ui/chat/panels/generate/includeFiles.js";
+import { getActivePanel } from "../../ui/chat/generatePanel/GeneratePanel.js";
+import { includeFiles } from "../../ui/chat/generatePanel/includeFiles.js";
 
 export function getIncludeFilesCommand(context: vscode.ExtensionContext) {
   return async function includeFilesCommand(

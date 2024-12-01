@@ -4,14 +4,14 @@ import {
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { marked } from "marked";
-import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
-import { navigateTo } from "../../../navigateTo.js";
+import { InvokePageBrokerType } from "../html/pages/generate/chat/getMessageBroker.js";
+import { navigateTo } from "../../navigateTo.js";
 import { GeneratePanel } from "./GeneratePanel.js";
-import { UserMessage } from "../../../../conversations/types.js";
-import { saveConversation } from "../../../../conversations/saveConversation.js";
-import { createMessageClient } from "../../../../messaging/messageClient.js";
-import { getLangFromFilename } from "../../../../sourceAnalysis/getLangFromFilename.js";
-import { getHtmlForCode } from "../../../../sourceAnalysis/getHtmlForCode.js";
+import { UserMessage } from "../../../conversations/types.js";
+import { saveConversation } from "../../../conversations/saveConversation.js";
+import { createMessageClient } from "../../../messaging/messageClient.js";
+import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
+import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,

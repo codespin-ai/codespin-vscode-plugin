@@ -76,6 +76,6 @@ export class ConversationsViewProvider extends ViewProvider {
   }
 
   getCssFile(): string {
-    return "styles.css";
+    return "conversations.css";
   }
 }

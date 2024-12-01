@@ -2,8 +2,8 @@ import { GenerateArgs as CodeSpinGenerateArgs } from "codespin/dist/commands/gen
 import { getModel } from "codespin/dist/settings/getModel.js";
 import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
 import { GeneratePanel } from "./GeneratePanel.js";
-import { getProviderConfigPath } from "../../../../settings/provider/getProviderConfigPath.js";
-import { getCodingConventionPath } from "../../../../settings/conventions/getCodingConventionPath.js";
+import { getProviderConfigPath } from "../../../settings/provider/getProviderConfigPath.js";
+import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 
 type GetGenerateArgsResult =
   | {

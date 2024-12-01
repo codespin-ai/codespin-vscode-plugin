@@ -3,7 +3,7 @@ import * as path from "path";
 import { AddDepsEvent } from "./types.js";
 import { GeneratePanel } from "./GeneratePanel.js";
 import { includeFiles } from "./includeFiles.js";
-import { pathExists } from "../../../../fs/pathExists.js";
+import { pathExists } from "../../../fs/pathExists.js";
 
 export async function addDeps(
   generatePanel: GeneratePanel,

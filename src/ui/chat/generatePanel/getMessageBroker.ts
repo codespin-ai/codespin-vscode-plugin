@@ -1,6 +1,6 @@
 import * as path from "path";
 import * as vscode from "vscode";
-import { navigateTo } from "../../../navigateTo.js";
+import { navigateTo } from "../../navigateTo.js";
 import { addDeps } from "./addDeps.js";
 import { copyToClipboard } from "./copyToClipboard.js";
 import { GeneratePanel } from "./GeneratePanel.js";
@@ -15,12 +15,12 @@ import {
   OpenFileEvent,
   UIPropsUpdateEvent,
 } from "./types.js";
-import { BrokerType, createMessageBroker } from "../../../../messaging/messageBroker.js";
-import { EditAnthropicConfigEvent, EditOpenAIConfigEvent } from "../../../../settings/provider/types.js";
-import { editAnthropicConfig } from "../../../../settings/provider/editAnthropicConfig.js";
-import { editOpenAIConfig } from "../../../../settings/provider/editOpenAIConfig.js";
-import { setDefaultModel } from "../../../../settings/models/setDefaultModel.js";
-import { saveUIProps } from "../../../../settings/ui/saveUIProps.js";
+import { BrokerType, createMessageBroker } from "../../../messaging/messageBroker.js";
+import { EditAnthropicConfigEvent, EditOpenAIConfigEvent } from "../../../settings/provider/types.js";
+import { editAnthropicConfig } from "../../../settings/provider/editAnthropicConfig.js";
+import { editOpenAIConfig } from "../../../settings/provider/editOpenAIConfig.js";
+import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
+import { saveUIProps } from "../../../settings/ui/saveUIProps.js";
 
 export function getMessageBroker(
   generatePanel: GeneratePanel,
