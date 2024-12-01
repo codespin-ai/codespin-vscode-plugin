@@ -5,20 +5,20 @@ import { ChatPanel } from "./ChatPanel.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 
-type GetGenerateArgsResult =
+type GetStartChatArgsResult =
   | {
       status: "missing_config";
       provider: string;
     }
   | {
-      status: "can_generate";
+      status: "can_start_chat";
       args: CodeSpinGenerateArgs;
     };
 
 export async function getGenerateArgs(
   generatePanel: ChatPanel,
   workspaceRoot: string
-): Promise<GetGenerateArgsResult> {
+): Promise<GetStartChatArgsResult> {
   const userInputFromPanel = generatePanel.userInput!;
 
   const codespinConfig = await readCodeSpinConfig(undefined, workspaceRoot);
