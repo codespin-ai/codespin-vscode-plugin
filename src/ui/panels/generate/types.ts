@@ -19,14 +19,6 @@ export type IncludeFilesEvent = {
   type: "includeFiles";
 } & IncludeFilesArgs;
 
-export type PromptCreatedArgs = {
-  prompt: string;
-};
-
-export type PromptCreatedEvent = {
-  type: "promptCreated";
-} & PromptCreatedArgs;
-
 export type ResponseStreamArgs = {
   data: string;
 };
@@ -122,6 +114,6 @@ export type UIPropsUpdateEvent = {
   type: "uiPropsUpdate";
 } & UIPropsUpdateArgs;
 
-export type NewHistoryEntryEvent = {
-  type: "newHistoryEntry";
+export type NewConversationEvent = {
+  type: "newConversation";
 };

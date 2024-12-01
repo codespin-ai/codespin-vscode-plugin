@@ -5,8 +5,7 @@ import { navigate } from "wouter/use-browser-location";
 import { getVSCodeApi } from "../vscode/getVSCodeApi.js";
 import { Generate } from "./html/pages/generate/Generate.js";
 import { Chat } from "./html/pages/generate/chat/Chat.js";
-import { HistoryEntry } from "./html/pages/history/entry/HistoryEntry.js";
-import { History } from "./html/pages/history/History.js";
+import { Conversations } from "./html/pages/conversations/Conversations.js";
 import { Initialize } from "./html/pages/initialize/Initialize.js";
 import { EditConfig } from "./html/pages/provider/EditConfig.js";
 import { BrowserEvent, NavigateEvent } from "./types.js";
@@ -40,8 +39,7 @@ function App() {
         <Route path="/generate" component={Generate} />
         <Route path="/generate/chat" component={Chat} />
         <Route path="/provider/config/edit" component={EditConfig} />
-        <Route path="/history" component={History} />
-        <Route path="/history/entry" component={HistoryEntry} />
+        <Route path="/conversations" component={Conversations} />
         <Route path="/initialize" component={Initialize} />
       </Switch>
     </>

@@ -1,4 +1,3 @@
-// Chat.tsx
 import * as React from "react";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
@@ -6,8 +5,16 @@ import { GeneratePanelBrokerType } from "../../../../panels/generate/getMessageB
 import { BrowserEvent } from "../../../../types.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { ContentItem, Message, UserMessage } from "./types.js";
 import { ContentBlock } from "./ContentBlock.js";
+import {
+  Message,
+  UserMessage,
+  UserTextContent,
+  FileHeadingContent,
+  TextContent,
+  CodeContent,
+  MarkdownContent,
+} from "../../../../../conversations/types.js";
 
 type GenerateStreamArgs = {
   provider: string;
@@ -18,9 +25,9 @@ export function Chat() {
   const args: GenerateStreamArgs = history.state;
 
   const [messages, setMessages] = React.useState<Message[]>([]);
-  const [currentBlock, setCurrentBlock] = React.useState<ContentItem | null>(
-    null
-  );
+  const [currentBlock, setCurrentBlock] = React.useState<
+    FileHeadingContent | TextContent | CodeContent | MarkdownContent | null
+  >(null);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [newMessage, setNewMessage] = React.useState("");
   const chatEndRef = React.useRef<HTMLDivElement>(null);
@@ -59,14 +66,13 @@ export function Chat() {
   function sendMessage() {
     if (!newMessage.trim() || isGenerating) return;
 
+    const userContent: UserTextContent = {
+      text: newMessage,
+    };
+
     const userMessage: UserMessage = {
       role: "user",
-      content: [
-        {
-          type: "text",
-          text: newMessage,
-        },
-      ],
+      content: [userContent],
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -82,7 +88,7 @@ export function Chat() {
       prompt: newMessage,
       codingConvention: undefined,
       includedFiles: [],
-      messages, // Pass entire conversation history
+      messages,
     };
 
     generatePanelMessageClient.send("generate", generateEvent);
@@ -92,7 +98,7 @@ export function Chat() {
   const renderMessage = (message: Message) => {
     if (message.role === "user") {
       return message.content.map((content, idx) => {
-        if (content.type === "text") {
+        if ("text" in content) {
           return (
             <div key={idx} className={`${baseBlockStyles}`}>
               <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
@@ -101,7 +107,6 @@ export function Chat() {
             </div>
           );
         }
-        // Handle image content if needed
         return null;
       });
     } else {

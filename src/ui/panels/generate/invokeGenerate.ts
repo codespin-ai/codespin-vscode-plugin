@@ -3,53 +3,49 @@ import {
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
-import { mkdir } from "fs/promises";
 import { marked } from "marked";
-import { pathExists } from "../../../fs/pathExists.js";
 import { createMessageClient } from "../../../messaging/messageClient.js";
-import { getHistoryItemDir } from "../../../settings/history/getHistoryItemDir.js";
-import { writeHistoryItem } from "../../../settings/history/writeHistoryItem.js";
 import { getHtmlForCode } from "../../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../../sourceAnalysis/getLangFromFilename.js";
 import { InvokePageBrokerType } from "../../html/pages/generate/chat/getMessageBroker.js";
 import { navigateTo } from "../../navigateTo.js";
 import { GeneratePanel } from "./GeneratePanel.js";
-import { PromptCreatedEvent } from "./types.js";
+import { saveConversation } from "../../../conversations/saveConversation.js";
+import { UserMessage } from "../../../conversations/types.js";
 
 export async function invokeGeneration(
   generatePanel: GeneratePanel,
-  argsForGeneration: { args: CodeSpinGenerateArgs; promptFilePath: string },
-  dirName: string,
+  argsForGeneration: { args: CodeSpinGenerateArgs },
   workspaceRoot: string
 ) {
   const userInputFromPanel = generatePanel.userInput!;
 
-  const historyDirPath = getHistoryItemDir(dirName, workspaceRoot);
-
-  if (!(await pathExists(historyDirPath))) {
-    await mkdir(historyDirPath, { recursive: true });
-  }
-
-  await writeHistoryItem(
-    userInputFromPanel.prompt,
-    "prompt.txt",
-    dirName,
-    workspaceRoot
-  );
-
-  const { type: unused1, ...messageSansType } = userInputFromPanel;
-
-  const inputAsJson = JSON.stringify(messageSansType, null, 2);
-
-  await writeHistoryItem(
-    inputAsJson,
-    "user-input.json",
-    dirName,
-    workspaceRoot
-  );
-
   await navigateTo(generatePanel, `/generate/chat`, {
     model: argsForGeneration.args.model,
+  });
+
+  // Save initial conversation with just the user message
+  const conversationId = `gen_${Date.now()}`;
+  const timestamp = Date.now();
+
+  const userMessage: UserMessage = {
+    role: "user",
+    content: [
+      {
+        text: userInputFromPanel.prompt,
+      },
+    ],
+  };
+
+  await saveConversation({
+    id: conversationId,
+    title: userInputFromPanel.prompt.slice(0, 100), // Use first 100 chars of prompt as title
+    timestamp,
+    model: userInputFromPanel.model,
+    codingConvention: userInputFromPanel.codingConvention || null,
+    includedFiles: userInputFromPanel.includedFiles,
+    messages: [userMessage],
+    workspaceRoot,
   });
 
   const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
@@ -59,17 +55,6 @@ export async function invokeGeneration(
   );
 
   let currentTextBlock = "";
-
-  argsForGeneration.args.promptCallback = async (prompt: string) => {
-    const promptCreated: PromptCreatedEvent = {
-      type: "promptCreated",
-      prompt,
-    };
-
-    invokePageMessageClient.send("promptCreated", promptCreated);
-
-    await writeHistoryItem(prompt, "raw-prompt.txt", dirName, workspaceRoot);
-  };
 
   argsForGeneration.args.fileResultStreamCallback = async (
     streamedBlock: StreamingFileParseResult
@@ -121,19 +106,6 @@ export async function invokeGeneration(
       });
     }
   };
-
-  argsForGeneration.args.responseCallback = async (text: string) => {
-    await writeHistoryItem(
-      text,
-      `raw-response-${Date.now()}.txt`,
-      dirName,
-      workspaceRoot
-    );
-  };
-
-  // argsForGeneration.args.parseCallback = async (files: any) => {
-  //   await writeGeneratedFiles(files, dirName, workspaceRoot);
-  // };
 
   await codespinGenerate(argsForGeneration.args, {
     workingDir: workspaceRoot,

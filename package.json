@@ -92,8 +92,8 @@
       "codespin-ai": [
         {
           "type": "webview",
-          "id": "codespin-ai.history",
-          "name": "History"
+          "id": "codespin-ai.conversations",
+          "name": "Conversations"
         }
       ]
     }

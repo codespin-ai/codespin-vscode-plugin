@@ -4,8 +4,7 @@ import {
 } from "../../../../../messaging/messageBroker.js";
 import {
   FileResultStreamEvent,
-  ProcessedStreamingFileParseResult,
-  PromptCreatedEvent
+  ProcessedStreamingFileParseResult
 } from "../../../../panels/generate/types.js";
 
 export function getMessageBroker({
@@ -16,9 +15,6 @@ export function getMessageBroker({
   onFileResult: (result: ProcessedStreamingFileParseResult) => void;
 }) {
   return createMessageBroker()
-    .attachHandler("promptCreated", async (message: PromptCreatedEvent) => {
-      setIsGenerating(true);
-    })
     .attachHandler(
       "fileResultStream",
       async (message: FileResultStreamEvent) => {

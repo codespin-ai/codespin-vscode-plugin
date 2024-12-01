@@ -1,35 +1,33 @@
 import * as React from "react";
-import { SelectHistoryEntryCommandEvent } from "../../../../commands/history/command.js";
-import { getVSCodeApi } from "../../../../vscode/getVSCodeApi.js";
-import { HistoryEntry } from "../../../viewProviders/history/types.js";
-import { getMessageBroker } from "./getMessageBroker.js";
+import { ConversationSummary } from "../../../../conversations/types.js";
 import { BrowserEvent } from "../../../types.js";
+import { getMessageBroker } from "./getMessageBroker.js";
 
-type GroupedEntries = { [date: string]: HistoryEntry[] };
+type GroupedEntries = { [date: string]: ConversationSummary[] };
 
-export type HistoryPageArgs = {
-  entries: HistoryEntry[];
+export type ConversationsPageArgs = {
+  entries: ConversationSummary[];
 };
 
-const truncatePrompt = (prompt: string): string => {
-  if (prompt.length <= 100) {
-    return prompt;
+const truncatePrompt = (text: string): string => {
+  if (text.length <= 100) {
+    return text;
   }
 
-  let truncated = prompt.slice(0, 101);
+  let truncated = text.slice(0, 101);
   const lastSpaceIndex = truncated.lastIndexOf(" ");
 
   if (lastSpaceIndex > -1) {
     truncated = truncated.slice(0, lastSpaceIndex) + "...";
   } else {
-    truncated = prompt.slice(0, 100) + "...";
+    truncated = text.slice(0, 100) + "...";
   }
 
   return truncated;
 };
 
-export function History() {
-  const args: HistoryPageArgs = history.state;
+export function Conversations() {
+  const args: ConversationsPageArgs = history.state;
   const [entries, setEntries] = React.useState(args.entries);
   const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
 
@@ -70,13 +68,8 @@ export function History() {
     return date === today ? "Today" : date === yesterday ? "Yesterday" : date;
   };
 
-  const onItemClick = (timestamp: number) => {
-    const vsCodeApi = getVSCodeApi();
-    const message: SelectHistoryEntryCommandEvent = {
-      type: "command:codespin-ai.selectHistoryEntry",
-      args: [{ itemId: timestamp.toString() }],
-    };
-    vsCodeApi.postMessage(message);
+  const onItemClick = (conversationId: string) => {
+    console.log("CONVERSATION ID", conversationId);
   };
 
   function getFilePaths(
@@ -88,12 +81,12 @@ export function History() {
   }
 
   React.useEffect(() => {
-    const historyPageMessageBroker = getMessageBroker(setEntries);
+    const conversationsPageMessageBroker = getMessageBroker(setEntries);
 
     function listener(event: BrowserEvent) {
       const message = event.data;
-      if (historyPageMessageBroker.canHandle(message.type)) {
-        historyPageMessageBroker.handleRequest(message as any);
+      if (conversationsPageMessageBroker.canHandle(message.type)) {
+        conversationsPageMessageBroker.handleRequest(message as any);
       }
     }
 
@@ -112,12 +105,13 @@ export function History() {
             <ul className="space-y-4 mb-8">
               {entries.map((entry, entryIndex) => {
                 const itemId = `${dateIndex}-${entryIndex}`;
+
                 return (
                   <li
                     key={entryIndex}
                     onMouseEnter={() => setHoveredItemId(itemId)}
                     onMouseLeave={() => setHoveredItemId(null)}
-                    onClick={() => onItemClick(entry.timestamp)}
+                    onClick={() => onItemClick(entry.id)}
                     className={`p-4 rounded border border-vscode-panel-border 
                               bg-vscode-input-background cursor-pointer
                               ${
@@ -127,16 +121,14 @@ export function History() {
                               }`}
                   >
                     <div className="text-vscode-input-foreground">
-                      {truncatePrompt(entry.prompt)}
+                      {truncatePrompt(entry.title)}
                     </div>
 
                     <div className="mt-2 text-sm text-vscode-editor-foreground opacity-60">
                       <span>{formatRelativeTime(entry.timestamp)}</span>
                       <span>
                         {(() => {
-                          const filePaths = getFilePaths(
-                            entry.userInput.includedFiles
-                          );
+                          const filePaths = getFilePaths(entry.includedFiles);
 
                           return filePaths.length > 0 ? (
                             <span className="ml-4">
@@ -156,7 +148,7 @@ export function History() {
         ))
       ) : (
         <div className="text-vscode-editor-foreground">
-          No history entries found.
+          No conversations found.
         </div>
       )}
     </div>

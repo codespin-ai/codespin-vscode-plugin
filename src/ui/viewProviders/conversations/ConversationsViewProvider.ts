@@ -1,16 +1,16 @@
 import * as vscode from "vscode";
-import { getHistory } from "../../../settings/history/getHistory.js";
 import { initialize } from "../../../settings/initialize.js";
 import { isInitialized } from "../../../settings/isInitialized.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { ViewProvider } from "../ViewProvider.js";
-import { HistoryPageArgs } from "../../html/pages/history/History.js";
-import { UpdateHistoryEvent } from "./types.js";
+import { ConversationsPageArgs as ConversationsPageArgs } from "../../html/pages/conversations/Conversations.js";
+import { UpdateConversationsEvent } from "./types.js";
 import { EventEmitter } from "events";
 import { navigateTo } from "../../navigateTo.js";
 import { MessageTemplate } from "../../types.js";
+import { listConversations } from "../../../conversations/listConversations.js";
 
-export class HistoryViewProvider extends ViewProvider {
+export class ConversationsViewProvider extends ViewProvider {
   constructor(
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
@@ -31,26 +31,28 @@ export class HistoryViewProvider extends ViewProvider {
         const initialized = await isInitialized(workspaceRoot);
 
         if (initialized) {
-          const historyPageArgs: HistoryPageArgs = {
-            entries: initialized ? await getHistory(workspaceRoot) : [],
+          const conversationsPageArgs: ConversationsPageArgs = {
+            entries: initialized
+              ? await listConversations({ workspaceRoot })
+              : [],
           };
 
-          navigateTo(this, "/history", historyPageArgs);
+          navigateTo(this, "/conversations", conversationsPageArgs);
         } else {
           navigateTo(this, "/initialize");
         }
         break;
       }
-      case "newHistoryEntry": {
-        const updateHistoryEvent: UpdateHistoryEvent = {
-          type: "updateHistory",
-          entries: await getHistory(workspaceRoot),
+      case "newConversation": {
+        const updateConversationsEvent: UpdateConversationsEvent = {
+          type: "updateConversations",
+          entries: await listConversations({ workspaceRoot }),
         };
 
         const webview = this.getWebview();
-        
+
         if (webview) {
-          webview.postMessage(updateHistoryEvent);
+          webview.postMessage(updateConversationsEvent);
         }
 
         break;
@@ -58,11 +60,11 @@ export class HistoryViewProvider extends ViewProvider {
       case "initialize": {
         await initialize(false, workspaceRoot);
 
-        const historyPageArgs: HistoryPageArgs = {
-          entries: await getHistory(workspaceRoot),
+        const conversationsPageArgs: ConversationsPageArgs = {
+          entries: await listConversations({ workspaceRoot }),
         };
 
-        navigateTo(this, "/history", historyPageArgs);
+        navigateTo(this, "/conversations", conversationsPageArgs);
 
         break;
       }

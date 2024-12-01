@@ -23,7 +23,6 @@ export function getActivePanel() {
 
 export class GeneratePanel extends UIPanel {
   userInput: GenerateEvent | undefined;
-  dirName: string | undefined = undefined;
   cancelGeneration: (() => void) | undefined;
   messageBroker: ReturnType<typeof getMessageBroker>;
 

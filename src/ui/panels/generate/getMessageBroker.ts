@@ -2,7 +2,7 @@ import * as path from "path";
 import * as vscode from "vscode";
 import {
   BrokerType,
-  createMessageBroker
+  createMessageBroker,
 } from "../../../messaging/messageBroker.js";
 import { setDefaultModel } from "../../../settings/models/setDefaultModel.js";
 import { editAnthropicConfig } from "../../../settings/provider/editAnthropicConfig.js";
@@ -23,7 +23,7 @@ import {
   CopyToClipboardEvent,
   GenerateEvent,
   ModelChangeEvent,
-  NewHistoryEntryEvent,
+  NewConversationEvent,
   OpenFileEvent,
   UIPropsUpdateEvent,
 } from "./types.js";
@@ -37,30 +37,18 @@ export function getMessageBroker(
       await addDeps(generatePanel, message, workspaceRoot);
     })
     .attachHandler("copyToClipboard", async (message: CopyToClipboardEvent) => {
-      if (generatePanel.dirName === undefined) {
-        generatePanel.dirName = Date.now().toString();
-      }
+      await copyToClipboard(message, workspaceRoot);
 
-      await copyToClipboard(message, generatePanel.dirName, workspaceRoot);
-
-      const newHistoryEntry: NewHistoryEntryEvent = {
-        type: "newHistoryEntry",
+      const newConversations: NewConversationEvent = {
+        type: "newConversation",
       };
 
-      generatePanel.globalEventEmitter.emit("message", newHistoryEntry);
+      generatePanel.globalEventEmitter.emit("message", newConversations);
     })
     .attachHandler("generate", async (message: unknown) => {
       generatePanel.userInput = message as GenerateEvent;
 
-      if (generatePanel.dirName === undefined) {
-        generatePanel.dirName = Date.now().toString();
-      }
-
-      const generateArgs = await getGenerateArgs(
-        generatePanel,
-        generatePanel.dirName,
-        workspaceRoot
-      );
+      const generateArgs = await getGenerateArgs(generatePanel, workspaceRoot);
 
       switch (generateArgs.status) {
         case "can_generate":
@@ -68,14 +56,13 @@ export function getMessageBroker(
             await invokeGeneration(
               generatePanel,
               generateArgs,
-              generatePanel.dirName,
               workspaceRoot
             );
           } finally {
-            const newHistoryEntry: NewHistoryEntryEvent = {
-              type: "newHistoryEntry",
+            const newConversation: NewConversationEvent = {
+              type: "newConversation",
             };
-            generatePanel.globalEventEmitter.emit("message", newHistoryEntry);
+            generatePanel.globalEventEmitter.emit("message", newConversation);
           }
           break;
         case "missing_config":

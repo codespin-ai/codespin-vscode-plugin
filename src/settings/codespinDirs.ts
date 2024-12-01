@@ -7,7 +7,3 @@ export function getCodeSpinDir(workspaceRoot: string) {
 export function getCodingConventionsDir(workspaceRoot: string) {
   return path.join(getCodeSpinDir(workspaceRoot), "conventions");
 }
-
-export function getHistoryDir(workspaceRoot: string) {
-  return path.join(getCodeSpinDir(workspaceRoot), "history");
-}
