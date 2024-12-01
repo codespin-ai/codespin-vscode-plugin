@@ -45,7 +45,7 @@ export function getMessageBroker(
       const generateArgs = await getGenerateArgs(generatePanel, workspaceRoot);
 
       switch (generateArgs.status) {
-        case "can_generate":
+        case "can_start_chat":
           try {
             await invokeGeneration(generatePanel, generateArgs, workspaceRoot);
           } finally {

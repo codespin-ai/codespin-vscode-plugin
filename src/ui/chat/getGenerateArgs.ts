@@ -50,7 +50,7 @@ export async function getGenerateArgs(
     };
 
     return {
-      status: "can_generate",
+      status: "can_start_chat",
       args: codespinGenerateArgs,
     };
   }
