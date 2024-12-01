@@ -39,7 +39,7 @@ export function getMessageBroker(
 
       chatPanel.globalEventEmitter.emit("message", newConversations);
     })
-    .attachHandler("generate", async (message: unknown) => {
+    .attachHandler("startChat", async (message: unknown) => {
       chatPanel.userInput = message as StartChatEvent;
 
       const startChatArgs = await getStartChatArgs(chatPanel, workspaceRoot);

@@ -82,8 +82,8 @@ export function Chat() {
         getVSCodeApi().postMessage(message);
       });
 
-    const generateEvent = {
-      type: "generate",
+    const startChatEvent = {
+      type: "startChat",
       model: args.model,
       prompt: newMessage,
       codingConvention: undefined,
@@ -91,7 +91,7 @@ export function Chat() {
       messages,
     };
 
-    chatPanelMessageClient.send("generate", generateEvent);
+    chatPanelMessageClient.send("startChat", startChatEvent);
     setNewMessage("");
   }
 

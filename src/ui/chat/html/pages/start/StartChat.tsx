@@ -142,7 +142,7 @@ export function StartChat() {
       ...args,
     };
 
-    chatPanelMessageClient.send("generate", message);
+    chatPanelMessageClient.send("startChat", message);
 
     if (promptRef.current) {
       if (
