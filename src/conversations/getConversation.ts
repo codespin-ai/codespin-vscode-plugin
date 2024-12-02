@@ -1,3 +1,4 @@
+// getConversation.ts
 import * as path from "path";
 import * as fs from "fs/promises";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
@@ -7,6 +8,10 @@ import {
   getConversationFileName,
   getFileNumberForPosition,
 } from "./fileTypes.js";
+import {
+  validateConversationsFileData,
+  validateConversationData,
+} from "./validations.js";
 
 export async function getConversation(params: {
   id: string;
@@ -20,9 +25,14 @@ export async function getConversation(params: {
 
   try {
     const summariesContent = await fs.readFile(summariesPath, "utf-8");
-    const summaries = JSON.parse(summariesContent) as ConversationsFile;
+    const summaries = JSON.parse(summariesContent);
 
-    const conversationIndex = summaries.conversations.findIndex(
+    if (!(await validateConversationsFileData(conversationsDir, summaries))) {
+      return null;
+    }
+
+    const summariesTyped = summaries as ConversationsFile;
+    const conversationIndex = summariesTyped.conversations.findIndex(
       (c: ConversationSummary) => c.id === params.id
     );
     if (conversationIndex === -1) {
@@ -30,7 +40,7 @@ export async function getConversation(params: {
     }
 
     const fileNumber = getFileNumberForPosition(
-      summaries.lastFileNumber,
+      summariesTyped.lastFileNumber,
       conversationIndex
     );
     const conversationPath = path.join(
@@ -39,13 +49,13 @@ export async function getConversation(params: {
     );
 
     const conversationContent = await fs.readFile(conversationPath, "utf-8");
-    if (!conversationContent) {
-      summaries.conversations.splice(conversationIndex, 1);
-      await fs.writeFile(summariesPath, JSON.stringify(summaries, null, 2));
+    const conversation = JSON.parse(conversationContent);
+
+    if (!(await validateConversationData(conversationsDir, conversation))) {
       return null;
     }
 
-    return JSON.parse(conversationContent) as Conversation;
+    return conversation as Conversation;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return null;

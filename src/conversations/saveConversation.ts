@@ -19,8 +19,6 @@ function getInitialTitle(messages: Message[]): string {
   return "Untitled";
 }
 
-// saveConversation.ts
-// Key changes: Remove fileNumber from summary, calculate file number only when needed
 export async function saveConversation(params: {
   id: string;
   title: string;
@@ -55,7 +53,7 @@ export async function saveConversation(params: {
     conversationsDir,
     getConversationFileName(fileNumber)
   );
-  await fs.writeFile(conversationPath, "");
+  await fs.unlink(conversationPath).catch(() => {}); // Delete if exists
 
   const summary: ConversationSummary = {
     id: params.id,
