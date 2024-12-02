@@ -6,7 +6,7 @@ import {
   getConversationFileName,
   getNextFileNumber,
 } from "./fileTypes.js";
-import { Message } from "./types.js";
+import { Message, ConversationSummary } from "./types.js";
 
 function getInitialTitle(messages: Message[]): string {
   const firstMessage = messages[0];
@@ -19,6 +19,8 @@ function getInitialTitle(messages: Message[]): string {
   return "Untitled";
 }
 
+// saveConversation.ts
+// Key changes: Remove fileNumber from summary, calculate file number only when needed
 export async function saveConversation(params: {
   id: string;
   title: string;
@@ -35,11 +37,10 @@ export async function saveConversation(params: {
   );
   const summariesPath = path.join(conversationsDir, "conversations.json");
 
-  // Read or initialize the conversations file
   let conversationsFile: ConversationsFile;
   try {
     const content = await fs.readFile(summariesPath, "utf-8");
-    conversationsFile = JSON.parse(content);
+    conversationsFile = JSON.parse(content) as ConversationsFile;
   } catch {
     conversationsFile = {
       lastFileNumber: 0,
@@ -47,25 +48,24 @@ export async function saveConversation(params: {
     };
   }
 
-  // Generate title from first message if not provided
   const title = params.title || getInitialTitle(params.messages);
-
-  // Determine file number and update lastFileNumber
   const fileNumber = getNextFileNumber(conversationsFile.lastFileNumber);
-  conversationsFile.lastFileNumber = fileNumber;
 
-  // Create the conversation summary
-  const summary = {
+  const conversationPath = path.join(
+    conversationsDir,
+    getConversationFileName(fileNumber)
+  );
+  await fs.writeFile(conversationPath, "");
+
+  const summary: ConversationSummary = {
     id: params.id,
     title,
     timestamp: params.timestamp,
     model: params.model,
     codingConvention: params.codingConvention,
     includedFiles: params.includedFiles,
-    fileNumber,
   };
 
-  // Update conversations list
   const existingIndex = conversationsFile.conversations.findIndex(
     (c) => c.id === params.id
   );
@@ -75,23 +75,12 @@ export async function saveConversation(params: {
     conversationsFile.conversations.unshift(summary);
   }
 
-  // Save the conversation detail file
-  const conversationPath = path.join(
-    conversationsDir,
-    getConversationFileName(fileNumber)
-  );
-  await fs.writeFile(
-    conversationPath,
-    JSON.stringify(
-      {
-        ...summary,
-        messages: params.messages,
-      },
-      null,
-      2
-    )
-  );
-
-  // Save the summaries file
+  conversationsFile.lastFileNumber = fileNumber;
   await fs.writeFile(summariesPath, JSON.stringify(conversationsFile, null, 2));
+
+  const conversation = {
+    ...summary,
+    messages: params.messages,
+  };
+  await fs.writeFile(conversationPath, JSON.stringify(conversation, null, 2));
 }
