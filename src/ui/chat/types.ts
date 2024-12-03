@@ -2,10 +2,6 @@ import { SourceFile } from "codespin/dist/sourceCode/SourceFile.js";
 
 export type FileVersions = "current" | "HEAD";
 
-export type ModelChange = {
-  model: string;
-};
-
 export type IncludeFilesArgs = {
   files: {
     path: string;
@@ -53,13 +49,13 @@ export type FileResultStreamEvent = {
   type: "fileResultStream";
 } & FileResultStreamArgs;
 
+export type DoneEvent = {
+  type: "done";
+};
+
 export type AddDepsArgs = {
   file: string;
   model: string;
-};
-
-export type DoneEvent = {
-  type: "done";
 };
 
 export type AddDepsEvent = {
@@ -73,6 +69,10 @@ export type OpenFileArgs = {
 export type OpenFileEvent = {
   type: "openFile";
 } & OpenFileArgs;
+
+export type ModelChange = {
+  model: string;
+};
 
 export type ModelChangeEvent = {
   type: "modelChange";
@@ -102,6 +102,23 @@ export type CopyToClipboardUserInput = {
 export type CopyToClipboardEvent = {
   type: "copyToClipboard";
 } & CopyToClipboardUserInput;
+
+export type MarkdownToHtmlArgs = {
+  content: string;
+};
+
+export type MarkdownToHtmlEvent = {
+  type: "markdownToHtml";
+} & MarkdownToHtmlArgs;
+
+export type SourceCodeToHtmlArgs = {
+  content: string;
+};
+
+export type SourceCodeToHtmlEvent = {
+  type: "sourceCodeToHtml";
+  filePath: string;
+} & SourceCodeToHtmlArgs;
 
 export type NewConversationEvent = {
   type: "newConversation";

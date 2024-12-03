@@ -12,6 +12,7 @@ import { saveConversation } from "../../conversations/saveConversation.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
+import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,
@@ -91,10 +92,7 @@ export async function invokeGenerate(
         data: streamedBlock,
       });
     } else if (streamedBlock.type === "text-block") {
-      const html = await marked(streamedBlock.content, {
-        gfm: true,
-        breaks: true,
-      });
+      const html = await markdownToHtml(streamedBlock.content);
 
       invokePageMessageClient.send("fileResultStream", {
         type: "fileResultStream",

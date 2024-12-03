@@ -4,10 +4,10 @@
  * Gets the programming language from a filename based on its extension.
  * Supports a broad range of languages recognized by Markdown syntax highlighting via Highlight.js.
  *
- * @param filename The name of the file, including its extension.
+ * @param filePath The name of the file, including its extension.
  * @returns The programming language or 'unknown' if not recognized.
  */
-export function getLangFromFilename(filename: string): string {
+export function getLangFromFilename(filePath: string): string {
   // Expanded mapping of file extensions to programming languages
   const extensionToLang: { [key: string]: string } = {
     // JavaScript and alternatives
@@ -104,7 +104,7 @@ export function getLangFromFilename(filename: string): string {
   };
 
   // Extract the file extension
-  const extension = filename.split(".").pop()?.toLowerCase() || "";
+  const extension = filePath.split(".").pop()?.toLowerCase() || "";
 
   // Return the corresponding language, or 'unknown' if not found
   return extensionToLang[extension] || "unknown";

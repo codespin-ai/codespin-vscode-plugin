@@ -20,11 +20,16 @@ import { invokeGenerate } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
+  MarkdownToHtmlEvent,
   ModelChangeEvent,
   NewConversationEvent,
   OpenFileEvent,
+  SourceCodeToHtmlEvent,
   StartChatEvent,
 } from "./types.js";
+import { markdownToHtml } from "../../markdown/markdownToHtml.js";
+import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
+import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
   const messageBroker = createMessageBroker()
@@ -77,6 +82,12 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
         await chatPanel.onMessage(chatPanel.userInput!);
       }
     )
+    .attachHandler("markdownToHtml", async (event: MarkdownToHtmlEvent) => {
+      return markdownToHtml(event.content);
+    })
+    .attachHandler("sourceCodeToHtml", async (event: SourceCodeToHtmlEvent) => {
+      return getHtmlForCode(event.content, getLangFromFilename(event.filePath));
+    })
     .attachHandler("modelChange", async (message: ModelChangeEvent) => {
       await setDefaultModel(message.model, workspaceRoot);
       return 100;
