@@ -14,38 +14,36 @@ declare module "react" {
 }
 
 export function ContentBlock({ block }: Props) {
-  const baseBlockStyles = "mt-4 mb-4";
+  const baseBlockStyles = "mb-1";
 
   switch (block.type) {
     case "file-heading":
       return <></>;
     case "code":
       return (
-        <div
-          data-block-type="code"
-          className="mb-4 bg-vscode-input-background font-vscode-editor [&_pre]:p-4 overflow-x-auto"
-        >
-          <div dangerouslySetInnerHTML={{ __html: block.html }} />
+        <div className="code-block">
+          <div className="code-header">{block.path}</div>
+          <div className="code-content">
+            <div dangerouslySetInnerHTML={{ __html: block.html }} />
+          </div>
         </div>
       );
     case "text":
       return (
-        <div data-block-type="text" className={baseBlockStyles}>
-          <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
+        <div data-block-type="markdown" className="markdown">
+          <pre className="whitespace-pre-wrap m-0 font-vscode-editor p-4 rounded-lg bg-vscode-input-background border border-vscode-input-border">
             {block.content}
           </pre>
         </div>
       );
     case "markdown":
       return (
-        <div data-block-type="markdown" className={baseBlockStyles}>
-          <div className="prose prose-invert max-w-none whitespace-pre-wrap m-0 overflow-x-auto text-base leading-none">
-            <div
-              dangerouslySetInnerHTML={{
-                __html: `${block.html}`,
-              }}
-            />
-          </div>
+        <div data-block-type="markdown" className="markdown">
+          <div
+            dangerouslySetInnerHTML={{
+              __html: `${block.html}`,
+            }}
+          />
         </div>
       );
   }

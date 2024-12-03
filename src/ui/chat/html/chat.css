@@ -1,3 +1,235 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.markdown {
+  /* First reset everything to defaults */
+  all: revert;
+  * {
+    all: revert;
+  }
+
+  /* Now apply our styles */
+  background: var(--vscode-editor-background);
+  color: var(--vscode-editor-foreground);
+  font-family: "Georgia", "Times New Roman", "Times", "Liberation Serif",
+    "Noto Serif", serif;
+  line-height: 1.5;
+  font-size: 16px;
+  margin: 0;
+
+  /* Text styles */
+  p {
+    margin: 0 0 0.75em 0;
+    padding: 0;
+    line-height: 1.5;
+  }
+
+  /* Lists */
+  ul,
+  ol {
+    margin: 0.5em 0;
+    padding-left: 2em;
+  }
+
+  ul {
+    list-style-type: disc;
+  }
+
+  ol {
+    list-style-type: decimal;
+  }
+
+  li {
+    margin: 0.5em 0;
+    line-height: 1.5;
+    padding-left: 0.5em;
+    display: list-item;
+  }
+
+  li > ul,
+  li > ol {
+    margin: 0.5em 0;
+  }
+
+  /* Headings */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--vscode-editor-foreground);
+    margin: 1.5em 0 0.75em 0;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+  h2 {
+    font-size: 1.75em;
+  }
+  h3 {
+    font-size: 1.5em;
+  }
+  h4 {
+    font-size: 1.25em;
+  }
+  h5 {
+    font-size: 1.1em;
+  }
+  h6 {
+    font-size: 1em;
+  }
+
+  /* Links */
+  a {
+    color: var(--vscode-textLink-foreground);
+    text-decoration: underline;
+    cursor: pointer;
+    &:hover {
+      color: var(--vscode-textLink-activeForeground);
+    }
+  }
+
+  /* Code blocks */
+  pre {
+    all: revert;
+    border-radius: 4px;
+    margin: 0.2em 0 0.5em 0;
+    overflow-x: auto;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    tab-size: 4;
+
+    code {
+      color: var(--vscode-editor-foreground);
+      font-family: "Consolas", "Monaco", "Andale Mono", monospace;
+      font-size: 0.9em;
+      text-align: left;
+      white-space: pre;
+      word-spacing: normal;
+      word-break: normal;
+      word-wrap: normal;
+      tab-size: 4;
+    }
+  }
+
+  /* Inline code */
+  code {
+    color: var(--vscode-editor-foreground);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: "Consolas", "Monaco", "Andale Mono", monospace;
+  }
+
+  /* Quotes */
+  blockquote {
+    border-left: 4px solid var(--vscode-panel-border);
+    color: var(--vscode-editor-foreground);
+    margin: 1em 0;
+    padding: 0.5em 0 0.5em 1em;
+    font-style: italic;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse;
+    margin: 1em 0;
+    width: 100%;
+
+    th,
+    td {
+      border: 1px solid var(--vscode-panel-border);
+      padding: 0.75em;
+      text-align: left;
+    }
+
+    th {
+      font-weight: 600;
+      background: var(--vscode-input-background);
+    }
+  }
+
+  /* Horizontal rule */
+  hr {
+    border: none;
+    border-top: 2px solid var(--vscode-panel-border);
+    margin: 2em 0;
+  }
+
+  /* Images */
+  img {
+    max-width: 100%;
+    height: auto;
+    margin: 1em 0;
+  }
+
+  /* Definition lists */
+  dl {
+    margin: 1em 0;
+  }
+
+  dt {
+    font-weight: 600;
+    margin-top: 1em;
+  }
+
+  dd {
+    margin-left: 2em;
+    margin-bottom: 1em;
+  }
+}
+
+.code-block {
+  /* Reset to defaults first */
+  all: revert;
+  * {
+    all: revert;
+  }
+
+  /* Container styling */
+  margin: 0 0 2em 0;
+
+  /* Header/filename styling */
+  .code-header {
+    color: var(--vscode-editor-foreground);
+    opacity: 0.7;
+    font-size: 0.875rem;
+    padding: 0.5em 0;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-weight: bold;
+  }
+
+  /* Code content container */
+  .code-content {
+    background: var(--vscode-editor-background);
+    border-radius: 6px;
+
+    pre {
+      margin: 0;
+      padding: 1em 2em;
+      overflow-x: auto;
+      font-family: "Consolas", "Monaco", "Andale Mono", monospace;
+      font-size: 0.9em;
+      line-height: 1.5;
+      border-radius: 4px;
+      color: var(--vscode-editor-foreground);
+
+      code {
+        font-family: inherit;
+        white-space: pre;
+        word-spacing: normal;
+        word-break: normal;
+        word-wrap: normal;
+        tab-size: 2;
+        hyphens: none;
+      }
+    }
+  }
+}

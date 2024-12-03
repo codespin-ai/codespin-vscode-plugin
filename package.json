@@ -110,7 +110,6 @@
     "build": "npx tsc"
   },
   "devDependencies": {
-    "@tailwindcss/typography": "^0.5.15",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.10.0",
     "@types/tailwindcss": "^3.0.11",
@@ -131,7 +130,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/ws": "^8.5.13",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.247",
+    "codespin": "^0.0.248",
     "diff2html": "^3.4.48",
     "gray-matter": "^4.0.3",
     "ignore": "^6.0.2",
