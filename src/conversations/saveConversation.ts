@@ -1,3 +1,4 @@
+// saveConversation.ts
 import * as fs from "fs/promises";
 import * as path from "path";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
@@ -41,27 +42,26 @@ export async function saveConversation(params: {
     conversationsFile = JSON.parse(content) as ConversationsFile;
   } catch {
     conversationsFile = {
-      lastFileNumber: 0,
+      lastFileNumber: 1,
       conversations: [],
     };
   }
 
   const title = params.title || getInitialTitle(params.messages);
   const fileNumber = getNextFileNumber(conversationsFile.lastFileNumber);
+  const fileName = getConversationFileName(fileNumber);
 
-  const conversationPath = path.join(
-    conversationsDir,
-    getConversationFileName(fileNumber)
-  );
+  const conversationPath = path.join(conversationsDir, fileName);
   await fs.unlink(conversationPath).catch(() => {}); // Delete if exists
 
-  const summary: ConversationSummary = {
+  const summary: ConversationSummary & { fileName: string } = {
     id: params.id,
     title,
     timestamp: params.timestamp,
     model: params.model,
     codingConvention: params.codingConvention,
     includedFiles: params.includedFiles,
+    fileName,
   };
 
   const existingIndex = conversationsFile.conversations.findIndex(
@@ -77,8 +77,8 @@ export async function saveConversation(params: {
   await fs.writeFile(summariesPath, JSON.stringify(conversationsFile, null, 2));
 
   const conversation = {
-    ...summary,
-    messages: params.messages,
+    ...params,
+    title,
   };
   await fs.writeFile(conversationPath, JSON.stringify(conversation, null, 2));
 }

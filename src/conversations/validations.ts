@@ -1,8 +1,8 @@
 // validations.ts
 import * as fs from "fs/promises";
 import * as path from "path";
-import { ConversationsFile, getConversationFileName } from "./fileTypes.js";
 import { Conversation, Message, ContentItem } from "./types.js";
+import { ConversationsFile } from "./fileTypes.js";
 
 function validateContentItem(item: unknown): item is ContentItem {
   if (!item || typeof item !== "object") {
@@ -73,7 +73,7 @@ function validateMessage(msg: unknown): msg is Message {
   return false;
 }
 
-function validateConversation(data: unknown): data is Conversation {
+export function validateConversation(data: unknown): data is Conversation {
   if (!data || typeof data !== "object") {
     return false;
   }
@@ -94,10 +94,9 @@ function validateConversation(data: unknown): data is Conversation {
   );
 }
 
-async function validateConversationsFile(
-  data: unknown,
-  conversationsDir: string
-): Promise<boolean> {
+export function validateConversationsStructure(
+  data: unknown
+): data is ConversationsFile {
   if (!data || typeof data !== "object") {
     return false;
   }
@@ -106,16 +105,17 @@ async function validateConversationsFile(
 
   if (
     typeof file.lastFileNumber !== "number" ||
-    !Array.isArray(file.conversations) ||
-    file.lastFileNumber < 0 ||
-    file.lastFileNumber > 200
+    file.lastFileNumber < 1 ||
+    file.lastFileNumber > 200 ||
+    !Array.isArray(file.conversations)
   ) {
     return false;
   }
 
+  // Check structure of each conversation entry
   if (
-    !file.conversations.every((c) => {
-      return (
+    !file.conversations.every(
+      (c) =>
         typeof c.id === "string" &&
         typeof c.title === "string" &&
         typeof c.timestamp === "number" &&
@@ -123,64 +123,20 @@ async function validateConversationsFile(
         (c.codingConvention === null ||
           typeof c.codingConvention === "string") &&
         Array.isArray(c.includedFiles) &&
-        c.includedFiles.every((f) => typeof f.path === "string")
-      );
-    })
+        c.includedFiles.every((f) => typeof f.path === "string") &&
+        typeof c.fileName === "string" &&
+        c.fileName.startsWith("conversation_") &&
+        c.fileName.endsWith(".json")
+    )
   ) {
     return false;
   }
 
+  // Check for duplicate IDs
   const ids = new Set(file.conversations.map((c) => c.id));
   if (ids.size !== file.conversations.length) {
     return false;
   }
 
-  const files = await fs.readdir(conversationsDir);
-  const expectedFiles = new Set([
-    "conversations.json",
-    ...Array.from({ length: file.conversations.length }, (_, i) => {
-      const fileNumber = ((file.lastFileNumber - i + 200) % 200) + 1;
-      return getConversationFileName(fileNumber);
-    }),
-  ]);
-
-  return (
-    files.length === expectedFiles.size &&
-    files.every((f) => expectedFiles.has(f))
-  );
-}
-
-export async function clearAllData(conversationsDir: string): Promise<void> {
-  try {
-    const files = await fs.readdir(conversationsDir);
-    await Promise.all(
-      files.map((file) => fs.unlink(path.join(conversationsDir, file)))
-    );
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-      throw error;
-    }
-  }
-}
-
-export async function validateConversationData(
-  conversationsDir: string,
-  data: unknown
-): Promise<boolean> {
-  if (!validateConversation(data)) {
-    await clearAllData(conversationsDir);
-    return false;
-  }
-  return true;
-}
-
-export async function validateConversationsFileData(
-  conversationsDir: string,
-  data: unknown
-): Promise<boolean> {
-  if (!(await validateConversationsFile(data, conversationsDir))) {
-    await clearAllData(conversationsDir);
-    return false;
-  }
   return true;
 }

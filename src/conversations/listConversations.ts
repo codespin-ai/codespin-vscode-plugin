@@ -1,17 +1,56 @@
-// listConversations.ts
 import * as path from "path";
 import * as fs from "fs/promises";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
 import { ConversationSummary } from "./types.js";
-import {
-  ConversationsFile,
-  getConversationFileName,
-  getFileNumberForPosition,
-} from "./fileTypes.js";
-import {
-  validateConversationsFileData,
-  validateConversationData,
-} from "./validations.js";
+import { ConversationsFile } from "./fileTypes.js";
+import { clearAllData } from "./clearAllData.js";
+
+function validateConversationsStructure(
+  data: unknown
+): data is ConversationsFile {
+  if (!data || typeof data !== "object") {
+    return false;
+  }
+
+  const file = data as ConversationsFile;
+
+  if (
+    typeof file.lastFileNumber !== "number" ||
+    file.lastFileNumber < 1 ||
+    file.lastFileNumber > 200 ||
+    !Array.isArray(file.conversations)
+  ) {
+    return false;
+  }
+
+  // Check structure of each conversation entry
+  if (
+    !file.conversations.every(
+      (c) =>
+        typeof c.id === "string" &&
+        typeof c.title === "string" &&
+        typeof c.timestamp === "number" &&
+        typeof c.model === "string" &&
+        (c.codingConvention === null ||
+          typeof c.codingConvention === "string") &&
+        Array.isArray(c.includedFiles) &&
+        c.includedFiles.every((f) => typeof f.path === "string") &&
+        typeof c.fileName === "string" &&
+        c.fileName.startsWith("conversation_") &&
+        c.fileName.endsWith(".json")
+    )
+  ) {
+    return false;
+  }
+
+  // Check for duplicate IDs
+  const ids = new Set(file.conversations.map((c) => c.id));
+  if (ids.size !== file.conversations.length) {
+    return false;
+  }
+
+  return true;
+}
 
 export async function listConversations(params: {
   workspaceRoot: string;
@@ -26,40 +65,13 @@ export async function listConversations(params: {
     const content = await fs.readFile(summariesPath, "utf-8");
     const data = JSON.parse(content);
 
-    if (!(await validateConversationsFileData(conversationsDir, data))) {
+    if (!validateConversationsStructure(data)) {
+      await clearAllData(conversationsDir);
       return [];
     }
 
-    const typedData = data as ConversationsFile;
-    const validConversations: ConversationSummary[] = [];
-
-    for (let i = 0; i < typedData.conversations.length; i++) {
-      const fileNumber = getFileNumberForPosition(typedData.lastFileNumber, i);
-      const conversationPath = path.join(
-        conversationsDir,
-        getConversationFileName(fileNumber)
-      );
-
-      try {
-        const content = await fs.readFile(conversationPath, "utf-8");
-        const conversation = JSON.parse(content);
-
-        if (await validateConversationData(conversationsDir, conversation)) {
-          validConversations.push(typedData.conversations[i]);
-        }
-      } catch (error) {
-        if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
-          throw error;
-        }
-      }
-    }
-
-    if (validConversations.length !== typedData.conversations.length) {
-      typedData.conversations = validConversations;
-      await fs.writeFile(summariesPath, JSON.stringify(typedData, null, 2));
-    }
-
-    return validConversations;
+    // Return summaries without the fileName field
+    return data.conversations.map(({ fileName, ...summary }) => summary);
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return [];
