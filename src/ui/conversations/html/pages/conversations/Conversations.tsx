@@ -16,14 +16,9 @@ const truncatePrompt = (text: string): string => {
 
   let truncated = text.slice(0, 101);
   const lastSpaceIndex = truncated.lastIndexOf(" ");
-
-  if (lastSpaceIndex > -1) {
-    truncated = truncated.slice(0, lastSpaceIndex) + "...";
-  } else {
-    truncated = text.slice(0, 100) + "...";
-  }
-
-  return truncated;
+  return lastSpaceIndex > -1
+    ? truncated.slice(0, lastSpaceIndex) + "..."
+    : text.slice(0, 100) + "...";
 };
 
 export function Conversations() {
@@ -95,59 +90,57 @@ export function Conversations() {
   }, []);
 
   return (
-    <div className="p-6 bg-vscode-editor-background text-vscode-editor-foreground min-h-screen">
+    <div className="p-4 bg-vscode-editor-background text-vscode-editor-foreground min-h-screen">
       {Object.keys(groupedEntries).length > 0 ? (
         Object.entries(groupedEntries).map(([date, entries], dateIndex) => (
           <React.Fragment key={dateIndex}>
-            <h3 className="text-xl font-semibold mb-4 text-vscode-editor-foreground">
+            <h3 className="text-sm font-medium mb-3 text-vscode-editor-foreground opacity-60 ml-1">
               {toHumanReadableDate(date)}
             </h3>
-            <ul className="mb-8">
+            <div className="space-y-2 mb-6">
               {entries.map((entry, entryIndex) => {
                 const itemId = `${dateIndex}-${entryIndex}`;
+                const filePaths = getFilePaths(entry.includedFiles);
 
                 return (
-                  <li
+                  <div
                     key={entryIndex}
                     onMouseEnter={() => setHoveredItemId(itemId)}
                     onMouseLeave={() => setHoveredItemId(null)}
                     onClick={() => onItemClick(entry.id)}
-                    className={`p-4 rounded border border-vscode-panel-border 
-                              bg-vscode-input-background cursor-pointer
+                    className={`px-3 py-2.5 rounded-lg transition-all duration-150 cursor-pointer
+                              bg-opacity-40 hover:bg-opacity-100
                               ${
                                 hoveredItemId === itemId
-                                  ? "ring-2 ring-vscode-focusBorder"
-                                  : ""
+                                  ? "bg-vscode-input-background translate-x-1"
+                                  : "bg-vscode-input-background/40"
                               }`}
                   >
-                    <div className="text-vscode-input-foreground">
+                    <div className="text-sm text-vscode-input-foreground">
                       {truncatePrompt(entry.title)}
                     </div>
 
-                    <div className="mt-2 text-sm text-vscode-editor-foreground opacity-60">
+                    <div className="mt-1 text-xs flex items-center space-x-2 text-vscode-editor-foreground/50">
                       <span>{formatRelativeTime(entry.timestamp)}</span>
-                      <span>
-                        {(() => {
-                          const filePaths = getFilePaths(entry.includedFiles);
-
-                          return filePaths.length > 0 ? (
-                            <span className="ml-4">
-                              {filePaths.length <= 3
-                                ? filePaths.join(", ")
-                                : filePaths.slice(0, 2).join(", ") + " etc"}
-                            </span>
-                          ) : null;
-                        })()}
-                      </span>
+                      {filePaths.length > 0 && (
+                        <>
+                          <span>•</span>
+                          <span className="truncate">
+                            {filePaths.length <= 2
+                              ? filePaths.join(", ")
+                              : `${filePaths[0]} +${filePaths.length - 1}`}
+                          </span>
+                        </>
+                      )}
                     </div>
-                  </li>
+                  </div>
                 );
               })}
-            </ul>
+            </div>
           </React.Fragment>
         ))
       ) : (
-        <div className="text-vscode-editor-foreground">
+        <div className="text-vscode-editor-foreground/60 text-sm">
           No conversations found.
         </div>
       )}
