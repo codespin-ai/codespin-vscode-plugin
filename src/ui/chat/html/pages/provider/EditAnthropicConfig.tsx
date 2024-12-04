@@ -1,50 +1,74 @@
-import {
-  VSCodeButton,
-  VSCodeTextField,
-} from "@vscode/webview-ui-toolkit/react/index.js";
 import * as React from "react";
 import { useState } from "react";
-import { CSFormField } from "../../components/CSFormField.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { AnthropicConfigArgs } from "../../../../../settings/provider/editAnthropicConfig.js";
 import { EditAnthropicConfigEvent } from "../../../../../settings/provider/types.js";
+import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 
 export function EditAnthropicConfig(props: AnthropicConfigArgs) {
-  const vsCodeApi = getVSCodeApi();
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
 
   function onSave() {
-    const message: EditAnthropicConfigEvent = {
+    const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
+      (message: unknown) => {
+        getVSCodeApi().postMessage(message);
+      }
+    );
+    
+    const event: EditAnthropicConfigEvent = {
       type: "editAnthropicConfig",
       apiKey,
     };
-    vsCodeApi.postMessage(message);
+
+    chatPanelMessageClient.send("editAnthropicConfig", event);
   }
 
   return (
-    <div>
-      {!props.apiKey ? (
-        <h1>Configure Anthropic Keys</h1>
-      ) : (
-        <h1>Anthropic API Config</h1>
-      )}
-      {!props.apiKey ? (
-        <p>
-          You need to set up OpenAI API keys. This will be stored in
-          .codespin/anthropic.json
-        </p>
-      ) : (
-        <></>
-      )}
-      <CSFormField label={{ text: "API Key:" }}>
-        <VSCodeTextField
-          value={apiKey}
-          onChange={(e: unknown) => setApiKey((e as any).target.value)}
-        />
-      </CSFormField>
-      <CSFormField>
-        <VSCodeButton onClick={onSave}>Save</VSCodeButton>
-      </CSFormField>
+    <div className="min-h-screen bg-vscode-editor-background p-8">
+      <div className="max-w-2xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-2xl font-semibold text-vscode-editor-foreground mb-2">
+            {!props.apiKey
+              ? "Configure Anthropic API"
+              : "Anthropic API Settings"}
+          </h1>
+          {!props.apiKey && (
+            <p className="text-vscode-editor-foreground opacity-80 text-sm">
+              Set up your Anthropic API key to get started. Your key will be
+              securely stored in .codespin/anthropic.json
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-6 bg-vscode-input-background rounded-lg p-6 shadow-sm border border-vscode-panel-border">
+          <div className="space-y-2">
+            <label
+              htmlFor="api-key"
+              className="block text-sm font-medium text-vscode-editor-foreground"
+            >
+              API Key
+            </label>
+            <input
+              id="api-key"
+              type="text"
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+              placeholder="Enter your Anthropic API key"
+              className="w-full px-3 py-2 bg-vscode-input-background border border-vscode-input-border rounded text-vscode-input-foreground placeholder-vscode-input-placeholder focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder"
+            />
+          </div>
+
+          <div className="pt-4">
+            <button
+              onClick={onSave}
+              className="min-w-[120px] px-4 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
+            >
+              Save Settings
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

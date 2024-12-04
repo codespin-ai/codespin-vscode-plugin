@@ -3,16 +3,15 @@ import {
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
-import { marked } from "marked";
-import { InvokePageBrokerType } from "./html/pages/chat/getMessageBroker.js";
+import { saveConversation } from "../../conversations/saveConversation.js";
+import { UserMessage } from "../../conversations/types.js";
+import { markdownToHtml } from "../../markdown/markdownToHtml.js";
+import { createMessageClient } from "../../messaging/messageClient.js";
+import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
+import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { navigateTo } from "../navigateTo.js";
 import { ChatPanel } from "./ChatPanel.js";
-import { UserMessage } from "../../conversations/types.js";
-import { saveConversation } from "../../conversations/saveConversation.js";
-import { createMessageClient } from "../../messaging/messageClient.js";
-import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
-import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
-import { markdownToHtml } from "../../markdown/markdownToHtml.js";
+import { InvokePageBrokerType } from "./html/pages/chat/getMessageBroker.js";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,

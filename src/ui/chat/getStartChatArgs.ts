@@ -21,11 +21,7 @@ export async function getStartChatArgs(
 ): Promise<GetStartChatArgsResult> {
   const userInputFromPanel = chatPanel.userInput!;
 
-  const codespinConfig = await readCodeSpinConfig(undefined, workspaceRoot);
-  const modelDescription = await getModel(
-    [codespinConfig.model],
-    codespinConfig
-  );
+  const modelDescription = await getModelDescription(workspaceRoot);
 
   const configFilePath = await getProviderConfigPath(
     modelDescription.provider,
@@ -44,6 +40,7 @@ export async function getStartChatArgs(
             workspaceRoot
           )
         : undefined,
+      reloadProviderConfig: true,
       cancelCallback: (cancel: () => void) => {
         chatPanel.cancelGeneration = cancel;
       },
@@ -61,4 +58,15 @@ export async function getStartChatArgs(
       provider: modelDescription.provider,
     };
   }
+}
+
+export async function getModelDescription(workspaceRoot: string) {
+  const codespinConfig = await readCodeSpinConfig(undefined, workspaceRoot);
+
+  const modelDescription = await getModel(
+    [codespinConfig.model],
+    codespinConfig
+  );
+
+  return modelDescription;
 }
