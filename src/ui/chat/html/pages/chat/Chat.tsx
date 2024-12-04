@@ -37,6 +37,7 @@ export function Chat() {
   React.useEffect(() => {
     const pageMessageBroker = getMessageBroker({
       setIsGenerating,
+      setMessages,
       onFileResult: (result) =>
         handleStreamingResult(result, {
           currentBlock,
@@ -77,10 +78,11 @@ export function Chat() {
 
     setMessages((prev) => [...prev, userMessage]);
 
-    const chatPanelMessageClient =
-      createMessageClient<ChatPanelBrokerType>((message: unknown) => {
+    const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
+      (message: unknown) => {
         getVSCodeApi().postMessage(message);
-      });
+      }
+    );
 
     const startChatEvent = {
       type: "startChat",

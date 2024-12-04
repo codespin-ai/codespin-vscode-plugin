@@ -37,6 +37,11 @@
       {
         "command": "codespin-ai.init",
         "title": "CodeSpin.AI: Initialize Project"
+      },
+      {
+        "command": "codespin-ai.openConversation",
+        "title": "Open Conversation",
+        "category": "CodeSpin"
       }
     ],
     "menus": {

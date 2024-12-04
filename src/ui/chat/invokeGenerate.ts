@@ -11,7 +11,7 @@ import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { navigateTo } from "../navigateTo.js";
 import { ChatPanel } from "./ChatPanel.js";
-import { InvokePageBrokerType } from "./html/pages/chat/getMessageBroker.js";
+import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,
@@ -48,7 +48,7 @@ export async function invokeGenerate(
     workspaceRoot,
   });
 
-  const invokePageMessageClient = createMessageClient<InvokePageBrokerType>(
+  const chatPageMessageClient = createMessageClient<ChatPageBrokerType>(
     (message) => {
       chatPanel.getWebview().postMessage(message);
     }
@@ -61,23 +61,18 @@ export async function invokeGenerate(
   ) => {
     if (streamedBlock.type === "start-file-block") {
       if (currentTextBlock !== "") {
-        invokePageMessageClient.send("fileResultStream", {
+        chatPageMessageClient.send("fileResultStream", {
           type: "fileResultStream",
           data: streamedBlock,
         });
       }
       currentTextBlock = "";
-
-      invokePageMessageClient.send("fileResultStream", {
-        type: "fileResultStream",
-        data: streamedBlock,
-      });
     } else if (streamedBlock.type === "end-file-block") {
       currentTextBlock = "";
       const lang = getLangFromFilename(streamedBlock.file.path);
       const html = await getHtmlForCode(streamedBlock.file.content, lang);
 
-      invokePageMessageClient.send("fileResultStream", {
+      chatPageMessageClient.send("fileResultStream", {
         type: "fileResultStream",
         data: {
           ...streamedBlock,
@@ -86,14 +81,14 @@ export async function invokeGenerate(
       });
     } else if (streamedBlock.type === "text") {
       currentTextBlock = currentTextBlock + streamedBlock.content;
-      invokePageMessageClient.send("fileResultStream", {
+      chatPageMessageClient.send("fileResultStream", {
         type: "fileResultStream",
         data: streamedBlock,
       });
     } else if (streamedBlock.type === "text-block") {
       const html = await markdownToHtml(streamedBlock.content);
 
-      invokePageMessageClient.send("fileResultStream", {
+      chatPageMessageClient.send("fileResultStream", {
         type: "fileResultStream",
         data: {
           type: "markdown",

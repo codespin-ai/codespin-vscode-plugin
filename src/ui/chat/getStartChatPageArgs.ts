@@ -1,14 +1,14 @@
-import { promises as fs } from "fs";
-import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
 import { getModel } from "codespin/dist/settings/getModel.js";
+import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
+import { promises as fs } from "fs";
 import * as path from "path";
-import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
-import { InitArgs } from "./ChatPanel.js";
 import { getFilesRecursive } from "../../fs/getFilesRecursive.js";
 import { CodingConvention } from "../../settings/conventions/CodingConvention.js";
+import { StartChatPageInitArgs } from "./ChatPanel.js";
+import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
 
-export async function getPageArgs(
-  initArgs: InitArgs,
+export async function getStartChatPageArgs(
+  initArgs: StartChatPageInitArgs,
   workspaceRoot: string,
   conventions: CodingConvention[],
 ): Promise<StartChatPageArgs> {

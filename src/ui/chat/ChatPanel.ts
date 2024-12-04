@@ -6,15 +6,25 @@ import { navigateTo } from "../navigateTo.js";
 import { MessageTemplate } from "../types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { getPageArgs } from "./getPageArgs.js";
+import { getStartChatPageArgs } from "./getStartChatPageArgs.js";
 import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
 import { StartChatEvent } from "./types.js";
+import { Conversation } from "../../conversations/types.js";
+import { createMessageClient } from "../../messaging/messageClient.js";
+import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
 
-export type InitArgs = {
+export type StartChatPageInitArgs = {
   type: "files";
   prompt: string | undefined;
   args: string[];
 };
+
+export type ContinueChatPageInitArgs = {
+  type: "existingConversation";
+  conversation: Conversation;
+};
+
+export type InitArgs = StartChatPageInitArgs | ContinueChatPageInitArgs;
 
 let activePanel: ChatPanel | undefined = undefined;
 
@@ -38,18 +48,34 @@ export class ChatPanel extends UIPanel {
 
   async init(initArgs: InitArgs) {
     const workspaceRoot = getWorkspaceRoot(this.context);
-
     await this.webviewReadyEvent();
 
-    const conventions = await getConventions(workspaceRoot);
+    if (initArgs.type === "existingConversation") {
+      const [provider] = initArgs.conversation.model.split(":");
+      const args = {
+        provider,
+        model: initArgs.conversation.model,
+      };
 
-    const startChatPageArgs: StartChatPageArgs = await getPageArgs(
-      initArgs,
-      workspaceRoot,
-      conventions
-    );
+      const chatPageMessageClient = createMessageClient<ChatPageBrokerType>(
+        (message) => {
+          this.getWebview().postMessage(message);
+        }
+      );
 
-    await navigateTo(this, "/start", startChatPageArgs);
+      await navigateTo(this, "/chat", args);
+
+      // Send initial messages to populate chat
+      chatPageMessageClient.send("messages", initArgs.conversation.messages);
+    } else {
+      const conventions = await getConventions(workspaceRoot);
+      const startChatPageArgs: StartChatPageArgs = await getStartChatPageArgs(
+        initArgs,
+        workspaceRoot,
+        conventions
+      );
+      await navigateTo(this, "/start", startChatPageArgs);
+    }
   }
 
   async onMessage(message: MessageTemplate) {

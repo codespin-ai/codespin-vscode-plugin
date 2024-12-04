@@ -7,6 +7,7 @@ import { getStartChatCommand } from "./commands/codegen/startChat.js";
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
 import { getInitCommand } from "./commands/init/command.js";
 import { ConversationsViewProvider } from "./ui/conversations/ConversationsViewProvider.js";
+import { getOpenConversationCommand } from "./commands/openConversation/index.js";
 
 const globalEventEmitter = new EventEmitter();
 
@@ -17,7 +18,10 @@ export async function activate(context: vscode.ExtensionContext) {
     deactivate();
   });
 
-  const conversationsProvider = new ConversationsViewProvider(context, globalEventEmitter);
+  const conversationsProvider = new ConversationsViewProvider(
+    context,
+    globalEventEmitter
+  );
   conversationsProvider.init();
 
   context.subscriptions.push(
@@ -41,12 +45,24 @@ export async function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(initCommand);
 
-  let includeFilesCommand = getIncludeFilesCommand(context);
+  const includeFilesCommand = getIncludeFilesCommand(context);
 
   context.subscriptions.push(
     vscode.commands.registerCommand(
       "codespin-ai.includeFiles",
       includeFilesCommand
+    )
+  );
+
+  const openConversationCommand = getOpenConversationCommand(
+    context,
+    globalEventEmitter
+  );
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(
+      "codespin-ai.openConversation",
+      openConversationCommand
     )
   );
 }

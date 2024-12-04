@@ -2,6 +2,7 @@ import * as React from "react";
 import { BrowserEvent } from "../../../../types.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { ConversationSummary } from "../../../../../conversations/types.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 
 type GroupedEntries = { [date: string]: ConversationSummary[] };
 
@@ -64,7 +65,11 @@ export function Conversations() {
   };
 
   const onItemClick = (conversationId: string) => {
-    console.log("CONVERSATION ID", conversationId);
+    const vscode = getVSCodeApi();
+    vscode.postMessage({
+      type: "command:codespin-ai.openConversation",
+      args: [conversationId],
+    });
   };
 
   function getFilePaths(
