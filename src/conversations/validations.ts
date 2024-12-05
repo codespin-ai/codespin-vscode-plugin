@@ -59,8 +59,8 @@ function validateMessage(msg: unknown): msg is Message {
     return message.content.every((item) => {
       if (item.type === "text") return typeof item.text === "string";
       if (item.type === "image") return typeof item.path === "string";
-      if (item.type === "file") {
-        return typeof item.path === "string";
+      if (item.type === "files") {
+        return Array.isArray(item.includedFiles);
       }
       return false;
     });

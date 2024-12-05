@@ -9,9 +9,13 @@ export type UserImageContent = {
   path: string;
 };
 
-export type UserFileContent = {
-  type: "file";
+export type IncludedFile = {
   path: string;
+};
+
+export type UserFileContent = {
+  type: "files";
+  includedFiles: IncludedFile[];
 };
 
 export type UserMessage = {

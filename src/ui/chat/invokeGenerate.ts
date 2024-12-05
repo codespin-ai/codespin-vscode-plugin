@@ -18,6 +18,7 @@ import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js
 import { navigateTo } from "../navigateTo.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
+import { includeFiles } from "./includeFiles.js";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,
@@ -40,11 +41,12 @@ export async function invokeGenerate(
       type: "text",
       text: request.prompt,
     },
-    ...request.includedFiles.map((file) => ({
-      type: "file" as const,
-      path: file.path,
-      size: file.size,
-    })),
+    {
+      type: "files" as const,
+      includedFiles: request.includedFiles.map((file) => ({
+        path: file.path,
+      })),
+    },
   ];
 
   const userMessage: UserMessage = {

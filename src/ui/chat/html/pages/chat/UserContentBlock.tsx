@@ -27,12 +27,14 @@ export function UserContentBlock({ message }: Props) {
                 <pre>{content.text}</pre>
               </div>
             );
-          case "file":
+          case "files":
             return (
-              <div key={index} className="user-file-block">
-                <div className="file-header text-sm opacity-70">
-                  {content.path}
-                </div>
+              <div key={index} className="user-files-block">
+                <ul className="file-attachment">
+                  {content.includedFiles.map((file) => (
+                    <li>{file.path}</li>
+                  ))}
+                </ul>
               </div>
             );
         }
