@@ -7,7 +7,7 @@ import {
   getConversationFileName,
   getNextFileNumber,
 } from "./fileTypes.js";
-import { Message, ConversationSummary } from "./types.js";
+import { Message, ConversationSummary, UserMessage } from "./types.js";
 
 function getInitialTitle(messages: Message[]): string {
   const firstMessage = messages[0];
@@ -26,7 +26,6 @@ export async function saveConversation(params: {
   timestamp: number;
   model: string;
   codingConvention: string | null;
-  includedFiles: { path: string }[];
   messages: Message[];
   workspaceRoot: string;
 }): Promise<void> {
@@ -60,7 +59,6 @@ export async function saveConversation(params: {
     timestamp: params.timestamp,
     model: params.model,
     codingConvention: params.codingConvention,
-    includedFiles: params.includedFiles,
     fileName,
   };
 

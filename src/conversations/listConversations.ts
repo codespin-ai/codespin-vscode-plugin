@@ -33,8 +33,6 @@ function validateConversationsStructure(
         typeof c.model === "string" &&
         (c.codingConvention === null ||
           typeof c.codingConvention === "string") &&
-        Array.isArray(c.includedFiles) &&
-        c.includedFiles.every((f) => typeof f.path === "string") &&
         typeof c.fileName === "string" &&
         c.fileName.startsWith("conversation_") &&
         c.fileName.endsWith(".json")

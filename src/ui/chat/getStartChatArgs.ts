@@ -4,6 +4,7 @@ import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js
 import { ChatPanel } from "./ChatPanel.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
+import { UserFileContent, UserTextContent } from "../../conversations/types.js";
 
 type GetStartChatArgsResult =
   | {
@@ -29,11 +30,19 @@ export async function getStartChatArgs(
   );
 
   if (configFilePath) {
+    const userText = userInputFromPanel.content.find(
+      (c): c is UserTextContent => c.type === "text"
+    );
+
+    const fileContents = userInputFromPanel.content.filter(
+      (c): c is UserFileContent => c.type === "file"
+    );
+
     const codespinGenerateArgs: CodeSpinGenerateArgs = {
-      prompt: userInputFromPanel.prompt,
+      prompt: userText?.text ?? "",
       model: userInputFromPanel.model,
       write: false,
-      include: userInputFromPanel.includedFiles.map((f) => f.path),
+      include: fileContents.map((f) => f.path),
       spec: userInputFromPanel.codingConvention
         ? await getCodingConventionPath(
             userInputFromPanel.codingConvention,

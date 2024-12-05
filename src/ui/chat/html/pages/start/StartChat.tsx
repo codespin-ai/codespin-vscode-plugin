@@ -1,16 +1,15 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
-import { CopyIcon } from "../../components/icons/CopyIcon.js";
-import { GenerateIcon } from "../../components/icons/GenerateIcon.js";
-import { getMessageBroker } from "./getMessageBroker.js";
-import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
-import { createMessageClient } from "../../../../../messaging/messageClient.js";
-import { BrowserEvent } from "../../../../types.js";
 import { formatFileSize } from "../../../../../fs/formatFileSize.js";
+import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
+import { BrowserEvent } from "../../../../types.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
-import { AddDepsEvent, StartChatEvent, OpenFileEvent } from "../../../types.js";
-import { StartChatPageArgs } from "./StartChatPageArgs.js";
+import { AddDepsEvent, OpenFileEvent, StartChatEvent } from "../../../types.js";
 import { ChatIcon } from "../../components/icons/ChatIcon.js";
+import { CopyIcon } from "../../components/icons/CopyIcon.js";
+import { getMessageBroker } from "./getMessageBroker.js";
+import { StartChatPageArgs } from "./StartChatPageArgs.js";
 
 export function StartChat() {
   const vsCodeApi = getVSCodeApi();
@@ -22,9 +21,9 @@ export function StartChat() {
   const [codingConvention, setCodingConvention] = useState<string | undefined>(
     args.codingConvention ?? "None"
   );
-  const [files, setFiles] = useState<{ path: string; size: number }[]>(
-    args.includedFiles
-  );
+  const [messageFiles, setMessageFiles] = useState<
+    { path: string; size: number }[]
+  >([]);
 
   const [showCopied, setShowCopied] = useState(false);
 
@@ -35,9 +34,13 @@ export function StartChat() {
   );
 
   useEffect(() => {
-    if (files.length >= 1) {
-      const fileExtension = getFileExtension(files[0].path);
-      if (files.every((x) => x.path.endsWith(fileExtension))) {
+    if (messageFiles.length >= 1) {
+      const fileExtension = getFileExtension(messageFiles[0].path);
+      if (
+        messageFiles.every((x: { path: string }) =>
+          x.path.endsWith(fileExtension)
+        )
+      ) {
         const matchingConvention = args.codingConventions.find((convention) => {
           return convention.extensions.includes(fileExtension);
         });
@@ -55,7 +58,7 @@ export function StartChat() {
       promptRef.current.addEventListener("keydown", onPromptTextAreaKeyDown);
     }
 
-    const startChatPageMessageBroker = getMessageBroker(setFiles);
+    const startChatPageMessageBroker = getMessageBroker(setMessageFiles);
 
     function listener(event: BrowserEvent) {
       const message = event.data;
@@ -88,13 +91,13 @@ export function StartChat() {
   }
 
   function onGenerateButtonClick() {
-    generate({});
+    generate();
   }
 
   async function copyToClipboard() {
     const message = {
       type: "copyToClipboard" as const,
-      includedFiles: files,
+      includedFiles: messageFiles,
       prompt,
       codingConvention,
     };
@@ -112,25 +115,25 @@ export function StartChat() {
       e.preventDefault();
       e.stopPropagation();
 
-      generate({ prompt: (e.currentTarget as HTMLTextAreaElement).value });
+      generate();
     }
   }
 
-  function generate(args: Partial<StartChatEvent>) {
+  function generate() {
     const message: StartChatEvent = {
       type: "startChat",
-      includedFiles: files,
       model,
-      prompt,
       codingConvention,
-      ...args,
+      content: [],
     };
 
     chatPanelMessageClient.send("startChat", message);
   }
 
   function handleDeleteFile(filePath: string) {
-    setFiles(files.filter((file) => file.path !== filePath));
+    setMessageFiles(
+      messageFiles.filter((file: { path: string }) => file.path !== filePath)
+    );
   }
 
   function onAddDeps(filePath: string) {
@@ -151,7 +154,10 @@ export function StartChat() {
   }
 
   function getTotalFileSize(): number {
-    return files.reduce((acc, file) => acc + file.size, 0);
+    return messageFiles.reduce(
+      (acc: number, file: { size: number }) => acc + file.size,
+      0
+    );
   }
 
   return (
@@ -250,7 +256,7 @@ export function StartChat() {
             Included Files ({formatFileSize(getTotalFileSize())}):
           </label>
           <div>
-            {files.map((file) => (
+            {messageFiles.map((file: { path: string; size: number }) => (
               <div
                 key={file.path}
                 className="flex items-center gap-4 text-vscode-editor-foreground"

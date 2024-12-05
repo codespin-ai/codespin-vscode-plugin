@@ -1,10 +1,12 @@
+import { promises as fs } from "fs";
+import * as path from "path";
 import {
   GenerateArgs as CodeSpinGenerateArgs,
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { saveConversation } from "../../conversations/saveConversation.js";
-import { UserMessage } from "../../conversations/types.js";
+import { UserFileContent, UserMessage } from "../../conversations/types.js";
 import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
@@ -30,21 +32,19 @@ export async function invokeGenerate(
 
   const userMessage: UserMessage = {
     role: "user",
-    content: [
-      {
-        type: "text",
-        text: userInputFromPanel.prompt,
-      },
-    ],
+    content: userInputFromPanel.content,
   };
+
+  const firstTextMessage = userInputFromPanel.content.find(
+    (x) => x.type === "text"
+  );
 
   await saveConversation({
     id: conversationId,
-    title: userInputFromPanel.prompt.slice(0, 100), // Use first 100 chars of prompt as title
+    title: firstTextMessage?.text.slice(0, 100) ?? "Untitled",
     timestamp,
     model: userInputFromPanel.model,
     codingConvention: userInputFromPanel.codingConvention || null,
-    includedFiles: userInputFromPanel.includedFiles,
     messages: [userMessage],
     workspaceRoot,
   });

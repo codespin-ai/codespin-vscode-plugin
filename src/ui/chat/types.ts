@@ -1,4 +1,5 @@
 import { SourceFile } from "codespin/dist/sourceCode/SourceFile.js";
+import { UserFileContent, UserImageContent, UserTextContent } from "../../conversations/types.js";
 
 export type FileVersions = "current" | "HEAD";
 
@@ -84,11 +85,8 @@ export type StartChatEvent = {
 
 export type StartChatUserInput = {
   model: string;
-  prompt: string;
   codingConvention: string | undefined;
-  includedFiles: {
-    path: string;
-  }[];
+  content: (UserTextContent | UserImageContent | UserFileContent)[];
 };
 
 export type CopyToClipboardUserInput = {

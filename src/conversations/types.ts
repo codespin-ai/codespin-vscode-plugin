@@ -1,4 +1,27 @@
-// Base content types
+// User message types
+export type UserTextContent = {
+  type: "text";
+  text: string;
+};
+
+export type UserImageContent = {
+  type: "image";
+  path: string;
+};
+
+export type UserFileContent = {
+  type: "file";
+  path: string;
+  content: string;
+  size: number;
+};
+
+export type UserMessage = {
+  role: "user";
+  content: (UserTextContent | UserImageContent | UserFileContent)[];
+};
+
+// Assistant Message
 export type FileHeadingContent = {
   type: "file-heading";
   id: string;
@@ -33,28 +56,13 @@ export type ContentItem =
   | CodeContent
   | MarkdownContent;
 
-// User message types
-export type UserTextContent = {
-  type: "text";
-  text: string;
-};
-
-export type UserImageContent = {
-  type: "image";
-  path: string;
-};
-
-export type Message = UserMessage | AssistantMessage;
-
-export type UserMessage = {
-  role: "user";
-  content: (UserTextContent | UserImageContent)[];
-};
-
 export type AssistantMessage = {
   role: "assistant";
   content: ContentItem[];
 };
+
+// Other types...
+export type Message = UserMessage | AssistantMessage;
 
 export type Conversation = {
   id: string;
@@ -62,9 +70,6 @@ export type Conversation = {
   timestamp: number;
   model: string;
   codingConvention: string | null;
-  includedFiles: {
-    path: string;
-  }[];
   messages: Message[];
 };
 
@@ -74,9 +79,6 @@ export type ConversationSummary = {
   timestamp: number;
   model: string;
   codingConvention: string | null;
-  includedFiles: {
-    path: string;
-  }[];
 };
 
 // Database types

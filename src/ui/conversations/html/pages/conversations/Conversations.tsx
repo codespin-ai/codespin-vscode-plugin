@@ -1,8 +1,10 @@
 import * as React from "react";
+import {
+  ConversationSummary
+} from "../../../../../conversations/types.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { BrowserEvent } from "../../../../types.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { ConversationSummary } from "../../../../../conversations/types.js";
-import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 
 type GroupedEntries = { [date: string]: ConversationSummary[] };
 
@@ -72,14 +74,6 @@ export function Conversations() {
     });
   };
 
-  function getFilePaths(
-    includedFiles: {
-      path: string;
-    }[]
-  ) {
-    return includedFiles.map((x) => x.path.split("/").slice(-1)[0]);
-  }
-
   React.useEffect(() => {
     const conversationsPageMessageBroker = getMessageBroker(setEntries);
 
@@ -105,7 +99,6 @@ export function Conversations() {
             <div className="space-y-2 mb-6">
               {entries.map((entry, entryIndex) => {
                 const itemId = `${dateIndex}-${entryIndex}`;
-                const filePaths = getFilePaths(entry.includedFiles);
 
                 return (
                   <div
@@ -127,16 +120,6 @@ export function Conversations() {
 
                     <div className="mt-1 text-xs flex items-center space-x-2 text-vscode-editor-foreground/50">
                       <span>{formatRelativeTime(entry.timestamp)}</span>
-                      {filePaths.length > 0 && (
-                        <>
-                          <span>•</span>
-                          <span className="truncate">
-                            {filePaths.length <= 2
-                              ? filePaths.join(", ")
-                              : `${filePaths[0]} +${filePaths.length - 1}`}
-                          </span>
-                        </>
-                      )}
                     </div>
                   </div>
                 );

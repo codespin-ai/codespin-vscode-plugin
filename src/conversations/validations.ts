@@ -59,10 +59,16 @@ function validateMessage(msg: unknown): msg is Message {
 
   if (message.role === "user") {
     return message.content.every((item) => {
-      return (
-        (item.type === "text" && typeof item.text === "string") ||
-        (item.type === "image" && typeof item.path === "string")
-      );
+      if (item.type === "text") return typeof item.text === "string";
+      if (item.type === "image") return typeof item.path === "string";
+      if (item.type === "file") {
+        return (
+          typeof item.path === "string" &&
+          typeof item.content === "string" &&
+          typeof item.size === "number"
+        );
+      }
+      return false;
     });
   }
 
@@ -88,9 +94,7 @@ export function validateConversation(data: unknown): data is Conversation {
     (conv.codingConvention === null ||
       typeof conv.codingConvention === "string") &&
     Array.isArray(conv.messages) &&
-    conv.messages.every(validateMessage) &&
-    Array.isArray(conv.includedFiles) &&
-    conv.includedFiles.every((f) => typeof f.path === "string")
+    conv.messages.every(validateMessage)
   );
 }
 
@@ -122,8 +126,6 @@ export function validateConversationsStructure(
         typeof c.model === "string" &&
         (c.codingConvention === null ||
           typeof c.codingConvention === "string") &&
-        Array.isArray(c.includedFiles) &&
-        c.includedFiles.every((f) => typeof f.path === "string") &&
         typeof c.fileName === "string" &&
         c.fileName.startsWith("conversation_") &&
         c.fileName.endsWith(".json")
