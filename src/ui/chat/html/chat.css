@@ -2,6 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --magenta-tint: #ebbd17;
+  --subtle-magenta-mix: color-mix(
+    in srgb,
+    var(--vscode-editor-background) 94%,
+    var(--magenta-tint)
+  );
+  --brighter-magenta-mix: color-mix(
+    in srgb,
+    var(--vscode-editor-background) 40%,
+    var(--magenta-tint)
+  );
+}
+
+.assistant-messages-list {
+  /* Use the variable for magenta tint */
+  background: color-mix(in srgb, var(--subtle-magenta-mix) 97%, white);
+  padding: 1rem;
+  border-radius: 6px;
+  margin: 0.5rem 0;
+}
+
+.code-block .code-content {
+  background: var(--vscode-editor-background);
+  border-radius: 6px;
+  border: 1px solid var(--brighter-magenta-mix);
+}
+
+@media (prefers-color-scheme: dark) {
+  .assistant-messages-list {
+    background: color-mix(in srgb, var(--subtle-magenta-mix) 96%, white);
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  .assistant-messages-list {
+    background: color-mix(in srgb, var(--subtle-magenta-mix) 96%, black);
+  }
+}
+
 .markdown {
   /* First reset everything to defaults */
   all: revert;
@@ -10,7 +50,6 @@
   }
 
   /* Now apply our styles */
-  background: var(--vscode-editor-background);
   color: var(--vscode-editor-foreground);
   font-family: "Georgia", "Times New Roman", "Times", "Liberation Serif",
     "Noto Serif", serif;
@@ -194,9 +233,31 @@
 }
 
 .file-attachment {
-  padding: 1em;
-  font-size: 12px;
-  font-weight: bold;
+  font-family: "Georgia", "Times New Roman", "Times", "Liberation Serif",
+    "Noto Serif", serif;
+  font-size: 16px;
+  padding: 0.5em 0;
+  margin: 0.5em 0;
+  list-style: none;
+}
+
+.file-attachment ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.file-attachment li {
+  display: flex;
+  align-items: center;
+  padding: 0.5em 1em;
+  margin: 0.5em 0;
+  color: var(--vscode-input-foreground);
+}
+
+.file-attachment li::before {
+  content: "📄";
+  margin-right: 0.5em;
 }
 
 .code-block {
@@ -223,6 +284,7 @@
   .code-content {
     background: var(--vscode-editor-background);
     border-radius: 6px;
+    border: 1px solid var(--brighter-magenta-mix);
 
     pre {
       margin: 0;

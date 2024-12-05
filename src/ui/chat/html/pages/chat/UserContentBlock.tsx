@@ -16,7 +16,7 @@ declare module "react" {
 
 export function UserContentBlock({ message }: Props) {
   return (
-    <div>
+    <div className="user-messages-list">
       {message.content.map((content, index) => {
         switch (content.type) {
           case "image":
@@ -32,7 +32,7 @@ export function UserContentBlock({ message }: Props) {
               <div key={index} className="user-files-block">
                 <ul className="file-attachment">
                   {content.includedFiles.map((file) => (
-                    <li>{file.path}</li>
+                    <li>./{file.path}</li>
                   ))}
                 </ul>
               </div>

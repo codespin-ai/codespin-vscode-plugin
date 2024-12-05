@@ -103,9 +103,13 @@ export function Chat() {
     if (message.role === "user") {
       return <UserContentBlock message={message} />;
     } else {
-      return message.content.map((block) => (
-        <AssistantContentBlock key={block.id} block={block} />
-      ));
+      return (
+        <div className="assistant-messages-list">
+          {message.content.map((block) => (
+            <AssistantContentBlock key={block.id} block={block} />
+          ))}
+        </div>
+      );
     }
   };
 
