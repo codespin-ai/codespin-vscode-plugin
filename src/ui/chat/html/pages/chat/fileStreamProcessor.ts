@@ -1,4 +1,11 @@
-import { AssistantMessage, CodeContent, FileHeadingContent, MarkdownContent, Message, TextContent } from "../../../../../conversations/types.js";
+import {
+  AssistantMessage,
+  CodeContent,
+  FileHeadingContent,
+  MarkdownContent,
+  Message,
+  TextContent,
+} from "../../../../../conversations/types.js";
 import { ProcessedStreamingFileParseResult } from "../../../types.js";
 
 type FileBlockProcessorArgs = {
@@ -39,7 +46,6 @@ export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
     id: generateBlockId(),
     type: "file-heading",
     path,
-    content: "",
   });
 }
 

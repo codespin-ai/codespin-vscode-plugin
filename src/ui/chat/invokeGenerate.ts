@@ -44,7 +44,6 @@ export async function invokeGenerate(
       type: "file" as const,
       path: file.path,
       size: file.size,
-      content: "", // This will be populated from the filesystem
     })),
   ];
 

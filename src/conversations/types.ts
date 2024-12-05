@@ -12,8 +12,6 @@ export type UserImageContent = {
 export type UserFileContent = {
   type: "file";
   path: string;
-  content: string;
-  size: number;
 };
 
 export type UserMessage = {
@@ -26,7 +24,6 @@ export type FileHeadingContent = {
   type: "file-heading";
   id: string;
   path: string;
-  content: string;
 };
 
 export type TextContent = {

@@ -17,9 +17,7 @@ function validateContentItem(item: unknown): item is ContentItem {
 
   switch (content.type) {
     case "file-heading": {
-      return (
-        typeof content.path === "string" && typeof content.content === "string"
-      );
+      return typeof content.path === "string";
     }
     case "text": {
       return typeof content.content === "string";
@@ -62,11 +60,7 @@ function validateMessage(msg: unknown): msg is Message {
       if (item.type === "text") return typeof item.text === "string";
       if (item.type === "image") return typeof item.path === "string";
       if (item.type === "file") {
-        return (
-          typeof item.path === "string" &&
-          typeof item.content === "string" &&
-          typeof item.size === "number"
-        );
+        return typeof item.path === "string";
       }
       return false;
     });

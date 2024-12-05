@@ -23,7 +23,7 @@ export function StartChat() {
   );
   const [messageFiles, setMessageFiles] = useState<
     { path: string; size: number }[]
-  >([]);
+  >(args.includedFiles);
 
   const [showCopied, setShowCopied] = useState(false);
 

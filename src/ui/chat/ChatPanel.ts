@@ -34,6 +34,7 @@ export function getActivePanel() {
 
 export class ChatPanel extends UIPanel {
   userInput: StartChatEvent | undefined;
+
   cancelGeneration: (() => void) | undefined;
   messageBroker: ReturnType<typeof getMessageBroker>;
 

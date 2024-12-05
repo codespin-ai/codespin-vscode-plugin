@@ -31,11 +31,8 @@ export function UserContentBlock({ message }: Props) {
             return (
               <div key={index} className="user-file-block">
                 <div className="file-header text-sm opacity-70">
-                  {content.path} ({formatFileSize(content.size)})
+                  {content.path}
                 </div>
-                <pre className="bg-vscode-input-background p-3 rounded mt-1 text-sm">
-                  {content.content}
-                </pre>
               </div>
             );
         }
