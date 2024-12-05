@@ -49,11 +49,15 @@ export async function invokeGenerate(
     workspaceRoot,
   });
 
+  // Send initial user message to chat page
   const chatPageMessageClient = createMessageClient<ChatPageBrokerType>(
     (message) => {
       chatPanel.getWebview().postMessage(message);
     }
   );
+
+  // Set initial messages with the user message
+  chatPageMessageClient.send("messages", [userMessage]);
 
   let currentTextBlock = "";
 
