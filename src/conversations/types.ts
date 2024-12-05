@@ -35,10 +35,12 @@ export type ContentItem =
 
 // User message types
 export type UserTextContent = {
+  type: "text";
   text: string;
 };
 
 export type UserImageContent = {
+  type: "image";
   path: string;
 };
 

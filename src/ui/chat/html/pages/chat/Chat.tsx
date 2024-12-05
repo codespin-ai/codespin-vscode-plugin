@@ -1,6 +1,5 @@
 import * as React from "react";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { ContentBlock } from "./ContentBlock.js";
 import {
   Message,
   UserMessage,
@@ -15,6 +14,8 @@ import { BrowserEvent } from "../../../../types.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
+import { AssistantContentBlock } from "./AssistantContentBlock.js";
+import { UserContentBlock } from "./UserContentBlock.js";
 
 type GenerateStreamArgs = {
   provider: string;
@@ -68,6 +69,7 @@ export function Chat() {
     if (!newMessage.trim() || isGenerating) return;
 
     const userContent: UserTextContent = {
+      type: "text",
       text: newMessage,
     };
 
@@ -99,27 +101,13 @@ export function Chat() {
 
   const renderMessage = (message: Message) => {
     if (message.role === "user") {
-      return message.content.map((content, idx) => {
-        if ("text" in content) {
-          return (
-            <div key={idx} className={`${baseBlockStyles}`}>
-              <pre className="whitespace-pre-wrap m-0 font-vscode-editor">
-                {content.text}
-              </pre>
-            </div>
-          );
-        }
-        return null;
-      });
+      return <UserContentBlock message={message} />;
     } else {
       return message.content.map((block) => (
-        <ContentBlock key={block.id} block={block} />
+        <AssistantContentBlock key={block.id} block={block} />
       ));
     }
   };
-
-  const baseBlockStyles =
-    "rounded p-4 mb-4 border bg-vscode-input-background border-vscode-input-border text-vscode-input-foreground";
 
   return (
     <div className="h-screen flex flex-col bg-vscode-editor-background">
@@ -143,7 +131,7 @@ export function Chat() {
 
         {currentBlock && (
           <div className="flex flex-col self-start">
-            <ContentBlock key={currentBlock.id} block={currentBlock} />
+            <AssistantContentBlock key={currentBlock.id} block={currentBlock} />
           </div>
         )}
         <div ref={chatEndRef} />

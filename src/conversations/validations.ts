@@ -60,8 +60,8 @@ function validateMessage(msg: unknown): msg is Message {
   if (message.role === "user") {
     return message.content.every((item) => {
       return (
-        ("text" in item && typeof item.text === "string") ||
-        ("path" in item && typeof item.path === "string")
+        (item.type === "text" && typeof item.text === "string") ||
+        (item.type === "image" && typeof item.path === "string")
       );
     });
   }

@@ -187,6 +187,11 @@
   }
 }
 
+.pre-text {
+  font-family: "Georgia", "Times New Roman", "Times", "Liberation Serif",
+    "Noto Serif", serif;
+}
+
 .code-block {
   /* Reset to defaults first */
   all: revert;

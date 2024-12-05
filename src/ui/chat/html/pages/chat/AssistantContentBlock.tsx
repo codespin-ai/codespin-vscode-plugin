@@ -13,9 +13,7 @@ declare module "react" {
   }
 }
 
-export function ContentBlock({ block }: Props) {
-  const baseBlockStyles = "mb-1";
-
+export function AssistantContentBlock({ block }: Props) {
   switch (block.type) {
     case "file-heading":
       return <></>;

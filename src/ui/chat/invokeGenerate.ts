@@ -32,6 +32,7 @@ export async function invokeGenerate(
     role: "user",
     content: [
       {
+        type: "text",
         text: userInputFromPanel.prompt,
       },
     ],
