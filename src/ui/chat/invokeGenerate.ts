@@ -1,12 +1,16 @@
-import { promises as fs } from "fs";
-import * as path from "path";
 import {
   GenerateArgs as CodeSpinGenerateArgs,
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { saveConversation } from "../../conversations/saveConversation.js";
-import { UserFileContent, UserMessage } from "../../conversations/types.js";
+import {
+  AssistantMessage,
+  Message,
+  UserMessage,
+  UserTextContent,
+  UserFileContent,
+} from "../../conversations/types.js";
 import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
@@ -20,7 +24,7 @@ export async function invokeGenerate(
   argsForGeneration: { args: CodeSpinGenerateArgs },
   workspaceRoot: string
 ) {
-  const userInputFromPanel = chatPanel.userInput!;
+  const request = chatPanel.userInput!;
 
   await navigateTo(chatPanel, `/chat`, {
     model: argsForGeneration.args.model,
@@ -30,22 +34,38 @@ export async function invokeGenerate(
   const conversationId = `gen_${Date.now()}`;
   const timestamp = Date.now();
 
+  // Construct user message from request
+  const userContent: (UserTextContent | UserFileContent)[] = [
+    {
+      type: "text",
+      text: request.prompt,
+    },
+    ...request.includedFiles.map((file) => ({
+      type: "file" as const,
+      path: file.path,
+      size: file.size,
+      content: "", // This will be populated from the filesystem
+    })),
+  ];
+
   const userMessage: UserMessage = {
     role: "user",
-    content: userInputFromPanel.content,
+    content: userContent,
   };
 
-  const firstTextMessage = userInputFromPanel.content.find(
-    (x) => x.type === "text"
-  );
+  let currentMessages: Message[] = [userMessage];
+  let currentAssistantMessage: AssistantMessage = {
+    role: "assistant",
+    content: [],
+  };
 
   await saveConversation({
     id: conversationId,
-    title: firstTextMessage?.text.slice(0, 100) ?? "Untitled",
+    title: request.prompt.slice(0, 100) ?? "Untitled",
     timestamp,
-    model: userInputFromPanel.model,
-    codingConvention: userInputFromPanel.codingConvention || null,
-    messages: [userMessage],
+    model: request.model,
+    codingConvention: request.codingConvention || null,
+    messages: currentMessages,
     workspaceRoot,
   });
 
@@ -61,6 +81,7 @@ export async function invokeGenerate(
 
   let currentTextBlock = "";
 
+  // Rest of the streaming callback remains the same
   argsForGeneration.args.fileResultStreamCallback = async (
     streamedBlock: StreamingFileParseResult
   ) => {
@@ -77,12 +98,22 @@ export async function invokeGenerate(
       const lang = getLangFromFilename(streamedBlock.file.path);
       const html = await getHtmlForCode(streamedBlock.file.content, lang);
 
+      const data = {
+        ...streamedBlock,
+        html,
+      };
+
       chatPageMessageClient.send("fileResultStream", {
         type: "fileResultStream",
-        data: {
-          ...streamedBlock,
-          html,
-        },
+        data,
+      });
+
+      currentAssistantMessage.content.push({
+        type: "code",
+        id: Math.random().toString(36).substr(2, 9),
+        path: streamedBlock.file.path,
+        content: streamedBlock.file.content,
+        html,
       });
     } else if (streamedBlock.type === "text") {
       currentTextBlock = currentTextBlock + streamedBlock.content;
@@ -101,10 +132,34 @@ export async function invokeGenerate(
           html,
         },
       });
+
+      currentAssistantMessage.content.push({
+        type: "markdown",
+        id: Math.random().toString(36).substr(2, 9),
+        content: streamedBlock.content,
+        html,
+      });
     }
   };
 
   await codespinGenerate(argsForGeneration.args, {
     workingDir: workspaceRoot,
   });
+
+  // Save final conversation state including assistant's response
+  if (currentAssistantMessage.content.length > 0) {
+    currentMessages.push(currentAssistantMessage);
+    await saveConversation({
+      id: conversationId,
+      title: request.prompt.slice(0, 100) ?? "Untitled",
+      timestamp,
+      model: request.model,
+      codingConvention: request.codingConvention || null,
+      messages: currentMessages,
+      workspaceRoot,
+    });
+  }
+
+  // Send done event to chat UI
+  chatPageMessageClient.send("done", undefined);
 }

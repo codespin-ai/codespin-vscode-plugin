@@ -19,7 +19,7 @@ export function StartChat() {
   const [model, setModel] = useState(args.selectedModel);
   const [prompt, setPrompt] = useState<string>(args.prompt ?? "");
   const [codingConvention, setCodingConvention] = useState<string | undefined>(
-    args.codingConvention ?? "None"
+    args.codingConvention ?? undefined
   );
   const [messageFiles, setMessageFiles] = useState<
     { path: string; size: number }[]
@@ -124,7 +124,11 @@ export function StartChat() {
       type: "startChat",
       model,
       codingConvention,
-      content: [],
+      prompt,
+      includedFiles: messageFiles.map((file) => ({
+        path: file.path,
+        size: file.size,
+      })),
     };
 
     chatPanelMessageClient.send("startChat", message);
