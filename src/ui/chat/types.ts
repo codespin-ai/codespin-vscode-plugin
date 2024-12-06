@@ -42,10 +42,6 @@ export type DoneEvent = {
   type: "done";
 };
 
-export type StartChatEvent = {
-  type: "startChat";
-} & StartChatUserInput;
-
 export type StartChatUserInput = {
   model: string;
   codingConvention: string | undefined;
@@ -55,3 +51,59 @@ export type StartChatUserInput = {
     size: number;
   }>;
 };
+
+export interface AddDepsEvent {
+  type: "addDeps";
+  file: string;
+  model: string;
+}
+
+export interface CopyToClipboardEvent {
+  type: "copyToClipboard";
+  prompt: string;
+  codingConvention: string | undefined;
+  includedFiles: {
+    path: string;
+  }[];
+}
+
+export interface EditAnthropicConfigEvent {
+  type: "editAnthropicConfig";
+  apiKey: string;
+  startChatUserInput: StartChatUserInput;
+}
+
+export interface EditOpenAIConfigEvent {
+  type: "editOpenAIConfig";
+  apiKey: string;
+  startChatUserInput: StartChatUserInput;
+}
+
+export interface MarkdownToHtmlEvent {
+  type: "markdownToHtml";
+  content: string;
+}
+
+export interface ModelChangeEvent {
+  type: "modelChange";
+  model: string;
+}
+
+export interface OpenFileEvent {
+  type: "openFile";
+  file: string;
+}
+
+export interface SourceCodeToHtmlEvent {
+  type: "sourceCodeToHtml";
+  filePath: string;
+  content: string;
+}
+
+export interface StartChatEvent extends StartChatUserInput {
+  type: "startChat";
+}
+
+export interface CancelEvent {
+  type: "cancel";
+}
