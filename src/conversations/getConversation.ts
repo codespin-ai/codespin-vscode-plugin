@@ -2,8 +2,7 @@
 import * as path from "path";
 import * as fs from "fs/promises";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
-import { Conversation } from "./types.js";
-import { ConversationsFile, getConversationFilePath } from "./fileTypes.js";
+import { Conversation, ConversationsFile } from "./types.js";
 import { validateConversation } from "./validations.js";
 import { clearAllData } from "./clearAllData.js";
 
@@ -29,7 +28,7 @@ export async function getConversation(params: {
     const conversationDirPath = path.join(conversationsDir, summary.id);
     const conversationPath = path.join(
       conversationDirPath,
-      getConversationFilePath(summary.id)
+      "conversation.json"
     );
 
     try {

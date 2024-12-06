@@ -1,6 +1,6 @@
 import { editAnthropicConfig as updateAnthropicConfig } from "../../../settings/provider/editAnthropicConfig.js";
-import { EditAnthropicConfigEvent } from "../../../settings/provider/types.js";
 import { ChatPanel } from "../ChatPanel.js";
+import { EditAnthropicConfigEvent } from "../types.js";
 import { handleStartChat } from "./handleStartChat.js";
 
 export async function handleEditAnthropicConfig(

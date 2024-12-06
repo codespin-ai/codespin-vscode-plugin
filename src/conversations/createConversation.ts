@@ -2,8 +2,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
-import { ConversationsFile, getConversationFilePath } from "./fileTypes.js";
-import { Message, ConversationSummary } from "./types.js";
+import { Message, ConversationSummary, ConversationsFile } from "./types.js";
 
 function getInitialTitle(messages: Message[]): string {
   const firstMessage = messages[0];
@@ -65,7 +64,7 @@ export async function createConversation(params: {
   const conversationDirPath = path.join(conversationsDir, id);
   const conversationFilePath = path.join(
     conversationDirPath,
-    getConversationFilePath(id)
+    "conversation.json"
   );
 
   // Create conversation directory

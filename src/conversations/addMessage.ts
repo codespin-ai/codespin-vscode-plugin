@@ -2,8 +2,7 @@
 import * as fs from "fs/promises";
 import * as path from "path";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
-import { Message, Conversation } from "./types.js";
-import { ConversationsFile, getConversationFilePath } from "./fileTypes.js";
+import { Message, Conversation, ConversationsFile } from "./types.js";
 
 export async function addMessage(params: {
   conversationId: string;
@@ -28,10 +27,7 @@ export async function addMessage(params: {
   }
 
   const conversationDirPath = path.join(conversationsDir, summary.id);
-  const conversationPath = path.join(
-    conversationDirPath,
-    getConversationFilePath(summary.id)
-  );
+  const conversationPath = path.join(conversationDirPath, "conversation.json");
 
   // Load existing conversation
   const conversationContent = await fs.readFile(conversationPath, "utf-8");

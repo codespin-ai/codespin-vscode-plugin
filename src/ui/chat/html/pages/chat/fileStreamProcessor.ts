@@ -1,3 +1,4 @@
+import { SourceFile } from "codespin/dist/sourceCode/SourceFile.js";
 import {
   AssistantMessage,
   CodeContent,
@@ -6,7 +7,42 @@ import {
   Message,
   TextContent,
 } from "../../../../../conversations/types.js";
-import { ProcessedStreamingFileParseResult } from "../../../types.js";
+
+export type ResponseStreamArgs = {
+  data: string;
+};
+
+export type ResponseStreamEvent = {
+  type: "responseStream";
+} & ResponseStreamArgs;
+
+export type ProcessedStreamingFileParseResult =
+  | {
+      type: "text";
+      content: string;
+    }
+  | {
+      type: "end-file-block";
+      file: SourceFile;
+      html: string;
+    }
+  | {
+      type: "start-file-block";
+      path: string;
+    }
+  | {
+      type: "markdown";
+      content: string;
+      html: string;
+    };
+
+export type FileResultStreamArgs = {
+  data: ProcessedStreamingFileParseResult;
+};
+
+export type FileResultStreamEvent = {
+  type: "fileResultStream";
+} & FileResultStreamArgs;
 
 type FileBlockProcessorArgs = {
   currentBlock:

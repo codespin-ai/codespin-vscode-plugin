@@ -2,10 +2,10 @@ import * as React from "react";
 import { useState } from "react";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { AnthropicConfigArgs } from "../../../../../settings/provider/editAnthropicConfig.js";
-import { EditAnthropicConfigEvent } from "../../../../../settings/provider/types.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import type { ConfigPageState } from "./EditConfig.js";
+import { EditAnthropicConfigEvent } from "../../../types.js";
 
 export function EditAnthropicConfig(props: AnthropicConfigArgs) {
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");

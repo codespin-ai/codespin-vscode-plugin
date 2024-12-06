@@ -1,5 +1,3 @@
-// types.ts
-// User message types
 export type UserTextContent = {
   type: "text";
   text: string;
@@ -81,3 +79,7 @@ export type ConversationSummary = {
   model: string;
   codingConvention: string | null;
 };
+
+export interface ConversationsFile {
+  conversations: ConversationSummary[];
+}

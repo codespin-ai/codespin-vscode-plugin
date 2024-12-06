@@ -1,6 +1,9 @@
-// validations.ts
-import { Conversation, Message, ContentItem } from "./types.js";
-import { ConversationsFile } from "./fileTypes.js";
+import {
+  Conversation,
+  Message,
+  ContentItem,
+  ConversationsFile,
+} from "./types.js";
 
 function validateContentItem(item: unknown): item is ContentItem {
   if (!item || typeof item !== "object") {

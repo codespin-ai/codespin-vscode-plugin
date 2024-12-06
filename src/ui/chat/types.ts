@@ -1,42 +1,5 @@
-import { SourceFile } from "codespin/dist/sourceCode/SourceFile.js";
-
-export type FileVersions = "current" | "HEAD";
-
-export type ResponseStreamArgs = {
-  data: string;
-};
-
-export type ResponseStreamEvent = {
-  type: "responseStream";
-} & ResponseStreamArgs;
-
-export type ProcessedStreamingFileParseResult =
-  | {
-      type: "text";
-      content: string;
-    }
-  | {
-      type: "end-file-block";
-      file: SourceFile;
-      html: string;
-    }
-  | {
-      type: "start-file-block";
-      path: string;
-    }
-  | {
-      type: "markdown";
-      content: string;
-      html: string;
-    };
-
-export type FileResultStreamArgs = {
-  data: ProcessedStreamingFileParseResult;
-};
-
-export type FileResultStreamEvent = {
-  type: "fileResultStream";
-} & FileResultStreamArgs;
+import { AnthropicConfigArgs } from "../../settings/provider/editAnthropicConfig.js";
+import { OpenAIConfigArgs } from "../../settings/provider/editOpenAIConfig.js";
 
 export type DoneEvent = {
   type: "done";

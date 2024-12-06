@@ -1,6 +1,6 @@
 import { editOpenAIConfig as updateOpenAIConfig } from "../../../settings/provider/editOpenAIConfig.js";
-import { EditOpenAIConfigEvent } from "../../../settings/provider/types.js";
 import { ChatPanel } from "../ChatPanel.js";
+import { EditOpenAIConfigEvent } from "../types.js";
 import { handleStartChat } from "./handleStartChat.js";
 
 export async function handleEditOpenAIConfig(

@@ -2,10 +2,10 @@ import * as React from "react";
 import { useState } from "react";
 import { OpenAIConfigArgs } from "../../../../../settings/provider/editOpenAIConfig.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
-import { EditOpenAIConfigEvent } from "../../../../../settings/provider/types.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import type { ConfigPageState } from "./EditConfig.js";
+import { EditOpenAIConfigEvent } from "../../../types.js";
 
 export function EditOpenAIConfig(props: OpenAIConfigArgs) {
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
