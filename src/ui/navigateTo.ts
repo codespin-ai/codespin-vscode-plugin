@@ -1,5 +1,13 @@
 import { UIContainer } from "./UIContainer.js";
-import { NavigateEvent } from "./types.js";
+
+export type NavigateArgs = {
+  url: string;
+  state: unknown;
+};
+
+export type NavigateEvent = {
+  type: "navigate";
+} & NavigateArgs;
 
 export async function navigateTo<T>(
   uiContainer: UIContainer,

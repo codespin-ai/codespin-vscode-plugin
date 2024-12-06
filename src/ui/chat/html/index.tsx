@@ -5,8 +5,9 @@ import { navigate } from "wouter/use-browser-location";
 import { StartChat } from "./pages/start/StartChat.js";
 import { Chat } from "./pages/chat/Chat.js";
 import { EditConfig } from "./pages/provider/EditConfig.js";
-import { BrowserEvent, NavigateEvent } from "../../types.js";
+import { BrowserEvent } from "../../types.js";
 import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
+import type { NavigateEvent } from "../../navigateTo.js";
 
 function App() {
   console.log("CodeSpin.AI extension started.");

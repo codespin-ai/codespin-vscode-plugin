@@ -2,10 +2,11 @@ import * as React from "react";
 import { createRoot } from "react-dom/client";
 import { Route, Switch } from "wouter";
 import { navigate } from "wouter/use-browser-location";
-import { BrowserEvent, NavigateEvent } from "../../types.js";
+import { BrowserEvent } from "../../types.js";
 import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
 import { Conversations } from "./pages/conversations/Conversations.js";
 import { Initialize } from "./pages/initialize/Initialize.js";
+import type { NavigateEvent } from "../../navigateTo.js";
 
 function App() {
   console.log("CodeSpin.AI extension started.");
