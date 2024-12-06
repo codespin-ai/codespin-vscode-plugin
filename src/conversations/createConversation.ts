@@ -1,8 +1,12 @@
-// createConversation.ts
 import * as fs from "fs/promises";
 import * as path from "path";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
-import { Message, ConversationSummary, ConversationsFile } from "./types.js";
+import {
+  Message,
+  ConversationSummary,
+  ConversationsFile,
+  Conversation,
+} from "./types.js";
 
 function getInitialTitle(messages: Message[]): string {
   const firstMessage = messages[0];
@@ -24,17 +28,27 @@ function getNextId(conversations: ConversationSummary[]): string {
   return (lastId + 1).toString();
 }
 
-export async function createConversation(params: {
+export type CreateConversationParams = {
   title: string;
   timestamp: number;
   model: string;
   codingConvention: string | null;
   initialMessage: Message;
-  workspaceRoot: string;
-}): Promise<string> {
+};
+
+export async function createConversation(
+  {
+    title: maybeTitle,
+    timestamp,
+    model,
+    codingConvention,
+    initialMessage,
+  }: CreateConversationParams,
+  workspaceRoot: string
+): Promise<string> {
   // Now returns the created ID
   const conversationsDir = path.join(
-    getCodeSpinDir(params.workspaceRoot),
+    getCodeSpinDir(workspaceRoot),
     "conversations"
   );
   const summariesPath = path.join(conversationsDir, "conversations.json");
@@ -58,7 +72,7 @@ export async function createConversation(params: {
     }
   }
 
-  const title = params.title || getInitialTitle([params.initialMessage]);
+  const title = maybeTitle || getInitialTitle([initialMessage]);
   const id = getNextId(conversationsFile.conversations);
 
   const conversationDirPath = path.join(conversationsDir, id);
@@ -73,20 +87,22 @@ export async function createConversation(params: {
   const summary: ConversationSummary = {
     id,
     title,
-    timestamp: params.timestamp,
-    model: params.model,
-    codingConvention: params.codingConvention,
+    timestamp,
+    model,
+    codingConvention,
   };
 
   conversationsFile.conversations.unshift(summary);
 
   await fs.writeFile(summariesPath, JSON.stringify(conversationsFile, null, 2));
 
-  const conversation = {
-    ...params,
+  const conversation: Conversation = {
     id,
     title,
-    messages: [params.initialMessage],
+    timestamp,
+    model,
+    codingConvention,
+    messages: [],
   };
 
   await fs.writeFile(

@@ -32,9 +32,7 @@ export class ConversationsViewProvider extends ViewProvider {
 
         if (initialized) {
           const conversationsPageArgs: ConversationsPageArgs = {
-            entries: initialized
-              ? await listConversations({ workspaceRoot })
-              : [],
+            entries: initialized ? await listConversations(workspaceRoot) : [],
           };
 
           navigateTo(this, "/conversations", conversationsPageArgs);
@@ -46,7 +44,7 @@ export class ConversationsViewProvider extends ViewProvider {
       case "newConversation": {
         const updateConversationsEvent: UpdateConversationsEvent = {
           type: "updateConversations",
-          entries: await listConversations({ workspaceRoot }),
+          entries: await listConversations(workspaceRoot),
         };
 
         const webview = this.getWebview();
@@ -61,7 +59,7 @@ export class ConversationsViewProvider extends ViewProvider {
         await initialize(false, workspaceRoot);
 
         const conversationsPageArgs: ConversationsPageArgs = {
-          entries: await listConversations({ workspaceRoot }),
+          entries: await listConversations(workspaceRoot),
         };
 
         navigateTo(this, "/conversations", conversationsPageArgs);

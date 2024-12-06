@@ -1,4 +1,3 @@
-// listConversations.ts
 import * as fs from "fs/promises";
 import * as path from "path";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
@@ -6,11 +5,11 @@ import { clearAllData } from "./clearAllData.js";
 import { ConversationSummary } from "./types.js";
 import { validateConversationsStructure } from "./validations.js";
 
-export async function listConversations(params: {
-  workspaceRoot: string;
-}): Promise<ConversationSummary[]> {
+export async function listConversations(
+  workspaceRoot: string
+): Promise<ConversationSummary[]> {
   const conversationsDir = path.join(
-    getCodeSpinDir(params.workspaceRoot),
+    getCodeSpinDir(workspaceRoot),
     "conversations"
   );
   const summariesPath = path.join(conversationsDir, "conversations.json");

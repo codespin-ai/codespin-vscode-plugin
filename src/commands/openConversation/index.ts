@@ -12,10 +12,10 @@ export function getOpenConversationCommand(
     conversationId: string
   ): Promise<void> {
     const workspaceRoot = getWorkspaceRoot(context);
-    const conversation = await getConversation({
-      id: conversationId,
-      workspaceRoot,
-    });
+    const conversation = await getConversation(
+      { id: conversationId },
+      workspaceRoot
+    );
 
     if (!conversation) {
       vscode.window.showErrorMessage("Could not load conversation");

@@ -53,14 +53,16 @@ export async function invokeGenerate(
     content: userContent,
   };
 
-  const conversationId = await createConversation({
-    title: startChatInput.prompt.slice(0, 100) ?? "Untitled",
-    timestamp,
-    model: startChatInput.model,
-    codingConvention: startChatInput.codingConvention || null,
-    initialMessage: userMessage,
-    workspaceRoot,
-  });
+  const conversationId = await createConversation(
+    {
+      title: startChatInput.prompt.slice(0, 100) ?? "Untitled",
+      timestamp,
+      model: startChatInput.model,
+      codingConvention: startChatInput.codingConvention || null,
+      initialMessage: userMessage,
+    },
+    workspaceRoot
+  );
 
   // Send initial user message to chat page
   const chatPageMessageClient = createMessageClient<ChatPageBrokerType>(
@@ -145,11 +147,13 @@ export async function invokeGenerate(
 
   // Add assistant's response to conversation if there is content
   if (currentAssistantMessage.content.length > 0) {
-    await addMessage({
-      conversationId,
-      message: currentAssistantMessage,
-      workspaceRoot,
-    });
+    await addMessage(
+      {
+        conversationId,
+        message: currentAssistantMessage,
+      },
+      workspaceRoot
+    );
   }
 
   // Send done event to chat UI

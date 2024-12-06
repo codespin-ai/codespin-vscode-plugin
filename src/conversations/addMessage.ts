@@ -1,16 +1,17 @@
-// addMessage.ts
 import * as fs from "fs/promises";
 import * as path from "path";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
 import { Message, Conversation, ConversationsFile } from "./types.js";
 
-export async function addMessage(params: {
-  conversationId: string;
-  message: Message;
-  workspaceRoot: string;
-}): Promise<void> {
+export async function addMessage(
+  params: {
+    conversationId: string;
+    message: Message;
+  },
+  workspaceRoot: string
+): Promise<void> {
   const conversationsDir = path.join(
-    getCodeSpinDir(params.workspaceRoot),
+    getCodeSpinDir(workspaceRoot),
     "conversations"
   );
   const summariesPath = path.join(conversationsDir, "conversations.json");

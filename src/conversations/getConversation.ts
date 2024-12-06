@@ -1,4 +1,3 @@
-// getConversation.ts
 import * as path from "path";
 import * as fs from "fs/promises";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
@@ -6,12 +5,14 @@ import { Conversation, ConversationsFile } from "./types.js";
 import { validateConversation } from "./validations.js";
 import { clearAllData } from "./clearAllData.js";
 
-export async function getConversation(params: {
-  id: string;
-  workspaceRoot: string;
-}): Promise<Conversation | null> {
+export async function getConversation(
+  params: {
+    id: string;
+  },
+  workspaceRoot: string
+): Promise<Conversation | null> {
   const conversationsDir = path.join(
-    getCodeSpinDir(params.workspaceRoot),
+    getCodeSpinDir(workspaceRoot),
     "conversations"
   );
   const summariesPath = path.join(conversationsDir, "conversations.json");
