@@ -14,7 +14,7 @@ import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
 
 // ChatPanel can be called with "/start" or "/chat" routes
 export type StartChatPageInitArgs = {
-  type: "files";
+  type: "newConversation";
   prompt: string | undefined;
   args: string[];
 };

@@ -34,7 +34,7 @@ export function getStartChatCommand(
         : undefined;
 
     const panel = new ChatPanel(context, globalEventEmitter);
-    await panel.init({ type: "files", prompt, args: filePaths });
+    await panel.init({ type: "newConversation", prompt, args: filePaths });
   };
 }
 
