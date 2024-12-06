@@ -4,11 +4,11 @@ import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
 import { StartChatUserInput } from "./types.js";
-import type { ConfigPageState } from "./html/pages/provider/EditConfig.js";
+import type { ProviderConfigPageArgs } from "./html/pages/provider/EditConfig.js";
 
 export type GetStartChatArgsMissingConfigResult = {
-  status: "missing_config";
-  configPageState: ConfigPageState;
+  status: "missing_provider_config";
+  providerConfigPageArgs: ProviderConfigPageArgs;
 };
 
 export type GetStartChatArgsOkResult = {
@@ -54,8 +54,8 @@ export async function getStartChatArgs(
     return canstartChatArgs;
   } else {
     const missingConfigResult: GetStartChatArgsMissingConfigResult = {
-      status: "missing_config",
-      configPageState: {
+      status: "missing_provider_config",
+      providerConfigPageArgs: {
         provider: modelDescription.provider,
         startChatUserInput: startChatInput,
       },

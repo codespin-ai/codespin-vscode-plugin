@@ -3,7 +3,7 @@ import { EditAnthropicConfig } from "./EditAnthropicConfig.js";
 import { EditOpenAIConfig } from "./EditOpenAIConfig.js";
 import { StartChatUserInput } from "../../../types.js";
 
-export type ConfigPageState = {
+export type ProviderConfigPageArgs = {
   provider: string;
   startChatUserInput: StartChatUserInput;
 };

@@ -4,12 +4,12 @@ import { OpenAIConfigArgs } from "../../../../../settings/provider/editOpenAICon
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
-import type { ConfigPageState } from "./EditConfig.js";
+import type { ProviderConfigPageArgs } from "./EditConfig.js";
 import { EditOpenAIConfigEvent } from "../../../types.js";
 
 export function EditOpenAIConfig(props: OpenAIConfigArgs) {
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
-  const state: ConfigPageState = history.state;
+  const state: ProviderConfigPageArgs = history.state;
 
   function onSave() {
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(

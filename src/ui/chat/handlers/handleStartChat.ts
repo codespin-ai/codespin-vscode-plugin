@@ -4,7 +4,7 @@ import { navigateTo } from "../../navigateTo.js";
 import { invokeGenerate } from "../invokeGenerate.js";
 import { StartChatEvent } from "../types.js";
 import { ChatPanel } from "../ChatPanel.js";
-import type { ConfigPageState } from "../html/pages/provider/EditConfig.js";
+import type { ProviderConfigPageArgs } from "../html/pages/provider/EditConfig.js";
 
 export async function handleStartChat(
   chatPanel: ChatPanel,
@@ -26,7 +26,7 @@ export async function handleStartChat(
         if (ex instanceof InvalidCredentialsError) {
           const modelDescription = await getModelDescription(workspaceRoot);
 
-          const configPageState: ConfigPageState = {
+          const configPageState: ProviderConfigPageArgs = {
             provider: modelDescription.provider,
             startChatUserInput: message,
           };
@@ -38,11 +38,11 @@ export async function handleStartChat(
       }
       break;
 
-    case "missing_config":
+    case "missing_provider_config":
       await navigateTo(
         chatPanel,
         `/provider/config/edit`,
-        startChatArgs.configPageState
+        startChatArgs.providerConfigPageArgs
       );
       break;
   }
