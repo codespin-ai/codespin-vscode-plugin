@@ -42,11 +42,11 @@ export function EditAnthropicConfig(props: AnthropicConfigArgs) {
               securely stored in .codespin/anthropic.json
             </p>
           )}
-          {state.returnTo && (
+          {
             <p className="text-vscode-editor-foreground opacity-80 text-sm mt-2">
               After saving, you'll return to your previous chat.
             </p>
-          )}
+          }
         </div>
 
         <div className="space-y-6 bg-vscode-input-background rounded-lg p-6 shadow-sm border border-vscode-panel-border">

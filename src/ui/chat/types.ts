@@ -133,6 +133,5 @@ export type ChatPageState = {
 
 export type ConfigPageState = {
   provider: string;
-  returnTo: string;
   startChatUserInput: StartChatUserInput;
 };

@@ -70,7 +70,6 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
 
             const configPageState: ConfigPageState = {
               provider: modelDescription.provider,
-              returnTo: "/chat",
               startChatUserInput: startChatInput,
             };
 
