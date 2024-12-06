@@ -1,16 +1,16 @@
 import { FormatPromptArgs } from "codespin/dist/commands/formatPrompt/index.js";
-import { CopyToClipboardUserInput } from "./types.js";
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
+import { CopyToClipboardUserInput } from "./copyToClipboard.js";
 
 export async function getPrintPromptArgs(
-  argsFromPanel: CopyToClipboardUserInput,
+  userInput: CopyToClipboardUserInput,
   workspaceRoot: string
 ): Promise<FormatPromptArgs> {
   const templateArgs: FormatPromptArgs = {
-    include: argsFromPanel.includedFiles.map((inc) => inc.path),
-    prompt: argsFromPanel.prompt,
-    spec: argsFromPanel.codingConvention
-      ? getCodingConventionPath(argsFromPanel.codingConvention, workspaceRoot)
+    include: userInput.includedFiles.map((inc) => inc.path),
+    prompt: userInput.prompt,
+    spec: userInput.codingConvention
+      ? getCodingConventionPath(userInput.codingConvention, workspaceRoot)
       : undefined,
     template: "files",
   };

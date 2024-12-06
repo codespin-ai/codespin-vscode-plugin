@@ -53,15 +53,6 @@ export type DoneEvent = {
   type: "done";
 };
 
-export type AddDepsArgs = {
-  file: string;
-  model: string;
-};
-
-export type AddDepsEvent = {
-  type: "addDeps";
-} & AddDepsArgs;
-
 export type OpenFileArgs = {
   file: string;
 };
@@ -69,14 +60,6 @@ export type OpenFileArgs = {
 export type OpenFileEvent = {
   type: "openFile";
 } & OpenFileArgs;
-
-export type ModelChange = {
-  model: string;
-};
-
-export type ModelChangeEvent = {
-  type: "modelChange";
-} & ModelChange;
 
 export type StartChatEvent = {
   type: "startChat";
@@ -91,17 +74,3 @@ export type StartChatUserInput = {
     size: number;
   }>;
 };
-
-export type CopyToClipboardUserInput = {
-  prompt: string;
-  codingConvention: string | undefined;
-  includedFiles: {
-    path: string;
-  }[];
-};
-
-export type CopyToClipboardEvent = {
-  type: "copyToClipboard";
-} & CopyToClipboardUserInput;
-
-

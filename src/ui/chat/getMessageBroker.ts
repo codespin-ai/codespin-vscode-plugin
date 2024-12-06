@@ -6,7 +6,6 @@ import {
   BrokerType,
   createMessageBroker,
 } from "../../messaging/messageBroker.js";
-import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
 import { editAnthropicConfig } from "../../settings/provider/editAnthropicConfig.js";
 import { editOpenAIConfig } from "../../settings/provider/editOpenAIConfig.js";
 import {
@@ -16,20 +15,33 @@ import {
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { navigateTo } from "../navigateTo.js";
-import { addDeps } from "./addDeps.js";
+import { addDeps } from "../../sourceAnalysis/addDeps.js";
 import { ChatPanel } from "./ChatPanel.js";
-import { copyToClipboard } from "./copyToClipboard.js";
+import { copyToClipboard, CopyToClipboardEvent } from "./copyToClipboard.js";
 import { getModelDescription, getStartChatArgs } from "./getStartChatArgs.js";
-import { invokeGenerate } from "./invokeGenerate.js";
-import {
-  AddDepsEvent,
-  CopyToClipboardEvent,
-  ModelChangeEvent,
-  OpenFileEvent,
-  StartChatEvent,
-  StartChatUserInput,
-} from "./types.js";
 import type { ConfigPageState } from "./html/pages/provider/EditConfig.js";
+import { invokeGenerate } from "./invokeGenerate.js";
+import { OpenFileEvent, StartChatEvent, StartChatUserInput } from "./types.js";
+import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
+import { includeFiles } from "./includeFiles.js";
+import { pathExists } from "../../fs/pathExists.js";
+
+export type AddDepsArgs = {
+  file: string;
+  model: string;
+};
+
+export type AddDepsEvent = {
+  type: "addDeps";
+} & AddDepsArgs;
+
+export type ModelChange = {
+  model: string;
+};
+
+export type ModelChangeEvent = {
+  type: "modelChange";
+} & ModelChange;
 
 export type MarkdownToHtmlArgs = {
   content: string;
@@ -54,7 +66,27 @@ export type NewConversationEvent = {
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
   async function handleAddDeps(message: AddDepsEvent) {
-    await addDeps(chatPanel, message, workspaceRoot);
+    const dependenciesResult = await addDeps(
+      message.file,
+      message.model,
+      workspaceRoot
+    );
+
+    includeFiles(
+      chatPanel,
+      (
+        await Promise.all(
+          dependenciesResult.dependencies
+            .filter((x) => x.isProjectFile)
+            .map(async (x) => {
+              const fullPath = path.resolve(workspaceRoot, x.filePath);
+              const fileExists = await pathExists(fullPath);
+              return fileExists ? fullPath : undefined;
+            })
+        )
+      ).filter(Boolean) as string[],
+      workspaceRoot
+    );
   }
 
   async function handleCopyToClipboard(message: CopyToClipboardEvent) {
@@ -134,7 +166,6 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
 
   async function handleModelChange(message: ModelChangeEvent) {
     await setDefaultModel(message.model, workspaceRoot);
-    return 100;
   }
 
   async function handleOpenFile(message: OpenFileEvent) {
