@@ -1,15 +1,17 @@
+// invokeGenerate.ts
 import {
   GenerateArgs as CodeSpinGenerateArgs,
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
-import { saveConversation } from "../../conversations/saveConversation.js";
+import { createConversation } from "../../conversations/createConversation.js";
+import { addMessage } from "../../conversations/addMessage.js";
 import {
   AssistantMessage,
   Message,
+  UserFileContent,
   UserMessage,
   UserTextContent,
-  UserFileContent,
 } from "../../conversations/types.js";
 import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
@@ -18,20 +20,19 @@ import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js
 import { navigateTo } from "../navigateTo.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
-import { includeFiles } from "./includeFiles.js";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,
   argsForGeneration: { args: CodeSpinGenerateArgs },
   workspaceRoot: string
-) {
+): Promise<void> {
   const request = chatPanel.userInput!;
 
   await navigateTo(chatPanel, `/chat`, {
     model: argsForGeneration.args.model,
   });
 
-  // Save initial conversation with just the user message
+  // Create initial conversation with just the user message
   const conversationId = `gen_${Date.now()}`;
   const timestamp = Date.now();
 
@@ -54,19 +55,13 @@ export async function invokeGenerate(
     content: userContent,
   };
 
-  let currentMessages: Message[] = [userMessage];
-  let currentAssistantMessage: AssistantMessage = {
-    role: "assistant",
-    content: [],
-  };
-
-  await saveConversation({
+  await createConversation({
     id: conversationId,
     title: request.prompt.slice(0, 100) ?? "Untitled",
     timestamp,
     model: request.model,
     codingConvention: request.codingConvention || null,
-    messages: currentMessages,
+    initialMessage: userMessage,
     workspaceRoot,
   });
 
@@ -81,6 +76,10 @@ export async function invokeGenerate(
   chatPageMessageClient.send("messages", [userMessage]);
 
   let currentTextBlock = "";
+  let currentAssistantMessage: AssistantMessage = {
+    role: "assistant",
+    content: [],
+  };
 
   // Rest of the streaming callback remains the same
   argsForGeneration.args.fileResultStreamCallback = async (
@@ -147,16 +146,11 @@ export async function invokeGenerate(
     workingDir: workspaceRoot,
   });
 
-  // Save final conversation state including assistant's response
+  // Add assistant's response to conversation if there is content
   if (currentAssistantMessage.content.length > 0) {
-    currentMessages.push(currentAssistantMessage);
-    await saveConversation({
-      id: conversationId,
-      title: request.prompt.slice(0, 100) ?? "Untitled",
-      timestamp,
-      model: request.model,
-      codingConvention: request.codingConvention || null,
-      messages: currentMessages,
+    await addMessage({
+      conversationId,
+      message: currentAssistantMessage,
       workspaceRoot,
     });
   }
