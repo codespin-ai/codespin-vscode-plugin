@@ -3,7 +3,8 @@ import { getModel } from "codespin/dist/settings/getModel.js";
 import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
-import { StartChatUserInput, ConfigPageState } from "./types.js";
+import { StartChatUserInput } from "./types.js";
+import type { ConfigPageState } from "./html/pages/provider/EditConfig.js";
 
 export type GetStartChatArgsMissingConfigResult = {
   status: "missing_config";

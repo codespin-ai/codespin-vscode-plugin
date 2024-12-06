@@ -18,7 +18,13 @@ import { MessageList } from "./components/MessageList.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
-import { ChatPageState, StartChatEvent } from "../../../types.js";
+import { StartChatEvent, StartChatUserInput } from "../../../types.js";
+
+// New types for navigation state
+export type ChatPageState = {
+  model: string;
+  startChat?: StartChatUserInput;
+};
 
 export function Chat() {
   const state: ChatPageState = history.state;

@@ -5,7 +5,7 @@ import { AnthropicConfigArgs } from "../../../../../settings/provider/editAnthro
 import { EditAnthropicConfigEvent } from "../../../../../settings/provider/types.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
-import { ConfigPageState } from "../../../types.js";
+import type { ConfigPageState } from "./EditConfig.js";
 
 export function EditAnthropicConfig(props: AnthropicConfigArgs) {
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");

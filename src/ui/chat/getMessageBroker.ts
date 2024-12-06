@@ -26,7 +26,6 @@ import {
 import { invokeGenerate } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
-  ConfigPageState,
   CopyToClipboardEvent,
   MarkdownToHtmlEvent,
   ModelChangeEvent,
@@ -36,6 +35,7 @@ import {
   StartChatEvent,
   StartChatUserInput,
 } from "./types.js";
+import type { ConfigPageState } from "./html/pages/provider/EditConfig.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
   async function handleAddDeps(message: AddDepsEvent) {
