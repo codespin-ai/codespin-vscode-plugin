@@ -52,19 +52,22 @@ export type StartChatUserInput = {
   }>;
 };
 
-export interface AddDepsEvent {
-  type: "addDeps";
-  file: string;
-  model: string;
-}
-
-export interface CopyToClipboardEvent {
-  type: "copyToClipboard";
+export type CopyToClipboardUserInput = {
   prompt: string;
   codingConvention: string | undefined;
   includedFiles: {
     path: string;
   }[];
+};
+
+export type CopyToClipboardEvent = {
+  type: "copyToClipboard";
+} & CopyToClipboardUserInput;
+
+export interface AddDepsEvent {
+  type: "addDeps";
+  file: string;
+  model: string;
 }
 
 export interface EditAnthropicConfigEvent {
