@@ -1,17 +1,15 @@
-// invokeGenerate.ts
 import {
   GenerateArgs as CodeSpinGenerateArgs,
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
-import { createConversation } from "../../conversations/createConversation.js";
 import { addMessage } from "../../conversations/addMessage.js";
+import { createConversation } from "../../conversations/createConversation.js";
 import {
   AssistantMessage,
-  Message,
   UserFileContent,
   UserMessage,
-  UserTextContent,
+  UserTextContent
 } from "../../conversations/types.js";
 import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
