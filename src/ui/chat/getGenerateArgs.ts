@@ -6,24 +6,24 @@ import { getProviderConfigPath } from "../../settings/provider/getProviderConfig
 import { GenerateUserInput } from "./types.js";
 import type { ProviderConfigPageArgs } from "./html/pages/provider/EditConfig.js";
 
-export type GetStartChatArgsMissingConfigResult = {
+export type MissingProviderConfigArgs = {
   status: "missing_provider_config";
   providerConfigPageArgs: ProviderConfigPageArgs;
 };
 
-export type GetStartChatArgsOkResult = {
-  status: "can_start_chat";
+export type CanGenerateArgs = {
+  status: "can_generate";
   args: CodeSpinGenerateArgs;
 };
 
-export type GetStartChatArgsResult =
-  | GetStartChatArgsMissingConfigResult
-  | GetStartChatArgsOkResult;
+export type GetGenerateArgs =
+  | MissingProviderConfigArgs
+  | CanGenerateArgs;
 
-export async function getStartChatArgs(
+export async function getGenerateArgs(
   startChatInput: GenerateUserInput,
   workspaceRoot: string
-): Promise<GetStartChatArgsResult> {
+): Promise<GetGenerateArgs> {
   const modelDescription = await getModelDescription(workspaceRoot);
 
   const configFilePath = await getProviderConfigPath(
@@ -46,14 +46,14 @@ export async function getStartChatArgs(
       reloadProviderConfig: true,
     };
 
-    const canstartChatArgs: GetStartChatArgsOkResult = {
-      status: "can_start_chat",
+    const canstartChatArgs: CanGenerateArgs = {
+      status: "can_generate",
       args: codespinGenerateArgs,
     };
 
     return canstartChatArgs;
   } else {
-    const missingConfigResult: GetStartChatArgsMissingConfigResult = {
+    const missingConfigResult: MissingProviderConfigArgs = {
       status: "missing_provider_config",
       providerConfigPageArgs: {
         provider: modelDescription.provider,

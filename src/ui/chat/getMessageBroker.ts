@@ -11,7 +11,7 @@ import { handleMarkdownToHtml } from "./handlers/handleMarkdownToHtml.js";
 import { handleModelChange } from "./handlers/handleModelChange.js";
 import { handleOpenFile } from "./handlers/handleOpenFile.js";
 import { handleSourceCodeToHtml } from "./handlers/handleSourceCodeToHtml.js";
-import { handleStartChat } from "./handlers/handleStartChat.js";
+import { handleGenerate } from "./handlers/handleGenerate.js";
 import { ChatPanel } from "./ChatPanel.js";
 import {
   AddDepsEvent,
@@ -34,7 +34,7 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
       handleCopyToClipboard(message, workspaceRoot)
     )
     .attachHandler("generate", (message: GenerateEvent) =>
-      handleStartChat(chatPanel, message, workspaceRoot)
+      handleGenerate(chatPanel, message, workspaceRoot)
     )
     .attachHandler("editAnthropicConfig", (message: EditAnthropicConfigEvent) =>
       handleEditAnthropicConfig(chatPanel, message, workspaceRoot)
