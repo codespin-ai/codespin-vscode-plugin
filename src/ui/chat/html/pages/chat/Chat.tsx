@@ -17,6 +17,7 @@ import { MessageInput } from "./components/MessageInput.js";
 import { MessageList } from "./components/MessageList.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
+import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
 
 interface GenerateStreamArgs {
   provider: string;
@@ -33,8 +34,14 @@ export function Chat() {
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [newMessage, setNewMessage] = React.useState("");
   const chatEndRef = React.useRef<HTMLDivElement>(null);
+  const [fileMap, setFileMap] = React.useState<FileReferenceMap>(new Map());
 
   const generateBlockId = () => Math.random().toString(36).substr(2, 9);
+
+  React.useEffect(() => {
+    // Update fileMap whenever messages change
+    setFileMap(buildFileReferenceMap(messages));
+  }, [messages]);
 
   React.useEffect(() => {
     const pageMessageBroker = getMessageBroker({
@@ -115,6 +122,7 @@ export function Chat() {
         setNewMessage={setNewMessage}
         sendMessage={sendMessage}
         isGenerating={isGenerating}
+        fileMap={fileMap}
       />
     </div>
   );

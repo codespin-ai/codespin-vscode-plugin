@@ -1,13 +1,13 @@
 import * as React from "react";
 import { Message } from "../../../../../../conversations/types.js";
-import { AssistantContentBlock } from "../AssistantContentBlock.js";
-import { UserContentBlock } from "../UserContentBlock.js";
+import { UserContentBlock } from "./UserContentBlock.js";
 import {
   FileHeadingContent,
   TextContent,
   CodeContent,
   MarkdownContent,
 } from "../../../../../../conversations/types.js";
+import { AssistantContentBlock } from "./AssistantContentBlock.js";
 
 interface MessageListProps {
   messages: Message[];

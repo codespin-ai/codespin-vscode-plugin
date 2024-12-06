@@ -1,5 +1,5 @@
 import * as React from "react";
-import { ContentItem } from "../../../../../conversations/types.js";
+import { ContentItem } from "../../../../../../conversations/types.js";
 
 type Props = {
   block: ContentItem;

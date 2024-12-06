@@ -1,6 +1,6 @@
 import * as React from "react";
-import { UserMessage } from "../../../../../conversations/types.js";
-import { formatFileSize } from "../../../../../fs/formatFileSize.js";
+import { UserMessage } from "../../../../../../conversations/types.js";
+import { formatFileSize } from "../../../../../../fs/formatFileSize.js";
 
 type Props = {
   message: UserMessage;
@@ -32,7 +32,7 @@ export function UserContentBlock({ message }: Props) {
               <div key={index} className="user-files-block">
                 <ul className="file-attachment">
                   {content.includedFiles.map((file) => (
-                    <li>./{file.path}</li>
+                    <li>{file.path}</li>
                   ))}
                 </ul>
               </div>

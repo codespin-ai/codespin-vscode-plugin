@@ -11,11 +11,10 @@ export async function includeFiles(
   filePaths: string[],
   workspaceRoot: string
 ) {
-  const startChatPageMessageClient = createMessageClient<StartChatPageBrokerType>(
-    (message: unknown) => {
+  const startChatPageMessageClient =
+    createMessageClient<StartChatPageBrokerType>((message: unknown) => {
       chatPanel.panel.webview.postMessage(message);
-    }
-  );
+    });
 
   const allPaths = await getFilesRecursive(filePaths, workspaceRoot);
 
