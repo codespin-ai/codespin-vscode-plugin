@@ -4,14 +4,14 @@ import { EditAnthropicConfigEvent } from "../types.js";
 import { handleStartChat } from "./handleStartChat.js";
 
 export async function handleEditAnthropicConfig(
-  message: EditAnthropicConfigEvent,
   chatPanel: ChatPanel,
+  message: EditAnthropicConfigEvent,
   workspaceRoot: string
 ): Promise<void> {
   await updateAnthropicConfig(message);
   await handleStartChat(
-    { type: "startChat", ...message.startChatUserInput },
     chatPanel,
+    { type: "startChat", ...message.startChatUserInput },
     workspaceRoot
   );
 }

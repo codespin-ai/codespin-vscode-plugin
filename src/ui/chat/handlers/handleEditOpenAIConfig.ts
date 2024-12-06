@@ -4,14 +4,14 @@ import { EditOpenAIConfigEvent } from "../types.js";
 import { handleStartChat } from "./handleStartChat.js";
 
 export async function handleEditOpenAIConfig(
-  message: EditOpenAIConfigEvent,
   chatPanel: ChatPanel,
+  message: EditOpenAIConfigEvent,
   workspaceRoot: string
 ): Promise<void> {
   await updateOpenAIConfig(message);
   await handleStartChat(
-    { type: "startChat", ...message.startChatUserInput },
     chatPanel,
+    { type: "startChat", ...message.startChatUserInput },
     workspaceRoot
   );
 }

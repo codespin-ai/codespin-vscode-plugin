@@ -28,19 +28,19 @@ import {
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
   return createMessageBroker()
     .attachHandler("addDeps", (message: AddDepsEvent) =>
-      handleAddDeps(message, chatPanel, workspaceRoot)
+      handleAddDeps(chatPanel, message, workspaceRoot)
     )
     .attachHandler("copyToClipboard", (message: CopyToClipboardEvent) =>
       handleCopyToClipboard(message, workspaceRoot)
     )
     .attachHandler("startChat", (message: StartChatEvent) =>
-      handleStartChat(message, chatPanel, workspaceRoot)
+      handleStartChat(chatPanel, message, workspaceRoot)
     )
     .attachHandler("editAnthropicConfig", (message: EditAnthropicConfigEvent) =>
-      handleEditAnthropicConfig(message, chatPanel, workspaceRoot)
+      handleEditAnthropicConfig(chatPanel, message, workspaceRoot)
     )
     .attachHandler("editOpenAIConfig", (message: EditOpenAIConfigEvent) =>
-      handleEditOpenAIConfig(message, chatPanel, workspaceRoot)
+      handleEditOpenAIConfig(chatPanel, message, workspaceRoot)
     )
     .attachHandler("markdownToHtml", (message: MarkdownToHtmlEvent) =>
       handleMarkdownToHtml(message)

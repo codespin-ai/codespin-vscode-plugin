@@ -102,7 +102,7 @@ export async function createConversation(
     timestamp,
     model,
     codingConvention,
-    messages: [],
+    messages: [initialMessage],
   };
 
   await fs.writeFile(

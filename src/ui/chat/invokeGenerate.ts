@@ -109,7 +109,7 @@ export async function invokeGenerate(
 
       currentAssistantMessage.content.push({
         type: "code",
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 9),
         path: streamedBlock.file.path,
         content: streamedBlock.file.content,
         html,
@@ -134,7 +134,7 @@ export async function invokeGenerate(
 
       currentAssistantMessage.content.push({
         type: "markdown",
-        id: Math.random().toString(36).substr(2, 9),
+        id: Math.random().toString(36).substring(2, 9),
         content: streamedBlock.content,
         html,
       });

@@ -38,7 +38,7 @@ export function Chat() {
   const chatEndRef = React.useRef<HTMLDivElement>(null);
   const [fileMap, setFileMap] = React.useState<FileReferenceMap>(new Map());
 
-  const generateBlockId = () => Math.random().toString(36).substr(2, 9);
+  const generateBlockId = () => Math.random().toString(36).substring(2, 9);
 
   React.useEffect(() => {
     // Update fileMap whenever messages change

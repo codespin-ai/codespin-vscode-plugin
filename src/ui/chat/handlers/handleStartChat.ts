@@ -7,8 +7,8 @@ import { ChatPanel } from "../ChatPanel.js";
 import type { ConfigPageState } from "../html/pages/provider/EditConfig.js";
 
 export async function handleStartChat(
-  message: StartChatEvent,
   chatPanel: ChatPanel,
+  message: StartChatEvent,
   workspaceRoot: string
 ): Promise<void> {
   const startChatArgs = await getStartChatArgs(message, workspaceRoot);

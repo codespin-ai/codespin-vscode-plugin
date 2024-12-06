@@ -1,10 +1,3 @@
-import { AnthropicConfigArgs } from "../../settings/provider/editAnthropicConfig.js";
-import { OpenAIConfigArgs } from "../../settings/provider/editOpenAIConfig.js";
-
-export type DoneEvent = {
-  type: "done";
-};
-
 export type StartChatUserInput = {
   model: string;
   codingConvention: string | undefined;

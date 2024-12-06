@@ -6,8 +6,8 @@ import * as path from "path";
 import { pathExists } from "../../../fs/pathExists.js";
 
 export async function handleAddDeps(
-  message: AddDepsEvent,
   chatPanel: ChatPanel,
+  message: AddDepsEvent,
   workspaceRoot: string
 ): Promise<void> {
   const dependenciesResult = await addDeps(
