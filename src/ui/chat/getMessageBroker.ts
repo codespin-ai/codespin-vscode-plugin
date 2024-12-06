@@ -1,30 +1,42 @@
 import { InvalidCredentialsError } from "codespin/dist/errors.js";
+import { promises as fs } from "fs";
 import * as path from "path";
 import * as vscode from "vscode";
+import { getFilesRecursive } from "../../fs/getFilesRecursive.js";
+import { pathExists } from "../../fs/pathExists.js";
 import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import {
   BrokerType,
   createMessageBroker,
 } from "../../messaging/messageBroker.js";
+import { createMessageClient } from "../../messaging/messageClient.js";
+import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
 import { editAnthropicConfig } from "../../settings/provider/editAnthropicConfig.js";
 import { editOpenAIConfig } from "../../settings/provider/editOpenAIConfig.js";
 import {
   EditAnthropicConfigEvent,
   EditOpenAIConfigEvent,
 } from "../../settings/provider/types.js";
+import { addDeps } from "../../sourceAnalysis/addDeps.js";
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { navigateTo } from "../navigateTo.js";
-import { addDeps } from "../../sourceAnalysis/addDeps.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { copyToClipboard, CopyToClipboardEvent } from "./copyToClipboard.js";
 import { getModelDescription, getStartChatArgs } from "./getStartChatArgs.js";
 import type { ConfigPageState } from "./html/pages/provider/EditConfig.js";
+import { StartChatPageBrokerType } from "./html/pages/start/getMessageBroker.js";
 import { invokeGenerate } from "./invokeGenerate.js";
-import { OpenFileEvent, StartChatEvent, StartChatUserInput } from "./types.js";
-import { setDefaultModel } from "../../settings/models/setDefaultModel.js";
-import { includeFiles } from "./includeFiles.js";
-import { pathExists } from "../../fs/pathExists.js";
+import { StartChatEvent, StartChatUserInput } from "./types.js";
+import { includeFiles, IncludeFilesEvent } from "./includeFiles.js";
+
+export type OpenFileArgs = {
+  file: string;
+};
+
+export type OpenFileEvent = {
+  type: "openFile";
+} & OpenFileArgs;
 
 export type AddDepsArgs = {
   file: string;
@@ -72,21 +84,19 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
       workspaceRoot
     );
 
-    includeFiles(
-      chatPanel,
-      (
-        await Promise.all(
-          dependenciesResult.dependencies
-            .filter((x) => x.isProjectFile)
-            .map(async (x) => {
-              const fullPath = path.resolve(workspaceRoot, x.filePath);
-              const fileExists = await pathExists(fullPath);
-              return fileExists ? fullPath : undefined;
-            })
-        )
-      ).filter(Boolean) as string[],
-      workspaceRoot
-    );
+    const filePaths = (
+      await Promise.all(
+        dependenciesResult.dependencies
+          .filter((x) => x.isProjectFile)
+          .map(async (x) => {
+            const fullPath = path.resolve(workspaceRoot, x.filePath);
+            const fileExists = await pathExists(fullPath);
+            return fileExists ? fullPath : undefined;
+          })
+      )
+    ).filter(Boolean) as string[];
+
+    await includeFiles(chatPanel, filePaths, workspaceRoot);
   }
 
   async function handleCopyToClipboard(message: CopyToClipboardEvent) {

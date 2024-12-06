@@ -1,10 +1,20 @@
 import { promises as fs } from "fs";
 import * as path from "path";
 import { ChatPanel } from "./ChatPanel.js";
-import { IncludeFilesEvent } from "./types.js";
 import { StartChatPageBrokerType } from "./html/pages/start/getMessageBroker.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
 import { getFilesRecursive } from "../../fs/getFilesRecursive.js";
+
+export type IncludeFilesArgs = {
+  files: {
+    path: string;
+    size: number;
+  }[];
+};
+
+export type IncludeFilesEvent = {
+  type: "includeFiles";
+} & IncludeFilesArgs;
 
 export async function includeFiles(
   chatPanel: ChatPanel,

@@ -2,17 +2,6 @@ import { SourceFile } from "codespin/dist/sourceCode/SourceFile.js";
 
 export type FileVersions = "current" | "HEAD";
 
-export type IncludeFilesArgs = {
-  files: {
-    path: string;
-    size: number;
-  }[];
-};
-
-export type IncludeFilesEvent = {
-  type: "includeFiles";
-} & IncludeFilesArgs;
-
 export type ResponseStreamArgs = {
   data: string;
 };
@@ -52,14 +41,6 @@ export type FileResultStreamEvent = {
 export type DoneEvent = {
   type: "done";
 };
-
-export type OpenFileArgs = {
-  file: string;
-};
-
-export type OpenFileEvent = {
-  type: "openFile";
-} & OpenFileArgs;
 
 export type StartChatEvent = {
   type: "startChat";
