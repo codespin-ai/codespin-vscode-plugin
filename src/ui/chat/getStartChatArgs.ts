@@ -3,7 +3,7 @@ import { getModel } from "codespin/dist/settings/getModel.js";
 import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
-import { StartChatUserInput } from "./types.js";
+import { GenerateUserInput } from "./types.js";
 import type { ProviderConfigPageArgs } from "./html/pages/provider/EditConfig.js";
 
 export type GetStartChatArgsMissingConfigResult = {
@@ -21,7 +21,7 @@ export type GetStartChatArgsResult =
   | GetStartChatArgsOkResult;
 
 export async function getStartChatArgs(
-  startChatInput: StartChatUserInput,
+  startChatInput: GenerateUserInput,
   workspaceRoot: string
 ): Promise<GetStartChatArgsResult> {
   const modelDescription = await getModelDescription(workspaceRoot);

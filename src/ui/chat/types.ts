@@ -1,4 +1,4 @@
-export type StartChatUserInput = {
+export type GenerateUserInput = {
   model: string;
   codingConvention: string | undefined;
   prompt: string;
@@ -29,13 +29,13 @@ export interface AddDepsEvent {
 export interface EditAnthropicConfigEvent {
   type: "editAnthropicConfig";
   apiKey: string;
-  startChatUserInput: StartChatUserInput;
+  generateUserInput: GenerateUserInput;
 }
 
 export interface EditOpenAIConfigEvent {
   type: "editOpenAIConfig";
   apiKey: string;
-  startChatUserInput: StartChatUserInput;
+  generateUserInput: GenerateUserInput;
 }
 
 export interface MarkdownToHtmlEvent {
@@ -59,8 +59,8 @@ export interface SourceCodeToHtmlEvent {
   content: string;
 }
 
-export interface StartChatEvent extends StartChatUserInput {
-  type: "startChat";
+export interface GenerateEvent extends GenerateUserInput {
+  type: "generate";
 }
 
 export interface CancelEvent {

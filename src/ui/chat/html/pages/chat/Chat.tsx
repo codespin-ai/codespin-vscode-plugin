@@ -18,12 +18,12 @@ import { MessageList } from "./components/MessageList.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
-import { StartChatEvent, StartChatUserInput } from "../../../types.js";
+import { GenerateEvent, GenerateUserInput } from "../../../types.js";
 
 // New types for navigation state
 export type ChatPageState = {
   model: string;
-  startChat?: StartChatUserInput;
+  generateUserInput?: GenerateUserInput;
 };
 
 export function Chat() {
@@ -96,15 +96,15 @@ export function Chat() {
       }
     );
 
-    const startChatEvent: StartChatEvent = {
-      type: "startChat",
+    const startChatEvent: GenerateEvent = {
+      type: "generate",
       model: state.model,
       prompt: newMessage,
       codingConvention: undefined,
       includedFiles: [],
     };
 
-    chatPanelMessageClient.send("startChat", startChatEvent);
+    chatPanelMessageClient.send("generate", startChatEvent);
     setNewMessage("");
   }, [newMessage, isGenerating, messages, state.model]);
 

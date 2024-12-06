@@ -1,11 +1,11 @@
 import * as React from "react";
 import { EditAnthropicConfig } from "./EditAnthropicConfig.js";
 import { EditOpenAIConfig } from "./EditOpenAIConfig.js";
-import { StartChatUserInput } from "../../../types.js";
+import { GenerateUserInput } from "../../../types.js";
 
 export type ProviderConfigPageArgs = {
   provider: string;
-  startChatUserInput: StartChatUserInput;
+  startChatUserInput: GenerateUserInput;
 };
 
 export type EditConfigPageArgs = {

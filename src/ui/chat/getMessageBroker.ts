@@ -22,7 +22,7 @@ import {
   ModelChangeEvent,
   OpenFileEvent,
   SourceCodeToHtmlEvent,
-  StartChatEvent,
+  GenerateEvent,
 } from "./types.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
@@ -33,7 +33,7 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
     .attachHandler("copyToClipboard", (message: CopyToClipboardEvent) =>
       handleCopyToClipboard(message, workspaceRoot)
     )
-    .attachHandler("startChat", (message: StartChatEvent) =>
+    .attachHandler("generate", (message: GenerateEvent) =>
       handleStartChat(chatPanel, message, workspaceRoot)
     )
     .attachHandler("editAnthropicConfig", (message: EditAnthropicConfigEvent) =>

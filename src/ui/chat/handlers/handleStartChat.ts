@@ -2,13 +2,13 @@ import { InvalidCredentialsError } from "codespin/dist/errors.js";
 import { getModelDescription, getStartChatArgs } from "../getStartChatArgs.js";
 import { navigateTo } from "../../navigateTo.js";
 import { invokeGenerate } from "../invokeGenerate.js";
-import { StartChatEvent } from "../types.js";
+import { GenerateEvent } from "../types.js";
 import { ChatPanel } from "../ChatPanel.js";
 import type { ProviderConfigPageArgs } from "../html/pages/provider/EditConfig.js";
 
 export async function handleStartChat(
   chatPanel: ChatPanel,
-  message: StartChatEvent,
+  message: GenerateEvent,
   workspaceRoot: string
 ): Promise<void> {
   const startChatArgs = await getStartChatArgs(message, workspaceRoot);

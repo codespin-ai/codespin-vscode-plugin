@@ -53,8 +53,8 @@ export function StartChat() {
   }, []);
 
   const generate = () => {
-    chatPanelMessageClient.send("startChat", {
-      type: "startChat",
+    chatPanelMessageClient.send("generate", {
+      type: "generate",
       model,
       codingConvention,
       prompt,

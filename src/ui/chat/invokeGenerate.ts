@@ -18,17 +18,17 @@ import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js
 import { navigateTo } from "../navigateTo.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
-import { StartChatUserInput } from "./types.js";
+import { GenerateUserInput } from "./types.js";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,
   generateArgs: CodeSpinGenerateArgs,
-  startChatInput: StartChatUserInput,
+  generateUserInput: GenerateUserInput,
   workspaceRoot: string
 ): Promise<void> {
   await navigateTo(chatPanel, `/chat`, {
     model: generateArgs.model,
-    startChat: startChatInput,
+    generateUserInput: generateUserInput,
   });
 
   // Create initial conversation with just the user message
@@ -38,11 +38,11 @@ export async function invokeGenerate(
   const userContent: (UserTextContent | UserFileContent)[] = [
     {
       type: "text",
-      text: startChatInput.prompt,
+      text: generateUserInput.prompt,
     },
     {
       type: "files" as const,
-      includedFiles: startChatInput.includedFiles.map((file) => ({
+      includedFiles: generateUserInput.includedFiles.map((file) => ({
         path: file.path,
       })),
     },
@@ -55,10 +55,10 @@ export async function invokeGenerate(
 
   const conversationId = await createConversation(
     {
-      title: startChatInput.prompt.slice(0, 100) ?? "Untitled",
+      title: generateUserInput.prompt.slice(0, 100) ?? "Untitled",
       timestamp,
-      model: startChatInput.model,
-      codingConvention: startChatInput.codingConvention || null,
+      model: generateUserInput.model,
+      codingConvention: generateUserInput.codingConvention || null,
       initialMessage: userMessage,
     },
     workspaceRoot

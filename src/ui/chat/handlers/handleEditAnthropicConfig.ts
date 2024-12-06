@@ -11,7 +11,7 @@ export async function handleEditAnthropicConfig(
   await updateAnthropicConfig(message);
   await handleStartChat(
     chatPanel,
-    { type: "startChat", ...message.startChatUserInput },
+    { type: "generate", ...message.generateUserInput },
     workspaceRoot
   );
 }
