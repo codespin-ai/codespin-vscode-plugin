@@ -3,24 +3,26 @@ import { getModel } from "codespin/dist/settings/getModel.js";
 import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
-import { ChatPanel } from "./ChatPanel.js";
+import { StartChatUserInput, ConfigPageState } from "./types.js";
 
-type GetStartChatArgsResult =
-  | {
-      status: "missing_config";
-      provider: string;
-    }
-  | {
-      status: "can_start_chat";
-      args: CodeSpinGenerateArgs;
-    };
+export type GetStartChatArgsMissingConfigResult = {
+  status: "missing_config";
+  configPageState: ConfigPageState;
+};
+
+export type GetStartChatArgsOkResult = {
+  status: "can_start_chat";
+  args: CodeSpinGenerateArgs;
+};
+
+export type GetStartChatArgsResult =
+  | GetStartChatArgsMissingConfigResult
+  | GetStartChatArgsOkResult;
 
 export async function getStartChatArgs(
-  chatPanel: ChatPanel,
+  startChatInput: StartChatUserInput,
   workspaceRoot: string
 ): Promise<GetStartChatArgsResult> {
-  const request = chatPanel.userInput!;
-
   const modelDescription = await getModelDescription(workspaceRoot);
 
   const configFilePath = await getProviderConfigPath(
@@ -30,40 +32,39 @@ export async function getStartChatArgs(
 
   if (configFilePath) {
     const codespinGenerateArgs: CodeSpinGenerateArgs = {
-      prompt: request.prompt,
-      model: request.model,
+      prompt: startChatInput.prompt,
+      model: startChatInput.model,
       write: false,
-      include: request.includedFiles.map((f) => f.path),
-      spec: request.codingConvention
-        ? await getCodingConventionPath(request.codingConvention, workspaceRoot)
+      include: startChatInput.includedFiles.map((f) => f.path),
+      spec: startChatInput.codingConvention
+        ? await getCodingConventionPath(
+            startChatInput.codingConvention,
+            workspaceRoot
+          )
         : undefined,
       reloadProviderConfig: true,
-      cancelCallback: (cancel: () => void) => {
-        chatPanel.cancelGeneration = cancel;
-      },
     };
 
-    return {
+    const canstartChatArgs: GetStartChatArgsOkResult = {
       status: "can_start_chat",
       args: codespinGenerateArgs,
     };
-  }
-  // config file doesn't exist.
-  else {
-    return {
+
+    return canstartChatArgs;
+  } else {
+    const missingConfigResult: GetStartChatArgsMissingConfigResult = {
       status: "missing_config",
-      provider: modelDescription.provider,
+      configPageState: {
+        provider: modelDescription.provider,
+        returnTo: "/chat",
+        returnData: startChatInput,
+      },
     };
+    return missingConfigResult;
   }
 }
 
 export async function getModelDescription(workspaceRoot: string) {
   const codespinConfig = await readCodeSpinConfig(undefined, workspaceRoot);
-
-  const modelDescription = await getModel(
-    [codespinConfig.model],
-    codespinConfig
-  );
-
-  return modelDescription;
+  return await getModel([codespinConfig.model], codespinConfig);
 }

@@ -5,9 +5,11 @@ import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { EditOpenAIConfigEvent } from "../../../../../settings/provider/types.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
+import { ConfigPageState } from "../../../types.js";
 
 export function EditOpenAIConfig(props: OpenAIConfigArgs) {
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
+  const state: ConfigPageState = history.state;
 
   function onSave() {
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
@@ -19,6 +21,7 @@ export function EditOpenAIConfig(props: OpenAIConfigArgs) {
     const message: EditOpenAIConfigEvent = {
       type: "editOpenAIConfig",
       apiKey,
+      startChatUserInput: state.returnData,
     };
 
     chatPanelMessageClient.send("editOpenAIConfig", message);
@@ -35,6 +38,11 @@ export function EditOpenAIConfig(props: OpenAIConfigArgs) {
             <p className="text-vscode-editor-foreground opacity-80 text-sm">
               Set up your OpenAI API key to get started. Your key will be
               securely stored in .codespin/openai.json
+            </p>
+          )}
+          {state.returnTo && (
+            <p className="text-vscode-editor-foreground opacity-80 text-sm mt-2">
+              After saving, you'll return to your previous chat.
             </p>
           )}
         </div>

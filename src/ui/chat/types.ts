@@ -129,3 +129,15 @@ export type SourceCodeToHtmlEvent = {
 export type NewConversationEvent = {
   type: "newConversation";
 };
+
+// New types for navigation state
+export type ChatPageState = {
+  model: string;
+  startChat?: StartChatUserInput;
+};
+
+export type ConfigPageState = {
+  provider: string;
+  returnTo: string;
+  returnData: StartChatUserInput;
+};

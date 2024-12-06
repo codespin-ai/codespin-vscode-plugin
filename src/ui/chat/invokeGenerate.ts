@@ -9,7 +9,7 @@ import {
   AssistantMessage,
   UserFileContent,
   UserMessage,
-  UserTextContent
+  UserTextContent,
 } from "../../conversations/types.js";
 import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
@@ -18,16 +18,17 @@ import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js
 import { navigateTo } from "../navigateTo.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
+import { StartChatUserInput } from "./types.js";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,
-  argsForGeneration: { args: CodeSpinGenerateArgs },
+  generateArgs: CodeSpinGenerateArgs,
+  startChatInput: StartChatUserInput,
   workspaceRoot: string
 ): Promise<void> {
-  const request = chatPanel.userInput!;
-
   await navigateTo(chatPanel, `/chat`, {
-    model: argsForGeneration.args.model,
+    model: generateArgs.model,
+    startChat: startChatInput,
   });
 
   // Create initial conversation with just the user message
@@ -37,11 +38,11 @@ export async function invokeGenerate(
   const userContent: (UserTextContent | UserFileContent)[] = [
     {
       type: "text",
-      text: request.prompt,
+      text: startChatInput.prompt,
     },
     {
       type: "files" as const,
-      includedFiles: request.includedFiles.map((file) => ({
+      includedFiles: startChatInput.includedFiles.map((file) => ({
         path: file.path,
       })),
     },
@@ -53,10 +54,10 @@ export async function invokeGenerate(
   };
 
   const conversationId = await createConversation({
-    title: request.prompt.slice(0, 100) ?? "Untitled",
+    title: startChatInput.prompt.slice(0, 100) ?? "Untitled",
     timestamp,
-    model: request.model,
-    codingConvention: request.codingConvention || null,
+    model: startChatInput.model,
+    codingConvention: startChatInput.codingConvention || null,
     initialMessage: userMessage,
     workspaceRoot,
   });
@@ -78,7 +79,7 @@ export async function invokeGenerate(
   };
 
   // Rest of the streaming callback remains the same
-  argsForGeneration.args.fileResultStreamCallback = async (
+  generateArgs.fileResultStreamCallback = async (
     streamedBlock: StreamingFileParseResult
   ) => {
     if (streamedBlock.type === "start-file-block") {
@@ -138,7 +139,7 @@ export async function invokeGenerate(
     }
   };
 
-  await codespinGenerate(argsForGeneration.args, {
+  await codespinGenerate(generateArgs, {
     workingDir: workspaceRoot,
   });
 

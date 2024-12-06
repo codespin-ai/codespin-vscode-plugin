@@ -1,5 +1,7 @@
+import { InvalidCredentialsError } from "codespin/dist/errors.js";
 import * as path from "path";
 import * as vscode from "vscode";
+import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import {
   BrokerType,
   createMessageBroker,
@@ -11,14 +13,20 @@ import {
   EditAnthropicConfigEvent,
   EditOpenAIConfigEvent,
 } from "../../settings/provider/types.js";
+import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
+import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { navigateTo } from "../navigateTo.js";
 import { addDeps } from "./addDeps.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { copyToClipboard } from "./copyToClipboard.js";
-import { getModelDescription, getStartChatArgs } from "./getStartChatArgs.js";
+import {
+  getModelDescription,
+  getStartChatArgs
+} from "./getStartChatArgs.js";
 import { invokeGenerate } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
+  ConfigPageState,
   CopyToClipboardEvent,
   MarkdownToHtmlEvent,
   ModelChangeEvent,
@@ -26,11 +34,8 @@ import {
   OpenFileEvent,
   SourceCodeToHtmlEvent,
   StartChatEvent,
+  StartChatUserInput,
 } from "./types.js";
-import { markdownToHtml } from "../../markdown/markdownToHtml.js";
-import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
-import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
-import { InvalidCredentialsError } from "codespin/dist/errors.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
   async function handleAddDeps(message: AddDepsEvent) {
@@ -47,21 +52,33 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
     chatPanel.globalEventEmitter.emit("message", newConversations);
   }
 
-  async function handleStartChat(message: unknown) {
-    chatPanel.userInput = message as StartChatEvent;
-
-    const startChatArgs = await getStartChatArgs(chatPanel, workspaceRoot);
+  async function handleStartChat(startChatInput: StartChatUserInput) {
+    const startChatArgs = await getStartChatArgs(startChatInput, workspaceRoot);
 
     switch (startChatArgs.status) {
       case "can_start_chat":
         try {
-          await invokeGenerate(chatPanel, startChatArgs, workspaceRoot);
+          await invokeGenerate(
+            chatPanel,
+            startChatArgs.args,
+            startChatInput,
+            workspaceRoot
+          );
         } catch (ex: any) {
           if (ex instanceof InvalidCredentialsError) {
             const modelDescription = await getModelDescription(workspaceRoot);
-            await navigateTo(chatPanel, `/provider/config/edit`, {
+
+            const configPageState: ConfigPageState = {
               provider: modelDescription.provider,
-            });
+              returnTo: "/chat",
+              returnData: startChatInput,
+            };
+
+            await navigateTo(
+              chatPanel,
+              `/provider/config/edit`,
+              configPageState
+            );
             break;
           }
         } finally {
@@ -72,21 +89,25 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
         }
         break;
       case "missing_config":
-        await navigateTo(chatPanel, `/provider/config/edit`, {
-          provider: startChatArgs.provider,
-        });
+        await navigateTo(
+          chatPanel,
+          `/provider/config/edit`,
+          startChatArgs.configPageState
+        );
         break;
     }
   }
 
   async function handleEditAnthropicConfig(message: EditAnthropicConfigEvent) {
     await editAnthropicConfig(message);
-    handleStartChat(chatPanel.userInput!);
+    const startChatUserInput: StartChatUserInput = message.startChatUserInput;
+    handleStartChat(startChatUserInput);
   }
 
   async function handleEditOpenAIConfig(message: EditOpenAIConfigEvent) {
     await editOpenAIConfig(message);
-    handleStartChat(chatPanel.userInput!);
+    const startChatUserInput: StartChatUserInput = message.startChatUserInput;
+    handleStartChat(startChatUserInput);
   }
 
   async function handleMarkdownToHtml(event: MarkdownToHtmlEvent) {
@@ -125,7 +146,7 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
     .attachHandler("copyToClipboard", async (message: CopyToClipboardEvent) => {
       await handleCopyToClipboard(message);
     })
-    .attachHandler("startChat", async (message: unknown) => {
+    .attachHandler("startChat", async (message: StartChatEvent) => {
       await handleStartChat(message);
     })
     .attachHandler(

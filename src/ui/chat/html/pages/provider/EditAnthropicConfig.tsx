@@ -5,9 +5,11 @@ import { AnthropicConfigArgs } from "../../../../../settings/provider/editAnthro
 import { EditAnthropicConfigEvent } from "../../../../../settings/provider/types.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
+import { ConfigPageState } from "../../../types.js";
 
 export function EditAnthropicConfig(props: AnthropicConfigArgs) {
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
+  const state: ConfigPageState = history.state;
 
   function onSave() {
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
@@ -15,10 +17,11 @@ export function EditAnthropicConfig(props: AnthropicConfigArgs) {
         getVSCodeApi().postMessage(message);
       }
     );
-    
+
     const event: EditAnthropicConfigEvent = {
       type: "editAnthropicConfig",
       apiKey,
+      startChatUserInput: state.returnData,
     };
 
     chatPanelMessageClient.send("editAnthropicConfig", event);
@@ -37,6 +40,11 @@ export function EditAnthropicConfig(props: AnthropicConfigArgs) {
             <p className="text-vscode-editor-foreground opacity-80 text-sm">
               Set up your Anthropic API key to get started. Your key will be
               securely stored in .codespin/anthropic.json
+            </p>
+          )}
+          {state.returnTo && (
+            <p className="text-vscode-editor-foreground opacity-80 text-sm mt-2">
+              After saving, you'll return to your previous chat.
             </p>
           )}
         </div>

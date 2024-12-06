@@ -18,14 +18,10 @@ import { MessageList } from "./components/MessageList.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
-
-interface GenerateStreamArgs {
-  provider: string;
-  model: string;
-}
+import { ChatPageState, StartChatEvent } from "../../../types.js";
 
 export function Chat() {
-  const args: GenerateStreamArgs = history.state;
+  const state: ChatPageState = history.state;
 
   const [messages, setMessages] = React.useState<Message[]>([]);
   const [currentBlock, setCurrentBlock] = React.useState<
@@ -94,22 +90,24 @@ export function Chat() {
       }
     );
 
-    const startChatEvent = {
+    const startChatEvent: StartChatEvent = {
       type: "startChat",
-      model: args.model,
+      model: state.model,
       prompt: newMessage,
       codingConvention: undefined,
       includedFiles: [],
-      messages,
     };
 
     chatPanelMessageClient.send("startChat", startChatEvent);
     setNewMessage("");
-  }, [newMessage, isGenerating, messages, args.model]);
+  }, [newMessage, isGenerating, messages, state.model]);
+
+  // Extract provider from model string (format is "provider:model")
+  const provider = state.model.split(":")[0];
 
   return (
     <div className="h-screen flex flex-col bg-vscode-editor-background">
-      <ChatHeader provider={args.provider} model={args.model} />
+      <ChatHeader provider={provider} model={state.model} />
 
       <MessageList
         messages={messages}
