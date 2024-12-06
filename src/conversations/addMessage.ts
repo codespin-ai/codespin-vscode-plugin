@@ -27,10 +27,10 @@ export async function addMessage(params: {
     throw new Error(`Conversation ${params.conversationId} not found`);
   }
 
-  const conversationDirPath = path.join(conversationsDir, summary.fileName);
+  const conversationDirPath = path.join(conversationsDir, summary.id);
   const conversationPath = path.join(
     conversationDirPath,
-    getConversationFilePath(summary.fileName)
+    getConversationFilePath(summary.id)
   );
 
   // Load existing conversation

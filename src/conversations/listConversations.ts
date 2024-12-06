@@ -1,54 +1,10 @@
 // listConversations.ts
-import * as path from "path";
 import * as fs from "fs/promises";
+import * as path from "path";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
-import { ConversationSummary } from "./types.js";
-import { ConversationsFile } from "./fileTypes.js";
 import { clearAllData } from "./clearAllData.js";
-
-function validateConversationsStructure(
-  data: unknown
-): data is ConversationsFile {
-  if (!data || typeof data !== "object") {
-    return false;
-  }
-
-  const file = data as ConversationsFile;
-
-  if (
-    typeof file.lastFileNumber !== "number" ||
-    file.lastFileNumber < 1 ||
-    file.lastFileNumber > 200 ||
-    !Array.isArray(file.conversations)
-  ) {
-    return false;
-  }
-
-  // Check structure of each conversation entry
-  if (
-    !file.conversations.every(
-      (c) =>
-        typeof c.id === "string" &&
-        typeof c.title === "string" &&
-        typeof c.timestamp === "number" &&
-        typeof c.model === "string" &&
-        (c.codingConvention === null ||
-          typeof c.codingConvention === "string") &&
-        typeof c.fileName === "string" &&
-        c.fileName.startsWith("conversation_")
-    )
-  ) {
-    return false;
-  }
-
-  // Check for duplicate IDs
-  const ids = new Set(file.conversations.map((c) => c.id));
-  if (ids.size !== file.conversations.length) {
-    return false;
-  }
-
-  return true;
-}
+import { ConversationSummary } from "./types.js";
+import { validateConversationsStructure } from "./validations.js";
 
 export async function listConversations(params: {
   workspaceRoot: string;
@@ -68,8 +24,7 @@ export async function listConversations(params: {
       return [];
     }
 
-    // Return summaries without the fileName field
-    return data.conversations.map(({ fileName, ...summary }) => summary);
+    return data.conversations;
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
       return [];

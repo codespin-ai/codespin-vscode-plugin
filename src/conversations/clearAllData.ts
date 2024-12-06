@@ -9,7 +9,7 @@ export async function clearAllData(conversationsDir: string): Promise<void> {
       items.map(async (item) => {
         const itemPath = path.join(conversationsDir, item);
         const stats = await fs.stat(itemPath);
-        
+
         if (stats.isDirectory()) {
           // If it's a directory, remove all its contents first
           const files = await fs.readdir(itemPath);

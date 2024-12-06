@@ -1,6 +1,4 @@
 // validations.ts
-import * as fs from "fs/promises";
-import * as path from "path";
 import { Conversation, Message, ContentItem } from "./types.js";
 import { ConversationsFile } from "./fileTypes.js";
 
@@ -101,12 +99,7 @@ export function validateConversationsStructure(
 
   const file = data as ConversationsFile;
 
-  if (
-    typeof file.lastFileNumber !== "number" ||
-    file.lastFileNumber < 1 ||
-    file.lastFileNumber > 200 ||
-    !Array.isArray(file.conversations)
-  ) {
+  if (!Array.isArray(file.conversations)) {
     return false;
   }
 
@@ -118,11 +111,7 @@ export function validateConversationsStructure(
         typeof c.title === "string" &&
         typeof c.timestamp === "number" &&
         typeof c.model === "string" &&
-        (c.codingConvention === null ||
-          typeof c.codingConvention === "string") &&
-        typeof c.fileName === "string" &&
-        c.fileName.startsWith("conversation_") &&
-        c.fileName.endsWith(".json")
+        (c.codingConvention === null || typeof c.codingConvention === "string")
     )
   ) {
     return false;

@@ -26,10 +26,10 @@ export async function getConversation(params: {
       return null;
     }
 
-    const conversationDirPath = path.join(conversationsDir, summary.fileName);
+    const conversationDirPath = path.join(conversationsDir, summary.id);
     const conversationPath = path.join(
       conversationDirPath,
-      getConversationFilePath(summary.fileName)
+      getConversationFilePath(summary.id)
     );
 
     try {

@@ -1,3 +1,4 @@
+// types.ts
 // User message types
 export type UserTextContent = {
   type: "text";
@@ -62,7 +63,6 @@ export type AssistantMessage = {
   content: ContentItem[];
 };
 
-// Other types...
 export type Message = UserMessage | AssistantMessage;
 
 export type Conversation = {
@@ -80,22 +80,4 @@ export type ConversationSummary = {
   timestamp: number;
   model: string;
   codingConvention: string | null;
-};
-
-// Database types
-export type DbBasicInfo = {
-  id: string;
-  title: string;
-  timestamp: number;
-  model: string;
-  codingConvention: string | null;
-};
-
-export type DbIncludedFile = {
-  path: string;
-};
-
-export type DbMessage = {
-  role: "user" | "assistant";
-  content: string;
 };

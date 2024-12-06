@@ -33,7 +33,6 @@ export async function invokeGenerate(
   });
 
   // Create initial conversation with just the user message
-  const conversationId = `gen_${Date.now()}`;
   const timestamp = Date.now();
 
   // Construct user message from request
@@ -55,8 +54,7 @@ export async function invokeGenerate(
     content: userContent,
   };
 
-  await createConversation({
-    id: conversationId,
+  const conversationId = await createConversation({
     title: request.prompt.slice(0, 100) ?? "Untitled",
     timestamp,
     model: request.model,
