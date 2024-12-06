@@ -7,7 +7,11 @@ export interface ConversationsFile {
 }
 
 export function getConversationFileName(id: number): string {
-  return `conversation_${id}.json`;
+  return `conversation_${id}`;
+}
+
+export function getConversationFilePath(dirName: string): string {
+  return "conversation.json";
 }
 
 export function getNextFileNumber(current: number): number {

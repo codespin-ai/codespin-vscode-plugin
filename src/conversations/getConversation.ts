@@ -3,7 +3,7 @@ import * as path from "path";
 import * as fs from "fs/promises";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
 import { Conversation } from "./types.js";
-import { ConversationsFile } from "./fileTypes.js";
+import { ConversationsFile, getConversationFilePath } from "./fileTypes.js";
 import { validateConversation } from "./validations.js";
 import { clearAllData } from "./clearAllData.js";
 
@@ -26,7 +26,11 @@ export async function getConversation(params: {
       return null;
     }
 
-    const conversationPath = path.join(conversationsDir, summary.fileName);
+    const conversationDirPath = path.join(conversationsDir, summary.fileName);
+    const conversationPath = path.join(
+      conversationDirPath,
+      getConversationFilePath(summary.fileName)
+    );
 
     try {
       const conversationContent = await fs.readFile(conversationPath, "utf-8");

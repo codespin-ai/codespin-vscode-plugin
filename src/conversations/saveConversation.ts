@@ -5,6 +5,7 @@ import { getCodeSpinDir } from "../settings/codespinDirs.js";
 import {
   ConversationsFile,
   getConversationFileName,
+  getConversationFilePath,
   getNextFileNumber,
 } from "./fileTypes.js";
 import { Message, ConversationSummary, UserMessage } from "./types.js";
@@ -41,17 +42,36 @@ export async function saveConversation(params: {
     conversationsFile = JSON.parse(content) as ConversationsFile;
   } catch {
     conversationsFile = {
-      lastFileNumber: 1,
+      lastFileNumber: 0,
       conversations: [],
     };
   }
 
   const title = params.title || getInitialTitle(params.messages);
-  const fileNumber = getNextFileNumber(conversationsFile.lastFileNumber);
-  const fileName = getConversationFileName(fileNumber);
 
-  const conversationPath = path.join(conversationsDir, fileName);
-  await fs.unlink(conversationPath).catch(() => {}); // Delete if exists
+  let dirName: string;
+  const existingIndex = conversationsFile.conversations.findIndex(
+    (c) => c.id === params.id
+  );
+
+  if (existingIndex !== -1) {
+    // Use existing directory name
+    dirName = conversationsFile.conversations[existingIndex].fileName;
+  } else {
+    // Create new directory with next number
+    const fileNumber = getNextFileNumber(conversationsFile.lastFileNumber);
+    dirName = getConversationFileName(fileNumber);
+    conversationsFile.lastFileNumber = fileNumber;
+  }
+
+  const conversationDirPath = path.join(conversationsDir, dirName);
+  const conversationFilePath = path.join(
+    conversationDirPath,
+    getConversationFilePath(dirName)
+  );
+
+  // Create conversation directory if it doesn't exist
+  await fs.mkdir(conversationDirPath, { recursive: true });
 
   const summary: ConversationSummary & { fileName: string } = {
     id: params.id,
@@ -59,24 +79,23 @@ export async function saveConversation(params: {
     timestamp: params.timestamp,
     model: params.model,
     codingConvention: params.codingConvention,
-    fileName,
+    fileName: dirName,
   };
 
-  const existingIndex = conversationsFile.conversations.findIndex(
-    (c) => c.id === params.id
-  );
   if (existingIndex !== -1) {
     conversationsFile.conversations[existingIndex] = summary;
   } else {
     conversationsFile.conversations.unshift(summary);
   }
 
-  conversationsFile.lastFileNumber = fileNumber;
   await fs.writeFile(summariesPath, JSON.stringify(conversationsFile, null, 2));
 
   const conversation = {
     ...params,
     title,
   };
-  await fs.writeFile(conversationPath, JSON.stringify(conversation, null, 2));
+  await fs.writeFile(
+    conversationFilePath,
+    JSON.stringify(conversation, null, 2)
+  );
 }

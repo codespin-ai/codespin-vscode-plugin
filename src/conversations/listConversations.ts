@@ -1,3 +1,4 @@
+// listConversations.ts
 import * as path from "path";
 import * as fs from "fs/promises";
 import { getCodeSpinDir } from "../settings/codespinDirs.js";
@@ -34,8 +35,7 @@ function validateConversationsStructure(
         (c.codingConvention === null ||
           typeof c.codingConvention === "string") &&
         typeof c.fileName === "string" &&
-        c.fileName.startsWith("conversation_") &&
-        c.fileName.endsWith(".json")
+        c.fileName.startsWith("conversation_")
     )
   ) {
     return false;
