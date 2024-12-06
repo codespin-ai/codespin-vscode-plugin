@@ -1,5 +1,7 @@
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
+import { Conversation } from "../../conversations/types.js";
+import { createMessageClient } from "../../messaging/messageClient.js";
 import { getConventions } from "../../settings/conventions/getCodingConventions.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { navigateTo } from "../navigateTo.js";
@@ -7,12 +9,10 @@ import { MessageTemplate } from "../types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getStartChatPageArgs } from "./getStartChatPageArgs.js";
-import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
-import { StartChatEvent } from "./types.js";
-import { Conversation } from "../../conversations/types.js";
-import { createMessageClient } from "../../messaging/messageClient.js";
 import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
+import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
 
+// ChatPanel can be called with "/start" or "/chat" routes
 export type StartChatPageInitArgs = {
   type: "files";
   prompt: string | undefined;

@@ -1,9 +1,4 @@
 import { SourceFile } from "codespin/dist/sourceCode/SourceFile.js";
-import {
-  UserFileContent,
-  UserImageContent,
-  UserTextContent,
-} from "../../conversations/types.js";
 
 export type FileVersions = "current" | "HEAD";
 
@@ -139,5 +134,5 @@ export type ChatPageState = {
 export type ConfigPageState = {
   provider: string;
   returnTo: string;
-  returnData: StartChatUserInput;
+  startChatUserInput: StartChatUserInput;
 };

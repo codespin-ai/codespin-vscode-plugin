@@ -57,7 +57,7 @@ export async function getStartChatArgs(
       configPageState: {
         provider: modelDescription.provider,
         returnTo: "/chat",
-        returnData: startChatInput,
+        startChatUserInput: startChatInput,
       },
     };
     return missingConfigResult;
