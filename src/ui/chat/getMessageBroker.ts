@@ -19,23 +19,38 @@ import { navigateTo } from "../navigateTo.js";
 import { addDeps } from "./addDeps.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { copyToClipboard } from "./copyToClipboard.js";
-import {
-  getModelDescription,
-  getStartChatArgs
-} from "./getStartChatArgs.js";
+import { getModelDescription, getStartChatArgs } from "./getStartChatArgs.js";
 import { invokeGenerate } from "./invokeGenerate.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
-  MarkdownToHtmlEvent,
   ModelChangeEvent,
-  NewConversationEvent,
   OpenFileEvent,
-  SourceCodeToHtmlEvent,
   StartChatEvent,
   StartChatUserInput,
 } from "./types.js";
 import type { ConfigPageState } from "./html/pages/provider/EditConfig.js";
+
+export type MarkdownToHtmlArgs = {
+  content: string;
+};
+
+export type MarkdownToHtmlEvent = {
+  type: "markdownToHtml";
+} & MarkdownToHtmlArgs;
+
+export type SourceCodeToHtmlArgs = {
+  content: string;
+};
+
+export type SourceCodeToHtmlEvent = {
+  type: "sourceCodeToHtml";
+  filePath: string;
+} & SourceCodeToHtmlArgs;
+
+export type NewConversationEvent = {
+  type: "newConversation";
+};
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
   async function handleAddDeps(message: AddDepsEvent) {

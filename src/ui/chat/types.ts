@@ -104,24 +104,4 @@ export type CopyToClipboardEvent = {
   type: "copyToClipboard";
 } & CopyToClipboardUserInput;
 
-export type MarkdownToHtmlArgs = {
-  content: string;
-};
-
-export type MarkdownToHtmlEvent = {
-  type: "markdownToHtml";
-} & MarkdownToHtmlArgs;
-
-export type SourceCodeToHtmlArgs = {
-  content: string;
-};
-
-export type SourceCodeToHtmlEvent = {
-  type: "sourceCodeToHtml";
-  filePath: string;
-} & SourceCodeToHtmlArgs;
-
-export type NewConversationEvent = {
-  type: "newConversation";
-};
 
