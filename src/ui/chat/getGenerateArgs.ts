@@ -21,7 +21,7 @@ export type GetGenerateArgs =
   | CanGenerateArgs;
 
 export async function getGenerateArgs(
-  startChatInput: GenerateUserInput,
+  generateUserInput: GenerateUserInput,
   workspaceRoot: string
 ): Promise<GetGenerateArgs> {
   const modelDescription = await getModelDescription(workspaceRoot);
@@ -33,31 +33,31 @@ export async function getGenerateArgs(
 
   if (configFilePath) {
     const codespinGenerateArgs: CodeSpinGenerateArgs = {
-      prompt: startChatInput.prompt,
-      model: startChatInput.model,
+      prompt: generateUserInput.prompt,
+      model: generateUserInput.model,
       write: false,
-      include: startChatInput.includedFiles.map((f) => f.path),
-      spec: startChatInput.codingConvention
+      include: generateUserInput.includedFiles.map((f) => f.path),
+      spec: generateUserInput.codingConvention
         ? await getCodingConventionPath(
-            startChatInput.codingConvention,
+            generateUserInput.codingConvention,
             workspaceRoot
           )
         : undefined,
       reloadProviderConfig: true,
     };
 
-    const canstartChatArgs: CanGenerateArgs = {
+    const canGenerateArgs: CanGenerateArgs = {
       status: "can_generate",
       args: codespinGenerateArgs,
     };
 
-    return canstartChatArgs;
+    return canGenerateArgs;
   } else {
     const missingConfigResult: MissingProviderConfigArgs = {
       status: "missing_provider_config",
       providerConfigPageArgs: {
         provider: modelDescription.provider,
-        startChatUserInput: startChatInput,
+        generateUserInput: generateUserInput,
       },
     };
     return missingConfigResult;

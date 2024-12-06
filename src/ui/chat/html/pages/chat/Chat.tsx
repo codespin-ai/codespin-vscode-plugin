@@ -96,7 +96,7 @@ export function Chat() {
       }
     );
 
-    const startChatEvent: GenerateEvent = {
+    const generateEvent: GenerateEvent = {
       type: "generate",
       model: state.model,
       prompt: newMessage,
@@ -104,7 +104,7 @@ export function Chat() {
       includedFiles: [],
     };
 
-    chatPanelMessageClient.send("generate", startChatEvent);
+    chatPanelMessageClient.send("generate", generateEvent);
     setNewMessage("");
   }, [newMessage, isGenerating, messages, state.model]);
 

@@ -11,14 +11,14 @@ export async function handleGenerate(
   message: GenerateEvent,
   workspaceRoot: string
 ): Promise<void> {
-  const startChatArgs = await getGenerateArgs(message, workspaceRoot);
+  const generateArgs = await getGenerateArgs(message, workspaceRoot);
 
-  switch (startChatArgs.status) {
+  switch (generateArgs.status) {
     case "can_generate":
       try {
         await invokeGenerate(
           chatPanel,
-          startChatArgs.args,
+          generateArgs.args,
           message,
           workspaceRoot
         );
@@ -28,7 +28,7 @@ export async function handleGenerate(
 
           const configPageState: ProviderConfigPageArgs = {
             provider: modelDescription.provider,
-            startChatUserInput: message,
+            generateUserInput: message,
           };
 
           await navigateTo(chatPanel, `/provider/config/edit`, configPageState);
@@ -42,7 +42,7 @@ export async function handleGenerate(
       await navigateTo(
         chatPanel,
         `/provider/config/edit`,
-        startChatArgs.providerConfigPageArgs
+        generateArgs.providerConfigPageArgs
       );
       break;
   }

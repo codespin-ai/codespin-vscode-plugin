@@ -5,7 +5,7 @@ import { GenerateUserInput } from "../../../types.js";
 
 export type ProviderConfigPageArgs = {
   provider: string;
-  startChatUserInput: GenerateUserInput;
+  generateUserInput: GenerateUserInput;
 };
 
 export type EditConfigPageArgs = {
