@@ -5,10 +5,7 @@ import {
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { addMessage } from "../../conversations/addMessage.js";
 import {
-  AssistantMessage,
-  UserFileContent,
-  UserMessage,
-  UserTextContent,
+  AssistantMessage
 } from "../../conversations/types.js";
 import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
