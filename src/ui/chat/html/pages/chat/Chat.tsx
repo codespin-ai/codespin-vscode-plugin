@@ -7,6 +7,7 @@ import {
   TextContent,
   UserMessage,
   UserTextContent,
+  Conversation,
 } from "../../../../../conversations/types.js";
 import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
@@ -18,18 +19,21 @@ import { MessageList } from "./components/MessageList.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
-import { GenerateEvent, GenerateUserInput } from "../../../types.js";
+import { GenerateEvent } from "../../../types.js";
 
-// New types for navigation state
+// Updated type for page state to include conversation
 export type ChatPageState = {
-  model: string;
-  generateUserInput?: GenerateUserInput;
+  conversation: Conversation;
+  isNew: boolean;
 };
 
 export function Chat() {
   const state: ChatPageState = history.state;
+  const conversation = state.conversation;
 
-  const [messages, setMessages] = React.useState<Message[]>([]);
+  const [messages, setMessages] = React.useState<Message[]>(
+    conversation.messages
+  );
   const [currentBlock, setCurrentBlock] = React.useState<
     FileHeadingContent | TextContent | CodeContent | MarkdownContent | null
   >(null);
@@ -38,7 +42,39 @@ export function Chat() {
   const chatEndRef = React.useRef<HTMLDivElement>(null);
   const [fileMap, setFileMap] = React.useState<FileReferenceMap>(new Map());
 
-  const generateBlockId = () => Math.random().toString(36).substring(2, 9);
+  // Check if we need to trigger generation automatically
+  React.useEffect(() => {
+    const shouldGenerate = messages.length === 1 && messages[0].role === "user";
+
+    if (shouldGenerate && !isGenerating) {
+      const userMessage = messages[0] as UserMessage;
+      const prompt = (userMessage.content[0] as UserTextContent).text;
+      const includedFiles =
+        userMessage.content[1]?.type === "files"
+          ? userMessage.content[1].includedFiles.map((file) => ({
+              path: file.path,
+              size: 0, // Size isn't needed for generation
+            }))
+          : [];
+
+      const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
+        (message: unknown) => {
+          getVSCodeApi().postMessage(message);
+        }
+      );
+
+      const generateEvent: GenerateEvent = {
+        type: "generate",
+        conversationId: conversation.id,
+        model: conversation.model,
+        prompt,
+        codingConvention: conversation.codingConvention || undefined,
+        includedFiles,
+      };
+
+      chatPanelMessageClient.send("generate", generateEvent);
+    }
+  }, []);
 
   React.useEffect(() => {
     // Update fileMap whenever messages change
@@ -54,7 +90,6 @@ export function Chat() {
           currentBlock,
           setCurrentBlock,
           setMessages,
-          generateBlockId,
         }),
     });
 
@@ -98,22 +133,29 @@ export function Chat() {
 
     const generateEvent: GenerateEvent = {
       type: "generate",
-      model: state.model,
+      conversationId: conversation.id,
+      model: conversation.model,
       prompt: newMessage,
-      codingConvention: undefined,
-      includedFiles: [],
+      codingConvention: conversation.codingConvention || undefined,
+      includedFiles: [], // No files for subsequent messages
     };
 
     chatPanelMessageClient.send("generate", generateEvent);
     setNewMessage("");
-  }, [newMessage, isGenerating, messages, state.model]);
+  }, [
+    newMessage,
+    isGenerating,
+    messages,
+    conversation.model,
+    conversation.codingConvention,
+  ]);
 
   // Extract provider from model string (format is "provider:model")
-  const provider = state.model.split(":")[0];
+  const provider = conversation.model.split(":")[0];
 
   return (
     <div className="h-screen flex flex-col bg-vscode-editor-background">
-      <ChatHeader provider={provider} model={state.model} />
+      <ChatHeader provider={provider} model={conversation.model} />
 
       <MessageList
         messages={messages}

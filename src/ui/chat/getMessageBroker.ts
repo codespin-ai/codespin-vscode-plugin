@@ -11,6 +11,7 @@ import { handleMarkdownToHtml } from "./handlers/handleMarkdownToHtml.js";
 import { handleModelChange } from "./handlers/handleModelChange.js";
 import { handleOpenFile } from "./handlers/handleOpenFile.js";
 import { handleSourceCodeToHtml } from "./handlers/handleSourceCodeToHtml.js";
+import { handleOpenChat } from "./handlers/handleOpenChat.js";
 import { handleGenerate } from "./handlers/handleGenerate.js";
 import { ChatPanel } from "./ChatPanel.js";
 import {
@@ -23,6 +24,7 @@ import {
   OpenFileEvent,
   SourceCodeToHtmlEvent,
   GenerateEvent,
+  OpenChatEvent,
 } from "./types.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
@@ -35,6 +37,9 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
     )
     .attachHandler("generate", (message: GenerateEvent) =>
       handleGenerate(chatPanel, message, workspaceRoot)
+    )
+    .attachHandler("openChat", (message: OpenChatEvent) =>
+      handleOpenChat(chatPanel, message, workspaceRoot)
     )
     .attachHandler("editAnthropicConfig", (message: EditAnthropicConfigEvent) =>
       handleEditAnthropicConfig(chatPanel, message, workspaceRoot)

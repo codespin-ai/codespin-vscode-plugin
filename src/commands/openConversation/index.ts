@@ -23,6 +23,7 @@ export function getOpenConversationCommand(
     }
 
     const panel = new ChatPanel(context, globalEventEmitter);
+    
     await panel.init({
       type: "existingConversation",
       conversation,

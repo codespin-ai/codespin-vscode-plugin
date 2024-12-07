@@ -1,5 +1,6 @@
 export type GenerateUserInput = {
   model: string;
+  conversationId: string;
   codingConvention: string | undefined;
   prompt: string;
   includedFiles: Array<{
@@ -7,6 +8,10 @@ export type GenerateUserInput = {
     size: number;
   }>;
 };
+
+export type OpenChatEvent = {
+  type: "openChat";
+} & Omit<GenerateUserInput, "conversationId">;
 
 export type CopyToClipboardUserInput = {
   prompt: string;

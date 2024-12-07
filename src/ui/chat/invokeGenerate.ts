@@ -4,7 +4,6 @@ import {
 } from "codespin/dist/commands/generate/index.js";
 import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { addMessage } from "../../conversations/addMessage.js";
-import { createConversation } from "../../conversations/createConversation.js";
 import {
   AssistantMessage,
   UserFileContent,
@@ -15,7 +14,6 @@ import { markdownToHtml } from "../../markdown/markdownToHtml.js";
 import { createMessageClient } from "../../messaging/messageClient.js";
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
-import { navigateTo } from "../navigateTo.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
 import { GenerateUserInput } from "./types.js";
@@ -26,53 +24,12 @@ export async function invokeGenerate(
   generateUserInput: GenerateUserInput,
   workspaceRoot: string
 ): Promise<void> {
-  await navigateTo(chatPanel, `/chat`, {
-    model: generateArgs.model,
-    generateUserInput: generateUserInput,
-  });
-
-  // Create initial conversation with just the user message
-  const timestamp = Date.now();
-
-  // Construct user message from request
-  const userContent: (UserTextContent | UserFileContent)[] = [
-    {
-      type: "text",
-      text: generateUserInput.prompt,
-    },
-    {
-      type: "files" as const,
-      includedFiles: generateUserInput.includedFiles.map((file) => ({
-        path: file.path,
-      })),
-    },
-  ];
-
-  const userMessage: UserMessage = {
-    role: "user",
-    content: userContent,
-  };
-
-  const conversationId = await createConversation(
-    {
-      title: generateUserInput.prompt.slice(0, 100) ?? "Untitled",
-      timestamp,
-      model: generateUserInput.model,
-      codingConvention: generateUserInput.codingConvention || null,
-      initialMessage: userMessage,
-    },
-    workspaceRoot
-  );
-
   // Send initial user message to chat page
   const chatPageMessageClient = createMessageClient<ChatPageBrokerType>(
     (message) => {
       chatPanel.getWebview().postMessage(message);
     }
   );
-
-  // Set initial messages with the user message
-  chatPageMessageClient.send("messages", [userMessage]);
 
   let currentTextBlock = "";
   let currentAssistantMessage: AssistantMessage = {
@@ -149,7 +106,7 @@ export async function invokeGenerate(
   if (currentAssistantMessage.content.length > 0) {
     await addMessage(
       {
-        conversationId,
+        conversationId: generateUserInput.conversationId,
         message: currentAssistantMessage,
       },
       workspaceRoot

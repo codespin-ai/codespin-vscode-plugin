@@ -57,11 +57,14 @@ type FileBlockProcessorArgs = {
     >
   >;
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>;
-  generateBlockId: () => string;
 };
 
+function generateBlockId() {
+  return Math.random().toString(36).substring(2, 9);
+}
+
 export function appendText(content: string, args: FileBlockProcessorArgs) {
-  const { setCurrentBlock, generateBlockId } = args;
+  const { setCurrentBlock } = args;
 
   setCurrentBlock((prev) => {
     if (prev && prev.type === "text") {
@@ -76,7 +79,7 @@ export function appendText(content: string, args: FileBlockProcessorArgs) {
 }
 
 export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
-  const { setCurrentBlock, generateBlockId } = args;
+  const { setCurrentBlock } = args;
 
   setCurrentBlock({
     id: generateBlockId(),
@@ -91,7 +94,7 @@ export function endFileBlock(
   html: string,
   args: FileBlockProcessorArgs
 ) {
-  const { setMessages, setCurrentBlock, generateBlockId } = args;
+  const { setMessages, setCurrentBlock } = args;
 
   const codeBlock: CodeContent = {
     id: generateBlockId(),
@@ -126,7 +129,7 @@ export function handleMarkdownBlock(
   html: string,
   args: FileBlockProcessorArgs
 ) {
-  const { setMessages, setCurrentBlock, generateBlockId } = args;
+  const { setMessages, setCurrentBlock } = args;
 
   const markdownBlock: MarkdownContent = {
     id: generateBlockId(),

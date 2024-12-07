@@ -52,9 +52,9 @@ export function StartChat() {
     return () => window.removeEventListener("message", listener);
   }, []);
 
-  const generate = () => {
-    chatPanelMessageClient.send("generate", {
-      type: "generate",
+  const openChat = () => {
+    chatPanelMessageClient.send("openChat", {
+      type: "openChat",
       model,
       codingConvention,
       prompt,
@@ -87,12 +87,12 @@ export function StartChat() {
           prompt={prompt}
           promptRef={promptRef}
           setPrompt={setPrompt}
-          onGenerate={generate}
+          onGenerate={openChat}
         />
 
         <ActionButtons
           messageClient={chatPanelMessageClient}
-          onGenerate={generate}
+          onGenerate={openChat}
           prompt={prompt}
           codingConvention={codingConvention}
           includedFiles={messageFiles}

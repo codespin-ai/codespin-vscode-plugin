@@ -1,7 +1,6 @@
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
 import { Conversation } from "../../conversations/types.js";
-import { createMessageClient } from "../../messaging/messageClient.js";
 import { getConventions } from "../../settings/conventions/getCodingConventions.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { navigateTo } from "../navigateTo.js";
@@ -9,22 +8,21 @@ import { MessageTemplate } from "../types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { getStartChatPageArgs } from "./getStartChatPageArgs.js";
-import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
 import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
 
-// ChatPanel can be called with "/start" or "/chat" routes
+// Simplified init args - we only need the conversation or start chat args
+export type ChatPageInitArgs = {
+  type: "existingConversation";
+  conversation: Conversation;
+};
+
 export type StartChatPageInitArgs = {
   type: "newConversation";
   prompt: string | undefined;
   args: string[];
 };
 
-export type ContinueChatPageInitArgs = {
-  type: "existingConversation";
-  conversation: Conversation;
-};
-
-export type InitArgs = StartChatPageInitArgs | ContinueChatPageInitArgs;
+export type InitArgs = StartChatPageInitArgs | ChatPageInitArgs;
 
 let activePanel: ChatPanel | undefined = undefined;
 
@@ -50,22 +48,9 @@ export class ChatPanel extends UIPanel {
     await this.webviewReadyEvent();
 
     if (initArgs.type === "existingConversation") {
-      const [provider] = initArgs.conversation.model.split(":");
-      const args = {
-        provider,
-        model: initArgs.conversation.model,
-      };
-
-      const chatPageMessageClient = createMessageClient<ChatPageBrokerType>(
-        (message) => {
-          this.getWebview().postMessage(message);
-        }
-      );
-
-      await navigateTo(this, "/chat", args);
-
-      // Send initial messages to populate chat
-      chatPageMessageClient.send("messages", initArgs.conversation.messages);
+      await navigateTo(this, "/chat", {
+        conversation: initArgs.conversation,
+      });
     } else {
       const conventions = await getConventions(workspaceRoot);
       const startChatPageArgs: StartChatPageArgs = await getStartChatPageArgs(
@@ -96,7 +81,6 @@ export class ChatPanel extends UIPanel {
       }
     }
 
-    // Set the context key to control visibility of the context menu item
     vscode.commands.executeCommand(
       "setContext",
       "codespin-ai.enableIncludeFiles",
