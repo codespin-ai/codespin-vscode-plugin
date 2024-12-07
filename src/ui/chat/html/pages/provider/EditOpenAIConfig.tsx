@@ -6,10 +6,13 @@ import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import type { ProviderConfigPageArgs } from "./EditConfig.js";
 import { EditOpenAIConfigEvent } from "../../../types.js";
+import { useLocation } from "react-router-dom";
 
 export function EditOpenAIConfig(props: OpenAIConfigArgs) {
+  const location = useLocation();
+  const state = location.state as ProviderConfigPageArgs;
+
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
-  const state: ProviderConfigPageArgs = history.state;
 
   function onSave() {
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(

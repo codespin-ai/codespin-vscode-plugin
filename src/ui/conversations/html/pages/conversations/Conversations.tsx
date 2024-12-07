@@ -1,10 +1,9 @@
 import * as React from "react";
-import {
-  ConversationSummary
-} from "../../../../../conversations/types.js";
+import { ConversationSummary } from "../../../../../conversations/types.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { BrowserEvent } from "../../../../types.js";
 import { getMessageBroker } from "./getMessageBroker.js";
+import { useLocation } from "react-router-dom";
 
 type GroupedEntries = { [date: string]: ConversationSummary[] };
 
@@ -25,8 +24,10 @@ const truncatePrompt = (text: string): string => {
 };
 
 export function Conversations() {
-  const args: ConversationsPageArgs = history.state;
-  const [entries, setEntries] = React.useState(args.entries);
+  const location = useLocation();
+  const state = location.state as ConversationsPageArgs;
+
+  const [entries, setEntries] = React.useState(state.entries);
   const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
 
   const formatRelativeTime = (timestamp: number): string => {

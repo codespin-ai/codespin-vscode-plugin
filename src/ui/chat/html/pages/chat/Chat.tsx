@@ -20,6 +20,7 @@ import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
 import { GenerateEvent } from "../../../types.js";
+import { useLocation } from "react-router-dom";
 
 // Updated type for page state to include conversation
 export type ChatPageState = {
@@ -28,7 +29,9 @@ export type ChatPageState = {
 };
 
 export function Chat() {
-  const state: ChatPageState = history.state;
+  const location = useLocation();
+  const state = location.state as ChatPageState;
+  
   const conversation = state.conversation;
 
   const [messages, setMessages] = React.useState<Message[]>(
@@ -39,7 +42,7 @@ export function Chat() {
   >(null);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [newMessage, setNewMessage] = React.useState("");
-  const chatEndRef = React.useRef<HTMLDivElement>(null);
+  const chatEndRef = React.useRef<HTMLDivElement>(null!);
   const [fileMap, setFileMap] = React.useState<FileReferenceMap>(new Map());
 
   // Check if we need to trigger generation automatically

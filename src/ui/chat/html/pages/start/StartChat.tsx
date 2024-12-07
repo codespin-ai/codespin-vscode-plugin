@@ -12,6 +12,7 @@ import { PromptInput } from "./components/PromptInput.js";
 import { ActionButtons } from "./components/ActionButtons.js";
 import { FileList } from "./components/FileList.js";
 import { CodingConventionsSelector } from "./components/CodingConventionsSelector.js";
+import { useLocation } from "react-router-dom";
 
 interface MessageFile {
   path: string;
@@ -20,16 +21,19 @@ interface MessageFile {
 
 export function StartChat() {
   const vsCodeApi = getVSCodeApi();
-  const args: StartChatPageArgs = history.state;
-  const promptRef = useRef<HTMLTextAreaElement>(null);
 
-  const [model, setModel] = useState(args.selectedModel);
-  const [prompt, setPrompt] = useState<string>(args.prompt ?? "");
+  const location = useLocation();
+  const state = location.state as StartChatPageArgs;
+
+  const promptRef = useRef<HTMLTextAreaElement>(null!);
+
+  const [model, setModel] = useState(state.selectedModel);
+  const [prompt, setPrompt] = useState<string>(state.prompt ?? "");
   const [codingConvention, setCodingConvention] = useState<string | undefined>(
-    args.codingConvention ?? undefined
+    state.codingConvention ?? undefined
   );
   const [messageFiles, setMessageFiles] = useState<MessageFile[]>(
-    args.includedFiles
+    state.includedFiles
   );
 
   const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
@@ -78,7 +82,7 @@ export function StartChat() {
       <form id="mainform">
         <ModelSelector
           model={model}
-          models={args.models}
+          models={state.models}
           messageClient={chatPanelMessageClient}
           onModelChange={setModel}
         />
@@ -109,7 +113,7 @@ export function StartChat() {
 
         <CodingConventionsSelector
           codingConvention={codingConvention}
-          conventions={args.codingConventions}
+          conventions={state.codingConventions}
           onChange={setCodingConvention}
         />
 

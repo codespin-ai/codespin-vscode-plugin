@@ -6,10 +6,12 @@ import { createMessageClient } from "../../../../../messaging/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import type { ProviderConfigPageArgs } from "./EditConfig.js";
 import { EditAnthropicConfigEvent } from "../../../types.js";
+import { useLocation } from "react-router-dom";
 
 export function EditAnthropicConfig(props: AnthropicConfigArgs) {
   const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
-  const state: ProviderConfigPageArgs = history.state;
+  const location = useLocation();
+  const state = location.state as ProviderConfigPageArgs;
 
   function onSave() {
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(

@@ -1,12 +1,28 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Route, Switch } from "wouter";
-import { navigate } from "wouter/use-browser-location";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+  createRoutesFromElements,
+  Route,
+} from "react-router-dom";
 import { StartChat } from "./pages/start/StartChat.js";
 import { Chat } from "./pages/chat/Chat.js";
 import { EditConfig } from "./pages/provider/EditConfig.js";
 import { BrowserEvent, NavigateEvent } from "../../types.js";
 import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
+
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <>
+      <Route path="/" element={<Navigate to="/start" replace />} />
+      <Route path="/start" element={<StartChat />} />
+      <Route path="/chat" element={<Chat />} />
+      <Route path="/provider/config/edit" element={<EditConfig />} />
+    </>
+  )
+);
 
 function App() {
   console.log("CodeSpin.AI extension started.");
@@ -17,7 +33,9 @@ function App() {
       switch (message.type) {
         case "navigate":
           const eventArgs = message as NavigateEvent;
-          navigate(eventArgs.url, { state: eventArgs.state });
+          router.navigate(eventArgs.url, {
+            state: eventArgs.state,
+          });
           getVSCodeApi().postMessage({
             type: "navigated",
             url: eventArgs.url,
@@ -31,15 +49,7 @@ function App() {
     return () => window.removeEventListener("message", listeners);
   }, []);
 
-  return (
-    <>
-      <Switch>
-        <Route path="/start" component={StartChat} />
-        <Route path="/chat" component={Chat} />
-        <Route path="/provider/config/edit" component={EditConfig} />
-      </Switch>
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export function initWebview() {

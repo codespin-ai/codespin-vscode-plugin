@@ -2,6 +2,7 @@ import * as React from "react";
 import { EditAnthropicConfig } from "./EditAnthropicConfig.js";
 import { EditOpenAIConfig } from "./EditOpenAIConfig.js";
 import { GenerateUserInput } from "../../../types.js";
+import { useLocation } from "react-router-dom";
 
 export type ProviderConfigPageArgs = {
   provider: string;
@@ -14,13 +15,15 @@ export type EditConfigPageArgs = {
 };
 
 export function EditConfig() {
-  const args: EditConfigPageArgs = history.state;
+  const location = useLocation();
+  const state = location.state as EditConfigPageArgs;
+
   const Page: any =
-    args.provider === "anthropic"
+    state.provider === "anthropic"
       ? EditAnthropicConfig
-      : args.provider === "openai"
+      : state.provider === "openai"
       ? EditOpenAIConfig
       : undefined;
 
-  return Page ? <Page {...args} /> : <div>Unsupported API</div>;
+  return Page ? <Page {...state} /> : <div>Unsupported API</div>;
 }

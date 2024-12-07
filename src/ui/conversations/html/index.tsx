@@ -1,7 +1,10 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import { Route, Switch } from "wouter";
-import { navigate } from "wouter/use-browser-location";
+import {
+  RouterProvider,
+  createBrowserRouter,
+  Navigate,
+} from "react-router-dom";
 import { BrowserEvent, NavigateEvent } from "../../types.js";
 import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
 import { Conversations } from "./pages/conversations/Conversations.js";
@@ -16,7 +19,10 @@ function App() {
       switch (message.type) {
         case "navigate":
           const eventArgs = message as NavigateEvent;
-          navigate(eventArgs.url, { state: eventArgs.state });
+          // Using React Router's navigate
+          router.navigate(eventArgs.url, {
+            state: eventArgs.state,
+          });
           getVSCodeApi().postMessage({
             type: "navigated",
             url: eventArgs.url,
@@ -30,14 +36,22 @@ function App() {
     return () => window.removeEventListener("message", listeners);
   }, []);
 
-  return (
-    <>
-      <Switch>
-        <Route path="/conversations" component={Conversations} />
-        <Route path="/initialize" component={Initialize} />
-      </Switch>
-    </>
-  );
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <Navigate to="/conversations" replace />,
+    },
+    {
+      path: "/conversations",
+      element: <Conversations />,
+    },
+    {
+      path: "/initialize",
+      element: <Initialize />,
+    },
+  ]);
+
+  return <RouterProvider router={router} />;
 }
 
 export function initWebview() {
