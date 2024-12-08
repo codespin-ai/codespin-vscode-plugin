@@ -2,8 +2,8 @@ import { EventEmitter } from "events";
 import * as vscode from "vscode";
 import { validateConfig } from "../../config/validateConfig.js";
 import { ChatPanel } from "../../ui/chat/ChatPanel.js";
-import { handleStartNewChat } from "../../ui/chat/handlers/handleStartNewChat.js";
-import { StartNewChatEvent } from "../../ui/chat/types.js";
+import { handleNewChat } from "../../ui/chat/handlers/handleStartChat.js";
+import { StartChatEvent } from "../../ui/chat/types.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 
 export function getStartChatCommand(
@@ -39,13 +39,13 @@ export function getStartChatCommand(
 
     await chatPanel.webviewReadyEvent();
 
-    const startNewChatEvent: StartNewChatEvent = {
-      type: "startNewChat" as const,
+    const startChatEvent: StartChatEvent = {
+      type: "startChat" as const,
       prompt,
       args: filePaths,
     };
 
-    handleStartNewChat(chatPanel, startNewChatEvent);
+    handleNewChat(chatPanel, startChatEvent);
   };
 }
 

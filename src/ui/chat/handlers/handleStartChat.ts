@@ -6,13 +6,13 @@ import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
 import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { ChatPanel } from "../ChatPanel.js";
-import { StartNewChatEvent } from "../types.js";
+import { StartChatEvent as StartChatEvent } from "../types.js";
 import { StartChatPageProps } from "../html/pages/start/StartChat.js";
 import { createChatNavigator } from "../createChatNavigator.js";
 
-export async function handleStartNewChat(
+export async function handleNewChat(
   chatPanel: ChatPanel,
-  message: StartNewChatEvent
+  message: StartChatEvent
 ): Promise<void> {
   const workspaceRoot = getWorkspaceRoot(chatPanel.context);
   const conventions = await getConventions(workspaceRoot);

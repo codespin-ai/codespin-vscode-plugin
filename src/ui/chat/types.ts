@@ -80,8 +80,8 @@ export interface OpenExistingConversationEvent {
   conversation: Conversation;
 }
 
-export interface StartNewChatEvent {
-  type: "startNewChat";
+export interface StartChatEvent {
+  type: "startChat";
   prompt?: string;
   args: string[]; // file paths
 }

@@ -11,7 +11,7 @@ import { handleSourceCodeToHtml } from "./handlers/handleSourceCodeToHtml.js";
 import { handleOpenChat } from "./handlers/handleOpenChat.js";
 import { handleGenerate } from "./handlers/handleGenerate.js";
 import { handleOpenExistingConversation } from "./handlers/handleOpenExistingConversation.js";
-import { handleStartNewChat } from "./handlers/handleStartNewChat.js";
+import { handleNewChat } from "./handlers/handleStartChat.js";
 import { ChatPanel } from "./ChatPanel.js";
 import {
   AddDepsEvent,
@@ -25,7 +25,7 @@ import {
   GenerateEvent,
   OpenChatEvent,
   OpenExistingConversationEvent,
-  StartNewChatEvent,
+  StartChatEvent,
 } from "./types.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
@@ -47,8 +47,8 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
       (message: OpenExistingConversationEvent) =>
         handleOpenExistingConversation(chatPanel, message)
     )
-    .attachHandler("startNewChat", (message: StartNewChatEvent) =>
-      handleStartNewChat(chatPanel, message)
+    .attachHandler("startChat", (message: StartChatEvent) =>
+      handleNewChat(chatPanel, message)
     )
     .attachHandler("editAnthropicConfig", (message: EditAnthropicConfigEvent) =>
       handleEditAnthropicConfig(chatPanel, message, workspaceRoot)
