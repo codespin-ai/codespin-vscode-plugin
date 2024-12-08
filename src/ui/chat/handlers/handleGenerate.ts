@@ -21,8 +21,8 @@ export async function handleGenerate(
       try {
         await invokeGenerate(
           chatPanel,
+          message.conversationId,
           generateArgs.args,
-          message,
           workspaceRoot
         );
       } catch (ex) {
