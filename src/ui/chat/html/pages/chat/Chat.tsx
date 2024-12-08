@@ -1,25 +1,24 @@
 import * as React from "react";
 import {
   CodeContent,
+  Conversation,
   FileHeadingContent,
   MarkdownContent,
-  Message,
   TextContent,
   UserMessage,
-  UserTextContent,
-  Conversation,
+  UserTextContent
 } from "../../../../../conversations/types.js";
 import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { BrowserEvent } from "../../../../types.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
+import { GenerateEvent } from "../../../types.js";
 import { ChatHeader } from "./components/ChatHeader.js";
 import { MessageInput } from "./components/MessageInput.js";
 import { MessageList } from "./components/MessageList.js";
+import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
-import { GenerateEvent } from "../../../types.js";
 
 export type ChatPageProps = {
   conversation: Conversation;
