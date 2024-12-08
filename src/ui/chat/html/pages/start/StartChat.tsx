@@ -6,34 +6,30 @@ import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { BrowserEvent } from "../../../../types.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { StartChatPageArgs } from "./StartChatPageArgs.js";
+import { StartChatPageProps } from "./StartChatPageArgs.js";
 import { ModelSelector } from "./components/ModelSelector.js";
 import { PromptInput } from "./components/PromptInput.js";
 import { ActionButtons } from "./components/ActionButtons.js";
 import { FileList } from "./components/FileList.js";
 import { CodingConventionsSelector } from "./components/CodingConventionsSelector.js";
-import { useLocation } from "react-router-dom";
 
 interface MessageFile {
   path: string;
   size: number;
 }
 
-export function StartChat() {
+export function StartChat(props: StartChatPageProps) {
   const vsCodeApi = getVSCodeApi();
-
-  const location = useLocation();
-  const state = location.state as StartChatPageArgs;
 
   const promptRef = useRef<HTMLTextAreaElement>(null!);
 
-  const [model, setModel] = useState(state.selectedModel);
-  const [prompt, setPrompt] = useState<string>(state.prompt ?? "");
+  const [model, setModel] = useState(props.selectedModel);
+  const [prompt, setPrompt] = useState<string>(props.prompt ?? "");
   const [codingConvention, setCodingConvention] = useState<string | undefined>(
-    state.codingConvention ?? undefined
+    props.codingConvention ?? undefined
   );
   const [messageFiles, setMessageFiles] = useState<MessageFile[]>(
-    state.includedFiles
+    props.includedFiles
   );
 
   const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
@@ -82,7 +78,7 @@ export function StartChat() {
       <form id="mainform">
         <ModelSelector
           model={model}
-          models={state.models}
+          models={props.models}
           messageClient={chatPanelMessageClient}
           onModelChange={setModel}
         />
@@ -113,7 +109,7 @@ export function StartChat() {
 
         <CodingConventionsSelector
           codingConvention={codingConvention}
-          conventions={state.codingConventions}
+          conventions={props.codingConventions}
           onChange={setCodingConvention}
         />
 

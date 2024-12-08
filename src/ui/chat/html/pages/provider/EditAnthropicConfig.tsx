@@ -1,17 +1,13 @@
 import * as React from "react";
 import { useState } from "react";
-import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
-import { AnthropicConfigArgs } from "../../../../../settings/provider/editAnthropicConfig.js";
 import { createMessageClient } from "../../../../../ipc/messageClient.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
-import type { ProviderConfigPageArgs } from "./EditConfig.js";
 import { EditAnthropicConfigEvent } from "../../../types.js";
-import { useLocation } from "react-router-dom";
+import { ProviderConfigPageArgs } from "./types.js";
 
-export function EditAnthropicConfig(props: AnthropicConfigArgs) {
-  const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
-  const location = useLocation();
-  const state = location.state as ProviderConfigPageArgs;
+export function EditAnthropicConfig(props: ProviderConfigPageArgs) {
+  const [apiKey, setApiKey] = useState<string>("");
 
   function onSave() {
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
@@ -23,7 +19,7 @@ export function EditAnthropicConfig(props: AnthropicConfigArgs) {
     const event: EditAnthropicConfigEvent = {
       type: "editAnthropicConfig",
       apiKey,
-      generateUserInput: state.generateUserInput,
+      generateUserInput: props.generateUserInput,
     };
 
     chatPanelMessageClient.send("editAnthropicConfig", event);
@@ -34,11 +30,11 @@ export function EditAnthropicConfig(props: AnthropicConfigArgs) {
       <div className="max-w-2xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-vscode-editor-foreground mb-2">
-            {!props.apiKey
+            {!apiKey
               ? "Configure Anthropic API"
               : "Anthropic API Settings"}
           </h1>
-          {!props.apiKey && (
+          {!apiKey && (
             <p className="text-vscode-editor-foreground opacity-80 text-sm">
               Set up your Anthropic API key to get started. Your key will be
               securely stored in .codespin/anthropic.json

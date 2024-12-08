@@ -4,7 +4,7 @@ import { navigateTo } from "../../navigateTo.js";
 import { invokeGenerate } from "../invokeGenerate.js";
 import { GenerateEvent } from "../types.js";
 import { ChatPanel } from "../ChatPanel.js";
-import type { ProviderConfigPageArgs } from "../html/pages/provider/EditConfig.js";
+import { ProviderConfigPageArgs } from "../html/pages/provider/types.js";
 
 export async function handleGenerate(
   chatPanel: ChatPanel,

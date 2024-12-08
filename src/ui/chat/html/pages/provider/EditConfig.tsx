@@ -1,29 +1,19 @@
 import * as React from "react";
 import { EditAnthropicConfig } from "./EditAnthropicConfig.js";
 import { EditOpenAIConfig } from "./EditOpenAIConfig.js";
-import { GenerateUserInput } from "../../../types.js";
-import { useLocation } from "react-router-dom";
 
-export type ProviderConfigPageArgs = {
-  provider: string;
-  generateUserInput: GenerateUserInput;
-};
-
-export type EditConfigPageArgs = {
+export type EditConfigPageProps = {
   provider: "openai" | "anthropic" | "google";
   [key: string]: string;
 };
 
-export function EditConfig() {
-  const location = useLocation();
-  const state = location.state as EditConfigPageArgs;
-
+export function EditConfig(props: EditConfigPageProps) {
   const Page: any =
-    state.provider === "anthropic"
+    props.provider === "anthropic"
       ? EditAnthropicConfig
-      : state.provider === "openai"
+      : props.provider === "openai"
       ? EditOpenAIConfig
       : undefined;
 
-  return Page ? <Page {...state} /> : <div>Unsupported API</div>;
+  return Page ? <Page {...props} /> : <div>Unsupported API</div>;
 }

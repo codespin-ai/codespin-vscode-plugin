@@ -1,28 +1,25 @@
+// src/ui/chat/html/index.tsx
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import {
-  RouterProvider,
-  createBrowserRouter,
-  Navigate,
-  createRoutesFromElements,
-  Route,
-} from "react-router-dom";
-import { StartChat } from "./pages/start/StartChat.js";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
+import { createRoutes } from "../../navigation/createRoutes.js";
+import { BrowserEvent, NavigateEvent } from "../../types.js";
+import type { ChatRoutes } from "../routes.js";
 import { Chat } from "./pages/chat/Chat.js";
 import { EditConfig } from "./pages/provider/EditConfig.js";
-import { BrowserEvent, NavigateEvent } from "../../types.js";
-import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
+import { StartChat } from "./pages/start/StartChat.js";
 
-const router = createBrowserRouter(
-  createRoutesFromElements(
-    <>
-      <Route path="/" element={<Navigate to="/start" replace />} />
-      <Route path="/start" element={<StartChat />} />
-      <Route path="/chat" element={<Chat />} />
-      <Route path="/provider/config/edit" element={<EditConfig />} />
-    </>
-  )
+const routes = createRoutes<ChatRoutes>(
+  {
+    "/chat": Chat,
+    "/start": StartChat,
+    "/provider/config/edit": EditConfig,
+  },
+  "/start"
 );
+
+const router = createBrowserRouter(routes);
 
 function App() {
   console.log("CodeSpin.AI extension started.");

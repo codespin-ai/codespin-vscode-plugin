@@ -1,3 +1,4 @@
+// src/ui/conversations/ConversationsViewProvider.ts
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
 import { listConversations } from "../../conversations/listConversations.js";
@@ -6,9 +7,9 @@ import { isInitialized } from "../../settings/isInitialized.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ViewProvider } from "../ViewProvider.js";
 import { MessageTemplate } from "../types.js";
-import { ConversationsPageArgs } from "./html/pages/conversations/Conversations.js";
 import { UpdateConversationsEvent } from "./types.js";
-import { navigateTo } from "../navigateTo.js";
+import { createConversationsNavigator } from "./createConversationsNavigator.js";
+import type { ConversationRoutes } from "./routes.js";
 
 export class ConversationsViewProvider extends ViewProvider {
   constructor(
@@ -26,18 +27,17 @@ export class ConversationsViewProvider extends ViewProvider {
 
   async onMessage(message: MessageTemplate) {
     const workspaceRoot = getWorkspaceRoot(this.context);
+    const navigate = createConversationsNavigator(this);
+
     switch (message.type) {
       case "webviewReady": {
         const initialized = await isInitialized(workspaceRoot);
 
         if (initialized) {
-          const conversationsPageArgs: ConversationsPageArgs = {
-            entries: initialized ? await listConversations(workspaceRoot) : [],
-          };
-
-          navigateTo(this, "/conversations", conversationsPageArgs);
+          const entries = await listConversations(workspaceRoot);
+          await navigate("/conversations", { entries });
         } else {
-          navigateTo(this, "/initialize");
+          await navigate("/initialize");
         }
         break;
       }
@@ -48,22 +48,15 @@ export class ConversationsViewProvider extends ViewProvider {
         };
 
         const webview = this.getWebview();
-
         if (webview) {
           webview.postMessage(updateConversationsEvent);
         }
-
         break;
       }
       case "initialize": {
         await initialize(false, workspaceRoot);
-
-        const conversationsPageArgs: ConversationsPageArgs = {
-          entries: await listConversations(workspaceRoot),
-        };
-
-        navigateTo(this, "/conversations", conversationsPageArgs);
-
+        const entries = await listConversations(workspaceRoot);
+        await navigate("/conversations", { entries });
         break;
       }
     }

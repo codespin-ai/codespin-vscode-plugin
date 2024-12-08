@@ -20,19 +20,14 @@ import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
 import { GenerateEvent } from "../../../types.js";
-import { useLocation } from "react-router-dom";
 
-// Updated type for page state to include conversation
-export type ChatPageState = {
+export type ChatPageProps = {
   conversation: Conversation;
   isNew: boolean;
 };
 
-export function Chat() {
-  const location = useLocation();
-  const state = location.state as ChatPageState;
-
-  const conversationInState = state.conversation;
+export function Chat(props: ChatPageProps) {
+  const conversationInState = props.conversation;
 
   const [conversation, setConversation] =
     React.useState<Conversation>(conversationInState);

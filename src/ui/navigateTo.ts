@@ -1,17 +1,17 @@
-import { NavigateEvent } from "./types.js";
 import { UIContainer } from "./UIContainer.js";
 
-export async function navigateTo<T>(
+// Base navigation utility
+export async function navigateTo<TState>(
   uiContainer: UIContainer,
   url: string,
-  args?: T
-) {
+  state?: TState
+): Promise<void> {
   return new Promise<void>((resolve) => {
     uiContainer.navigationPromiseResolvers.set(url, resolve);
-    const navigateEvent: NavigateEvent = {
-      type: "navigate",
+    const navigateEvent = {
+      type: "navigate" as const,
       url,
-      state: args,
+      state,
     };
 
     const webview = uiContainer.getWebview();

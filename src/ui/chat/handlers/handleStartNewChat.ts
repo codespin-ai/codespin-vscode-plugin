@@ -7,7 +7,7 @@ import { getConventions } from "../../../settings/conventions/getCodingConventio
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { navigateTo } from "../../navigateTo.js";
 import { ChatPanel } from "../ChatPanel.js";
-import { StartChatPageArgs } from "../html/pages/start/StartChatPageArgs.js";
+import { StartChatPageProps } from "../html/pages/start/StartChatPageArgs.js";
 import { StartNewChatEvent } from "../types.js";
 
 export async function handleStartNewChat(
@@ -34,7 +34,7 @@ export async function handleStartNewChat(
     )
   ).sort((a, b) => a.path.localeCompare(b.path));
 
-  const startChatPageArgs: StartChatPageArgs = {
+  const startChatPageArgs: StartChatPageProps = {
     includedFiles: fileDetails,
     codingConventions: conventions,
     models: codespinConfig.models ?? [],

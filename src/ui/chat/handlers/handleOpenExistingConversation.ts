@@ -1,10 +1,15 @@
-import { navigateTo } from "../../navigateTo.js";
 import { ChatPanel } from "../ChatPanel.js";
+import { createChatNavigator } from "../createChatNavigator.js";
 import { OpenExistingConversationEvent } from "../types.js";
 
 export async function handleOpenExistingConversation(
   chatPanel: ChatPanel,
   message: OpenExistingConversationEvent
 ): Promise<void> {
-  await navigateTo(chatPanel, "/chat", { conversation: message.conversation });
+  const navigate = createChatNavigator(chatPanel);
+
+  await navigate("/chat", {
+    conversation: message.conversation,
+    isNew: false,
+  });
 }

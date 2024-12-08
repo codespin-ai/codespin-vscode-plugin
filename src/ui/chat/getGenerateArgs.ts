@@ -4,7 +4,7 @@ import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
 import { GenerateUserInput } from "./types.js";
-import type { ProviderConfigPageArgs } from "./html/pages/provider/EditConfig.js";
+import { ProviderConfigPageArgs } from "./html/pages/provider/types.js";
 
 export type MissingProviderConfigArgs = {
   status: "missing_provider_config";

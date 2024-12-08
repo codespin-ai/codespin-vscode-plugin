@@ -6,7 +6,7 @@ export interface Model {
   alias?: string;
 }
 
-export type StartChatPageArgs = {
+export type StartChatPageProps = {
   models: ModelDescription[];
   codingConventions: Array<CodingConvention>;
   selectedModel: string;

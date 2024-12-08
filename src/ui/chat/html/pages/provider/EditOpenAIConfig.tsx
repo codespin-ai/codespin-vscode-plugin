@@ -1,18 +1,13 @@
 import * as React from "react";
 import { useState } from "react";
-import { OpenAIConfigArgs } from "../../../../../settings/provider/editOpenAIConfig.js";
-import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { createMessageClient } from "../../../../../ipc/messageClient.js";
+import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
-import type { ProviderConfigPageArgs } from "./EditConfig.js";
 import { EditOpenAIConfigEvent } from "../../../types.js";
-import { useLocation } from "react-router-dom";
+import { ProviderConfigPageArgs } from "./types.js";
 
-export function EditOpenAIConfig(props: OpenAIConfigArgs) {
-  const location = useLocation();
-  const state = location.state as ProviderConfigPageArgs;
-
-  const [apiKey, setApiKey] = useState<string>(props.apiKey ?? "");
+export function EditOpenAIConfig(props: ProviderConfigPageArgs) {
+  const [apiKey, setApiKey] = useState<string>("");
 
   function onSave() {
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
@@ -24,7 +19,7 @@ export function EditOpenAIConfig(props: OpenAIConfigArgs) {
     const message: EditOpenAIConfigEvent = {
       type: "editOpenAIConfig",
       apiKey,
-      generateUserInput: state.generateUserInput,
+      generateUserInput: props.generateUserInput,
     };
 
     chatPanelMessageClient.send("editOpenAIConfig", message);

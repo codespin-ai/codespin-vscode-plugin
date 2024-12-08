@@ -1,12 +1,10 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
-import {
-  RouterProvider,
-  createBrowserRouter,
-  Navigate,
-} from "react-router-dom";
-import { BrowserEvent, NavigateEvent } from "../../types.js";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import { getVSCodeApi } from "../../../vscode/getVSCodeApi.js";
+import { createRoutes } from "../../navigation/createRoutes.js";
+import { BrowserEvent, NavigateEvent } from "../../types.js";
+import type { ConversationRoutes } from "../routes.js";
 import { Conversations } from "./pages/conversations/Conversations.js";
 import { Initialize } from "./pages/initialize/Initialize.js";
 
@@ -19,7 +17,6 @@ function App() {
       switch (message.type) {
         case "navigate":
           const eventArgs = message as NavigateEvent;
-          // Using React Router's navigate
           router.navigate(eventArgs.url, {
             state: eventArgs.state,
           });
@@ -36,20 +33,15 @@ function App() {
     return () => window.removeEventListener("message", listeners);
   }, []);
 
-  const router = createBrowserRouter([
+  const routes = createRoutes<ConversationRoutes>(
     {
-      path: "/",
-      element: <Navigate to="/conversations" replace />,
+      "/conversations": Conversations,
+      "/initialize": Initialize,
     },
-    {
-      path: "/conversations",
-      element: <Conversations />,
-    },
-    {
-      path: "/initialize",
-      element: <Initialize />,
-    },
-  ]);
+    "/conversations"
+  );
+
+  const router = createBrowserRouter(routes);
 
   return <RouterProvider router={router} />;
 }
