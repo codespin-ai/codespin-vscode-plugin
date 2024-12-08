@@ -1,3 +1,5 @@
+import { Conversation } from "../../conversations/types.js";
+
 export type GenerateUserInput = {
   model: string;
   conversationId: string;
@@ -70,4 +72,16 @@ export interface GenerateEvent extends GenerateUserInput {
 
 export interface CancelEvent {
   type: "cancel";
+}
+
+// New event types for chat initialization
+export interface OpenExistingConversationEvent {
+  type: "openExistingConversation";
+  conversation: Conversation;
+}
+
+export interface StartNewChatEvent {
+  type: "startNewChat";
+  prompt?: string;
+  args: string[]; // file paths
 }

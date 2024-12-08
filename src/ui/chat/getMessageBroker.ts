@@ -1,7 +1,4 @@
-import {
-  BrokerType,
-  createMessageBroker,
-} from "../../ipc/messageBroker.js";
+import { BrokerType, createMessageBroker } from "../../ipc/messageBroker.js";
 import { handleAddDeps } from "./handlers/handleAddDeps.js";
 import { handleCancel } from "./handlers/handleCancel.js";
 import { handleCopyToClipboard } from "./handlers/handleCopyToClipboard.js";
@@ -13,6 +10,8 @@ import { handleOpenFile } from "./handlers/handleOpenFile.js";
 import { handleSourceCodeToHtml } from "./handlers/handleSourceCodeToHtml.js";
 import { handleOpenChat } from "./handlers/handleOpenChat.js";
 import { handleGenerate } from "./handlers/handleGenerate.js";
+import { handleOpenExistingConversation } from "./handlers/handleOpenExistingConversation.js";
+import { handleStartNewChat } from "./handlers/handleStartNewChat.js";
 import { ChatPanel } from "./ChatPanel.js";
 import {
   AddDepsEvent,
@@ -25,6 +24,8 @@ import {
   SourceCodeToHtmlEvent,
   GenerateEvent,
   OpenChatEvent,
+  OpenExistingConversationEvent,
+  StartNewChatEvent,
 } from "./types.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
@@ -40,6 +41,14 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
     )
     .attachHandler("openChat", (message: OpenChatEvent) =>
       handleOpenChat(chatPanel, message, workspaceRoot)
+    )
+    .attachHandler(
+      "openExistingConversation",
+      (message: OpenExistingConversationEvent) =>
+        handleOpenExistingConversation(chatPanel, message)
+    )
+    .attachHandler("startNewChat", (message: StartNewChatEvent) =>
+      handleStartNewChat(chatPanel, message)
     )
     .attachHandler("editAnthropicConfig", (message: EditAnthropicConfigEvent) =>
       handleEditAnthropicConfig(chatPanel, message, workspaceRoot)

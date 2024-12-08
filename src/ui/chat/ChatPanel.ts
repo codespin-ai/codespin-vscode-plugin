@@ -1,28 +1,9 @@
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
-import { Conversation } from "../../conversations/types.js";
-import { getConventions } from "../../settings/conventions/getCodingConventions.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { navigateTo } from "../navigateTo.js";
-import { MessageTemplate } from "../types.js";
 import { UIPanel } from "../UIPanel.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { getStartChatPageArgs } from "./getStartChatPageArgs.js";
-import { StartChatPageArgs } from "./html/pages/start/StartChatPageArgs.js";
-
-// Simplified init args - we only need the conversation or start chat args
-export type ChatPageInitArgs = {
-  type: "existingConversation";
-  conversation: Conversation;
-};
-
-export type StartChatPageInitArgs = {
-  type: "newConversation";
-  prompt: string | undefined;
-  args: string[];
-};
-
-export type InitArgs = StartChatPageInitArgs | ChatPageInitArgs;
+import { MessageTemplate } from "../types.js";
 
 let activePanel: ChatPanel | undefined = undefined;
 
@@ -41,25 +22,7 @@ export class ChatPanel extends UIPanel {
     super({}, context, globalEventEmitter);
     const workspaceRoot = getWorkspaceRoot(context);
     this.messageBroker = getMessageBroker(this, workspaceRoot);
-  }
-
-  async init(initArgs: InitArgs) {
-    const workspaceRoot = getWorkspaceRoot(this.context);
-    await this.webviewReadyEvent();
-
-    if (initArgs.type === "existingConversation") {
-      await navigateTo(this, "/chat", {
-        conversation: initArgs.conversation,
-      });
-    } else {
-      const conventions = await getConventions(workspaceRoot);
-      const startChatPageArgs: StartChatPageArgs = await getStartChatPageArgs(
-        initArgs,
-        workspaceRoot,
-        conventions
-      );
-      await navigateTo(this, "/start", startChatPageArgs);
-    }
+    this.setIncludeFilesContext(true);
   }
 
   async onMessage(message: MessageTemplate) {
