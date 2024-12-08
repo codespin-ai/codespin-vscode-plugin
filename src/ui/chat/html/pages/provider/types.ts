@@ -1,6 +1,8 @@
-import { GenerateUserInput } from "../../../types.js";
+// import { GenerateUserInput } from "../../../types.js";
 
-export type ProviderConfigPageArgs = {
-  provider: string;
-  generateUserInput: GenerateUserInput;
-};
+// export type SupportedProviders = "openai" | "anthropic" | "google";
+
+// export type ProviderConfigArgs = {
+//   provider: SupportedProviders;
+//   generateUserInput: GenerateUserInput;
+// };

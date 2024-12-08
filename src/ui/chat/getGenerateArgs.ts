@@ -4,11 +4,14 @@ import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
 import { GenerateUserInput } from "./types.js";
-import { ProviderConfigPageArgs } from "./html/pages/provider/types.js";
+import {
+  EditConfigPageProps,
+  SupportedProviders,
+} from "./html/pages/provider/EditConfig.js";
 
 export type MissingProviderConfigArgs = {
   status: "missing_provider_config";
-  providerConfigPageArgs: ProviderConfigPageArgs;
+  providerConfigArgs: EditConfigPageProps;
 };
 
 export type CanGenerateArgs = {
@@ -16,9 +19,7 @@ export type CanGenerateArgs = {
   args: CodeSpinGenerateArgs;
 };
 
-export type GetGenerateArgs =
-  | MissingProviderConfigArgs
-  | CanGenerateArgs;
+export type GetGenerateArgs = MissingProviderConfigArgs | CanGenerateArgs;
 
 export async function getGenerateArgs(
   generateUserInput: GenerateUserInput,
@@ -55,8 +56,8 @@ export async function getGenerateArgs(
   } else {
     const missingConfigResult: MissingProviderConfigArgs = {
       status: "missing_provider_config",
-      providerConfigPageArgs: {
-        provider: modelDescription.provider,
+      providerConfigArgs: {
+        provider: modelDescription.provider as SupportedProviders,
         generateUserInput: generateUserInput,
       },
     };

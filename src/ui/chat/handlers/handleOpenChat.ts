@@ -5,8 +5,8 @@ import {
   UserTextContent,
   UserFileContent,
 } from "../../../conversations/types.js";
-import { navigateTo } from "../../navigateTo.js";
 import { ChatPanel } from "../ChatPanel.js";
+import { createChatNavigator } from "../createChatNavigator.js";
 import { OpenChatEvent } from "../types.js";
 
 export async function handleOpenChat(
@@ -53,5 +53,6 @@ export async function handleOpenChat(
     throw new Error("Failed to create conversation");
   }
 
-  await navigateTo(chatPanel, "/chat", { conversation });
+  const navigate = createChatNavigator(chatPanel);
+  await navigate("/chat", { conversation, isNew: true });
 }

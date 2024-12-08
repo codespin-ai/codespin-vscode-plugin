@@ -1,10 +1,13 @@
 import * as React from "react";
 import { EditAnthropicConfig } from "./EditAnthropicConfig.js";
 import { EditOpenAIConfig } from "./EditOpenAIConfig.js";
+import { GenerateUserInput } from "../../../types.js";
+
+export type SupportedProviders = "openai" | "anthropic" | "google";
 
 export type EditConfigPageProps = {
-  provider: "openai" | "anthropic" | "google";
-  [key: string]: string;
+  provider: SupportedProviders;
+  generateUserInput: GenerateUserInput;
 };
 
 export function EditConfig(props: EditConfigPageProps) {

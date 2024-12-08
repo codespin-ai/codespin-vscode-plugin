@@ -6,7 +6,7 @@ import { getMessageBroker } from "./getMessageBroker.js";
 
 type GroupedEntries = { [date: string]: ConversationSummary[] };
 
-export type ConversationsPageArgs = {
+export type ConversationsPageProps = {
   entries: ConversationSummary[];
 };
 
@@ -22,7 +22,7 @@ const truncatePrompt = (text: string): string => {
     : text.slice(0, 100) + "...";
 };
 
-export function Conversations(props: ConversationsPageArgs) {
+export function Conversations(props: ConversationsPageProps) {
   const [entries, setEntries] = React.useState(props.entries);
   const [hoveredItemId, setHoveredItemId] = React.useState<string | null>(null);
 

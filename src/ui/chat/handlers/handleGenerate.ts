@@ -1,10 +1,13 @@
 import { InvalidCredentialsError } from "codespin/dist/errors.js";
-import { getModelDescription, getGenerateArgs } from "../getGenerateArgs.js";
-import { navigateTo } from "../../navigateTo.js";
+import { ChatPanel } from "../ChatPanel.js";
+import { createChatNavigator } from "../createChatNavigator.js";
+import { getGenerateArgs, getModelDescription } from "../getGenerateArgs.js";
 import { invokeGenerate } from "../invokeGenerate.js";
 import { GenerateEvent } from "../types.js";
-import { ChatPanel } from "../ChatPanel.js";
-import { ProviderConfigPageArgs } from "../html/pages/provider/types.js";
+import {
+  EditConfigPageProps,
+  SupportedProviders,
+} from "../html/pages/provider/EditConfig.js";
 
 export async function handleGenerate(
   chatPanel: ChatPanel,
@@ -26,12 +29,13 @@ export async function handleGenerate(
         if (ex instanceof InvalidCredentialsError) {
           const modelDescription = await getModelDescription(workspaceRoot);
 
-          const configPageState: ProviderConfigPageArgs = {
-            provider: modelDescription.provider,
+          const configPageState: EditConfigPageProps = {
+            provider: modelDescription.provider as SupportedProviders,
             generateUserInput: message,
           };
 
-          await navigateTo(chatPanel, `/provider/config/edit`, configPageState);
+          const navigate = createChatNavigator(chatPanel);
+          await navigate(`/provider/config/edit`, configPageState);
           break;
         }
         throw ex;
@@ -39,11 +43,8 @@ export async function handleGenerate(
       break;
 
     case "missing_provider_config":
-      await navigateTo(
-        chatPanel,
-        `/provider/config/edit`,
-        generateArgs.providerConfigPageArgs
-      );
+      const navigate = createChatNavigator(chatPanel);
+      await navigate(`/provider/config/edit`, generateArgs.providerConfigArgs);
       break;
   }
 }

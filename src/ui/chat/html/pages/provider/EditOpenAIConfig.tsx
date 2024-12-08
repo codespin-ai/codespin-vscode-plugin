@@ -4,9 +4,9 @@ import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { EditOpenAIConfigEvent } from "../../../types.js";
-import { ProviderConfigPageArgs } from "./types.js";
+import { EditConfigPageProps } from "./EditConfig.js";
 
-export function EditOpenAIConfig(props: ProviderConfigPageArgs) {
+export function EditOpenAIConfig(props: EditConfigPageProps) {
   const [apiKey, setApiKey] = useState<string>("");
 
   function onSave() {

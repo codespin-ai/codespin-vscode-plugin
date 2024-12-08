@@ -4,9 +4,9 @@ import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { EditAnthropicConfigEvent } from "../../../types.js";
-import { ProviderConfigPageArgs } from "./types.js";
+import { EditConfigPageProps } from "./EditConfig.js";
 
-export function EditAnthropicConfig(props: ProviderConfigPageArgs) {
+export function EditAnthropicConfig(props: EditConfigPageProps) {
   const [apiKey, setApiKey] = useState<string>("");
 
   function onSave() {

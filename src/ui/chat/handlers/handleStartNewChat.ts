@@ -5,10 +5,10 @@ import * as path from "path";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
 import { getConventions } from "../../../settings/conventions/getCodingConventions.js";
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
-import { navigateTo } from "../../navigateTo.js";
 import { ChatPanel } from "../ChatPanel.js";
-import { StartChatPageProps } from "../html/pages/start/StartChatPageArgs.js";
 import { StartNewChatEvent } from "../types.js";
+import { StartChatPageProps } from "../html/pages/start/StartChat.js";
+import { createChatNavigator } from "../createChatNavigator.js";
 
 export async function handleStartNewChat(
   chatPanel: ChatPanel,
@@ -34,7 +34,7 @@ export async function handleStartNewChat(
     )
   ).sort((a, b) => a.path.localeCompare(b.path));
 
-  const startChatPageArgs: StartChatPageProps = {
+  const pageProps: StartChatPageProps = {
     includedFiles: fileDetails,
     codingConventions: conventions,
     models: codespinConfig.models ?? [],
@@ -43,5 +43,6 @@ export async function handleStartNewChat(
     codingConvention: undefined,
   };
 
-  await navigateTo(chatPanel, "/start", startChatPageArgs);
+  const navigate = createChatNavigator(chatPanel);
+  await navigate("/start", pageProps);
 }

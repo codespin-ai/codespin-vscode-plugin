@@ -6,17 +6,30 @@ import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { BrowserEvent } from "../../../../types.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { getMessageBroker } from "./getMessageBroker.js";
-import { StartChatPageProps } from "./StartChatPageArgs.js";
 import { ModelSelector } from "./components/ModelSelector.js";
 import { PromptInput } from "./components/PromptInput.js";
 import { ActionButtons } from "./components/ActionButtons.js";
 import { FileList } from "./components/FileList.js";
 import { CodingConventionsSelector } from "./components/CodingConventionsSelector.js";
+import { ModelDescription } from "codespin/dist/settings/CodeSpinConfig.js";
+import { CodingConvention } from "../../../../../settings/conventions/CodingConvention.js";
 
 interface MessageFile {
   path: string;
   size: number;
 }
+
+export type StartChatPageProps = {
+  models: ModelDescription[];
+  codingConventions: Array<CodingConvention>;
+  selectedModel: string;
+  codingConvention: string | undefined;
+  prompt: string;
+  includedFiles: {
+    path: string;
+    size: number;
+  }[];
+};
 
 export function StartChat(props: StartChatPageProps) {
   const vsCodeApi = getVSCodeApi();
