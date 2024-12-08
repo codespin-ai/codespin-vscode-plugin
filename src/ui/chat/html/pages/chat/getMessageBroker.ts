@@ -1,18 +1,21 @@
-import { Message } from "../../../../../conversations/types.js";
+import { Conversation, Message } from "../../../../../conversations/types.js";
 import {
   BrokerType,
   createMessageBroker,
 } from "../../../../../ipc/messageBroker.js";
-import { FileResultStreamEvent, ProcessedStreamingFileParseResult } from "./fileStreamProcessor.js";
+import {
+  FileResultStreamEvent,
+  ProcessedStreamingFileParseResult,
+} from "./fileStreamProcessor.js";
 
 export function getMessageBroker({
   setIsGenerating,
   onFileResult,
-  setMessages,
+  setCurrentConversation,
 }: {
   setIsGenerating: (value: boolean) => void;
   onFileResult: (result: ProcessedStreamingFileParseResult) => void;
-  setMessages: (value: React.SetStateAction<Message[]>) => void;
+  setCurrentConversation: React.Dispatch<React.SetStateAction<Conversation>>;
 }) {
   return createMessageBroker()
     .attachHandler(
@@ -22,7 +25,7 @@ export function getMessageBroker({
       }
     )
     .attachHandler("messages", async (messages: Message[]) => {
-      setMessages(messages);
+      setCurrentConversation((prev) => ({ ...prev, messages }));
     })
     .attachHandler("done", async () => {
       setIsGenerating(false);

@@ -31,12 +31,12 @@ export type ChatPageState = {
 export function Chat() {
   const location = useLocation();
   const state = location.state as ChatPageState;
-  
+
   const conversation = state.conversation;
 
-  const [messages, setMessages] = React.useState<Message[]>(
-    conversation.messages
-  );
+  const [currentConversation, setCurrentConversation] =
+    React.useState<Conversation>(conversation);
+
   const [currentBlock, setCurrentBlock] = React.useState<
     FileHeadingContent | TextContent | CodeContent | MarkdownContent | null
   >(null);
@@ -47,10 +47,12 @@ export function Chat() {
 
   // Check if we need to trigger generation automatically
   React.useEffect(() => {
-    const shouldGenerate = messages.length === 1 && messages[0].role === "user";
+    const shouldGenerate =
+      currentConversation.messages.length === 1 &&
+      currentConversation.messages[0].role === "user";
 
     if (shouldGenerate && !isGenerating) {
-      const userMessage = messages[0] as UserMessage;
+      const userMessage = currentConversation.messages[0] as UserMessage;
       const prompt = (userMessage.content[0] as UserTextContent).text;
       const includedFiles =
         userMessage.content[1]?.type === "files"
@@ -80,19 +82,18 @@ export function Chat() {
   }, []);
 
   React.useEffect(() => {
-    // Update fileMap whenever messages change
-    setFileMap(buildFileReferenceMap(messages));
-  }, [messages]);
+    setFileMap(buildFileReferenceMap(currentConversation.messages));
+  }, [currentConversation.messages]);
 
   React.useEffect(() => {
     const pageMessageBroker = getMessageBroker({
       setIsGenerating,
-      setMessages,
+      setCurrentConversation,
       onFileResult: (result) =>
         handleStreamingResult(result, {
           currentBlock,
           setCurrentBlock,
-          setMessages,
+          setCurrentConversation,
         }),
     });
 
@@ -111,7 +112,7 @@ export function Chat() {
 
   React.useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [conversation.messages]);
 
   const sendMessage = React.useCallback(() => {
     if (!newMessage.trim() || isGenerating) return;
@@ -126,7 +127,10 @@ export function Chat() {
       content: [userContent],
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    setCurrentConversation((prev) => ({
+      ...prev,
+      messages: [...prev.messages, userMessage],
+    }));
 
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
       (message: unknown) => {
@@ -148,7 +152,7 @@ export function Chat() {
   }, [
     newMessage,
     isGenerating,
-    messages,
+    conversation.messages,
     conversation.model,
     conversation.codingConvention,
   ]);
@@ -161,7 +165,7 @@ export function Chat() {
       <ChatHeader provider={provider} model={conversation.model} />
 
       <MessageList
-        messages={messages}
+        messages={currentConversation.messages}
         currentBlock={currentBlock}
         chatEndRef={chatEndRef}
       />
