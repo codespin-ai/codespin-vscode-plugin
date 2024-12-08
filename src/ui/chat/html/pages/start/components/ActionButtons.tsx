@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ChatIcon } from "../../../components/icons/ChatIcon.js";
 import { CopyIcon } from "../../../components/icons/CopyIcon.js";
 import { ChatPanelBrokerType } from "../../../../getMessageBroker.js";
-import { MessageClient } from "../../../../../../messaging/messageClient.js";
+import { MessageClient } from "../../../../../../ipc/messageClient.js";
 
 interface ActionButtonsProps {
   messageClient: MessageClient<ChatPanelBrokerType>;

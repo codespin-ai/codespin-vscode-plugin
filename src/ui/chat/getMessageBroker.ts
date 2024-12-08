@@ -1,7 +1,7 @@
 import {
   BrokerType,
   createMessageBroker,
-} from "../../messaging/messageBroker.js";
+} from "../../ipc/messageBroker.js";
 import { handleAddDeps } from "./handlers/handleAddDeps.js";
 import { handleCancel } from "./handlers/handleCancel.js";
 import { handleCopyToClipboard } from "./handlers/handleCopyToClipboard.js";

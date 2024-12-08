@@ -2,7 +2,7 @@ import * as React from "react";
 import { useState } from "react";
 import { OpenAIConfigArgs } from "../../../../../settings/provider/editOpenAIConfig.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
-import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import type { ProviderConfigPageArgs } from "./EditConfig.js";
 import { EditOpenAIConfigEvent } from "../../../types.js";

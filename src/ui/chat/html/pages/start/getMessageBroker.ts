@@ -1,4 +1,4 @@
-import { BrokerType, createMessageBroker } from "../../../../../messaging/messageBroker.js";
+import { BrokerType, createMessageBroker } from "../../../../../ipc/messageBroker.js";
 import { IncludeFilesEvent } from "../../../includeFiles.js";
 
 export function getMessageBroker(

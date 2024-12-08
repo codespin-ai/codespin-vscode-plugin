@@ -8,7 +8,7 @@ import {
   AssistantMessage
 } from "../../conversations/types.js";
 import { markdownToHtml } from "../../markdown/markdownToHtml.js";
-import { createMessageClient } from "../../messaging/messageClient.js";
+import { createMessageClient } from "../../ipc/messageClient.js";
 import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { ChatPanel } from "./ChatPanel.js";

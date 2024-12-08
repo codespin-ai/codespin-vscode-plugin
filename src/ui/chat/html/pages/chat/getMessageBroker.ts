@@ -2,7 +2,7 @@ import { Message } from "../../../../../conversations/types.js";
 import {
   BrokerType,
   createMessageBroker,
-} from "../../../../../messaging/messageBroker.js";
+} from "../../../../../ipc/messageBroker.js";
 import { FileResultStreamEvent, ProcessedStreamingFileParseResult } from "./fileStreamProcessor.js";
 
 export function getMessageBroker({

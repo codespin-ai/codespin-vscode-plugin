@@ -1,7 +1,7 @@
 import * as React from "react";
 import { formatFileSize } from "../../../../../../fs/formatFileSize.js";
 import { ChatPanelBrokerType } from "../../../../getMessageBroker.js";
-import { MessageClient } from "../../../../../../messaging/messageClient.js";
+import { MessageClient } from "../../../../../../ipc/messageClient.js";
 
 interface FileInfo {
   path: string;

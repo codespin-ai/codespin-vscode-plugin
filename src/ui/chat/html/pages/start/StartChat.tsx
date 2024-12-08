@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { formatFileSize } from "../../../../../fs/formatFileSize.js";
-import { createMessageClient } from "../../../../../messaging/messageClient.js";
+import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { BrowserEvent } from "../../../../types.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
