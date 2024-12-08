@@ -1,31 +1,31 @@
 import { BrokerType, createMessageBroker } from "../../ipc/messageBroker.js";
+import { ChatPanel } from "./ChatPanel.js";
 import { handleAddDeps } from "./handlers/handleAddDeps.js";
 import { handleCancel } from "./handlers/handleCancel.js";
 import { handleCopyToClipboard } from "./handlers/handleCopyToClipboard.js";
 import { handleEditAnthropicConfig } from "./handlers/handleEditAnthropicConfig.js";
 import { handleEditOpenAIConfig } from "./handlers/handleEditOpenAIConfig.js";
+import { handleGenerate } from "./handlers/handleGenerate.js";
 import { handleMarkdownToHtml } from "./handlers/handleMarkdownToHtml.js";
 import { handleModelChange } from "./handlers/handleModelChange.js";
+import { handleNewConversation } from "./handlers/handleNewConversation.js";
+import { handleOpenChat } from "./handlers/handleOpenChat.js";
 import { handleOpenFile } from "./handlers/handleOpenFile.js";
 import { handleSourceCodeToHtml } from "./handlers/handleSourceCodeToHtml.js";
-import { handleOpenChat } from "./handlers/handleOpenChat.js";
-import { handleGenerate } from "./handlers/handleGenerate.js";
-import { handleOpenExistingConversation } from "./handlers/handleOpenExistingConversation.js";
 import { handleNewChat } from "./handlers/handleStartChat.js";
-import { ChatPanel } from "./ChatPanel.js";
 import {
   AddDepsEvent,
   CopyToClipboardEvent,
   EditAnthropicConfigEvent,
   EditOpenAIConfigEvent,
+  GenerateEvent,
   MarkdownToHtmlEvent,
   ModelChangeEvent,
+  NewConversationEvent,
+  OpenChatEvent,
   OpenFileEvent,
   SourceCodeToHtmlEvent,
-  GenerateEvent,
-  OpenChatEvent,
-  OpenExistingConversationEvent,
-  StartChatEvent,
+  StartChatEvent
 } from "./types.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
@@ -39,13 +39,11 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
     .attachHandler("generate", (message: GenerateEvent) =>
       handleGenerate(chatPanel, message, workspaceRoot)
     )
+    .attachHandler("newConversation", (message: NewConversationEvent) =>
+      handleNewConversation(chatPanel, message, workspaceRoot)
+    )
     .attachHandler("openChat", (message: OpenChatEvent) =>
       handleOpenChat(chatPanel, message, workspaceRoot)
-    )
-    .attachHandler(
-      "openExistingConversation",
-      (message: OpenExistingConversationEvent) =>
-        handleOpenExistingConversation(chatPanel, message)
     )
     .attachHandler("startChat", (message: StartChatEvent) =>
       handleNewChat(chatPanel, message)

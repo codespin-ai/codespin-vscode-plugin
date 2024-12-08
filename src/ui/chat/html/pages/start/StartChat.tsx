@@ -66,8 +66,8 @@ export function StartChat(props: StartChatPageProps) {
   }, []);
 
   const openChat = () => {
-    chatPanelMessageClient.send("openChat", {
-      type: "openChat",
+    chatPanelMessageClient.send("newConversation", {
+      type: "newConversation",
       model,
       codingConvention,
       prompt,

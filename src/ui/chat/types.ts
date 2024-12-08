@@ -11,9 +11,18 @@ export type GenerateUserInput = {
   }>;
 };
 
+export type NewConversationEvent = {
+  type: "newConversation";
+} & Omit<GenerateUserInput, "conversationId">;
+
+export type OpenChatArgs = {
+  conversation: Conversation;
+  isNew: boolean;
+};
+
 export type OpenChatEvent = {
   type: "openChat";
-} & Omit<GenerateUserInput, "conversationId">;
+} & OpenChatArgs;
 
 export type CopyToClipboardUserInput = {
   prompt: string;

@@ -3,7 +3,7 @@ import { EventEmitter } from "events";
 import { ChatPanel } from "../../ui/chat/ChatPanel.js";
 import { getConversation } from "../../conversations/getConversation.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { handleOpenExistingConversation } from "../../ui/chat/handlers/handleOpenExistingConversation.js";
+import { handleOpenChat } from "../../ui/chat/handlers/handleOpenChat.js";
 
 export function getOpenConversationCommand(
   context: vscode.ExtensionContext,
@@ -27,9 +27,14 @@ export function getOpenConversationCommand(
 
     await panel.webviewReadyEvent();
 
-    handleOpenExistingConversation(panel, {
-      type: "openExistingConversation",
-      conversation,
-    });
+    handleOpenChat(
+      panel,
+      {
+        type: "openChat",
+        conversation,
+        isNew: false,
+      },
+      workspaceRoot
+    );
   };
 }
