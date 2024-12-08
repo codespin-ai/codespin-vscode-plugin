@@ -1,11 +1,6 @@
 import { ModelDescription } from "codespin/dist/settings/CodeSpinConfig.js";
 import { CodingConvention } from "../../../../../settings/conventions/CodingConvention.js";
 
-export interface Model {
-  name: string;
-  alias?: string;
-}
-
 export type StartChatPageProps = {
   models: ModelDescription[];
   codingConventions: Array<CodingConvention>;

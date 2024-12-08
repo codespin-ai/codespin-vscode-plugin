@@ -1,9 +1,13 @@
 import * as React from "react";
-import { Model } from "../StartChatPageArgs.js";
 import { ChatPanelBrokerType } from "../../../../getMessageBroker.js";
 import { MessageClient } from "../../../../../../ipc/messageClient.js";
 
-interface ModelSelectorProps {
+interface Model {
+  name: string;
+  alias?: string;
+}
+
+export interface ModelSelectorProps {
   model: string;
   models: Model[];
   messageClient: MessageClient<ChatPanelBrokerType>;
