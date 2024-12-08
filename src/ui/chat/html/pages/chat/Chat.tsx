@@ -32,10 +32,10 @@ export function Chat() {
   const location = useLocation();
   const state = location.state as ChatPageState;
 
-  const conversation = state.conversation;
+  const conversationInState = state.conversation;
 
-  const [currentConversation, setCurrentConversation] =
-    React.useState<Conversation>(conversation);
+  const [conversation, setConversation] =
+    React.useState<Conversation>(conversationInState);
 
   const [currentBlock, setCurrentBlock] = React.useState<
     FileHeadingContent | TextContent | CodeContent | MarkdownContent | null
@@ -48,11 +48,11 @@ export function Chat() {
   // Check if we need to trigger generation automatically
   React.useEffect(() => {
     const shouldGenerate =
-      currentConversation.messages.length === 1 &&
-      currentConversation.messages[0].role === "user";
+      conversation.messages.length === 1 &&
+      conversation.messages[0].role === "user";
 
     if (shouldGenerate && !isGenerating) {
-      const userMessage = currentConversation.messages[0] as UserMessage;
+      const userMessage = conversation.messages[0] as UserMessage;
       const prompt = (userMessage.content[0] as UserTextContent).text;
       const includedFiles =
         userMessage.content[1]?.type === "files"
@@ -82,18 +82,18 @@ export function Chat() {
   }, []);
 
   React.useEffect(() => {
-    setFileMap(buildFileReferenceMap(currentConversation.messages));
-  }, [currentConversation.messages]);
+    setFileMap(buildFileReferenceMap(conversation.messages));
+  }, [conversation.messages]);
 
   React.useEffect(() => {
     const pageMessageBroker = getMessageBroker({
       setIsGenerating,
-      setCurrentConversation,
+      setCurrentConversation: setConversation,
       onFileResult: (result) =>
         handleStreamingResult(result, {
           currentBlock,
           setCurrentBlock,
-          setCurrentConversation,
+          setCurrentConversation: setConversation,
         }),
     });
 
@@ -127,7 +127,7 @@ export function Chat() {
       content: [userContent],
     };
 
-    setCurrentConversation((prev) => ({
+    setConversation((prev) => ({
       ...prev,
       messages: [...prev.messages, userMessage],
     }));
@@ -165,7 +165,7 @@ export function Chat() {
       <ChatHeader provider={provider} model={conversation.model} />
 
       <MessageList
-        messages={currentConversation.messages}
+        messages={conversation.messages}
         currentBlock={currentBlock}
         chatEndRef={chatEndRef}
       />
