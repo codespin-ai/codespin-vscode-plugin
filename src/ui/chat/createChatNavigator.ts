@@ -1,4 +1,4 @@
-import { createNavigator } from "../navigation/core.js";
+import { createNavigator } from "../navigation/createNavigator.js";
 import type { chatRoutes } from "./routes.js";
 import type { ChatPanel } from "./ChatPanel.js";
 

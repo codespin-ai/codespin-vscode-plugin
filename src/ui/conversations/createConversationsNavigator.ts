@@ -1,4 +1,4 @@
-import { createNavigator } from "../navigation/core.js";
+import { createNavigator } from "../navigation/createNavigator.js";
 import type { conversationRoutes } from "./routes.js";
 import type { ConversationsViewProvider } from "./ConversationsViewProvider.js";
 
