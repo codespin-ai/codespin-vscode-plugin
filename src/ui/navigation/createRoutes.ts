@@ -2,15 +2,10 @@ import * as React from "react";
 import { Navigate, RouteObject } from "react-router-dom";
 import { withRouteState } from "./PageWrapper.js";
 
-type RouteComponents<T extends Record<string, unknown>> = {
-  [K in keyof T]: React.ComponentType<T[K]>;
-};
-
-export function createRoutes<T extends Record<string, unknown>>(
-  components: RouteComponents<T>,
-  defaultPath: keyof T
-): RouteObject[] {
-  const routes = Object.entries(components).map(([path, Component]) => ({
+export function createRoutes<
+  T extends Record<string, React.ComponentType<any>>
+>(routes: T, defaultPath: keyof T): RouteObject[] {
+  const routeObjects = Object.entries(routes).map(([path, Component]) => ({
     path,
     element: React.createElement(withRouteState(Component)),
   }));
@@ -23,6 +18,6 @@ export function createRoutes<T extends Record<string, unknown>>(
         replace: true,
       }),
     },
-    ...routes,
+    ...routeObjects,
   ];
 }

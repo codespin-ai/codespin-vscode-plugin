@@ -1,10 +1,7 @@
 import { createNavigator } from "../navigation/core.js";
-import { ChatRoutes } from "./routes.js";
-import { ChatPanel } from "./ChatPanel.js";
+import type { chatRoutes } from "./routes.js";
+import type { ChatPanel } from "./ChatPanel.js";
 
 export function createChatNavigator(panel: ChatPanel) {
-  return createNavigator<ChatRoutes>({
-    routes: {} as ChatRoutes,
-    container: panel,
-  });
+  return createNavigator<typeof chatRoutes>(panel);
 }

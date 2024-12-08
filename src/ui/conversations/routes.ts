@@ -1,8 +1,9 @@
-import type { ConversationSummary } from "../../conversations/types.js";
+import { Conversations } from "./html/pages/conversations/Conversations.js";
+import { Initialize } from "./html/pages/initialize/Initialize.js";
 
-export type ConversationRoutes = {
-  "/conversations": {
-    entries: ConversationSummary[];
-  };
-  "/initialize": undefined;
-};
+export const conversationRoutes = {
+  "/conversations": Conversations,
+  "/initialize": Initialize,
+} as const;
+
+export type ConversationRoutes = typeof conversationRoutes;
