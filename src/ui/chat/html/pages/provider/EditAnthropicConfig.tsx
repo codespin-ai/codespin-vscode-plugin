@@ -19,7 +19,7 @@ export function EditAnthropicConfig(props: EditConfigPageProps) {
     const event: EditAnthropicConfigEvent = {
       type: "editAnthropicConfig",
       apiKey,
-      generateUserInput: props.generateUserInput,
+      conversation: props.conversation
     };
 
     chatPanelMessageClient.send("editAnthropicConfig", event);

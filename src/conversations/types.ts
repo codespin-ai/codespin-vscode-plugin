@@ -68,7 +68,7 @@ export type Conversation = {
   title: string;
   timestamp: number;
   model: string;
-  codingConvention: string | null;
+  codingConvention: string | undefined;
   messages: Message[];
 };
 
@@ -77,7 +77,7 @@ export type ConversationSummary = {
   title: string;
   timestamp: number;
   model: string;
-  codingConvention: string | null;
+  codingConvention: string | undefined;
 };
 
 export interface ConversationsFile {

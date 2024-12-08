@@ -16,7 +16,7 @@ interface MessageListProps {
     | TextContent
     | CodeContent
     | MarkdownContent
-    | null;
+    | undefined;
   chatEndRef: React.RefObject<HTMLDivElement>;
 }
 

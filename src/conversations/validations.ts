@@ -86,7 +86,7 @@ export function validateConversation(data: unknown): data is Conversation {
     typeof conv.title === "string" &&
     typeof conv.timestamp === "number" &&
     typeof conv.model === "string" &&
-    (conv.codingConvention === null ||
+    (conv.codingConvention === undefined ||
       typeof conv.codingConvention === "string") &&
     Array.isArray(conv.messages) &&
     conv.messages.every(validateMessage)
@@ -114,7 +114,7 @@ export function validateConversationsStructure(
         typeof c.title === "string" &&
         typeof c.timestamp === "number" &&
         typeof c.model === "string" &&
-        (c.codingConvention === null || typeof c.codingConvention === "string")
+        (c.codingConvention === undefined || typeof c.codingConvention === "string")
     )
   ) {
     return false;

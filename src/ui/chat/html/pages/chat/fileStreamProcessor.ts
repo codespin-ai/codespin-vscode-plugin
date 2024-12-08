@@ -51,10 +51,14 @@ type FileBlockProcessorArgs = {
     | TextContent
     | CodeContent
     | MarkdownContent
-    | null;
+    | undefined;
   setCurrentBlock: React.Dispatch<
     React.SetStateAction<
-      FileHeadingContent | TextContent | CodeContent | MarkdownContent | null
+      | FileHeadingContent
+      | TextContent
+      | CodeContent
+      | MarkdownContent
+      | undefined
     >
   >;
   setCurrentConversation: React.Dispatch<React.SetStateAction<Conversation>>;
@@ -170,7 +174,7 @@ export function handleMarkdownBlock(
     };
   });
 
-  setCurrentBlock(null);
+  setCurrentBlock(undefined);
 }
 
 export function handleStreamingResult(

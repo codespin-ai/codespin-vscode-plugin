@@ -6,7 +6,7 @@ import {
   MarkdownContent,
   TextContent,
   UserMessage,
-  UserTextContent
+  UserTextContent,
 } from "../../../../../conversations/types.js";
 import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
@@ -32,8 +32,8 @@ export function Chat(props: ChatPageProps) {
     React.useState<Conversation>(conversationInState);
 
   const [currentBlock, setCurrentBlock] = React.useState<
-    FileHeadingContent | TextContent | CodeContent | MarkdownContent | null
-  >(null);
+    FileHeadingContent | TextContent | CodeContent | MarkdownContent | undefined
+  >(undefined);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [newMessage, setNewMessage] = React.useState("");
   const chatEndRef = React.useRef<HTMLDivElement>(null!);
@@ -64,11 +64,7 @@ export function Chat(props: ChatPageProps) {
 
       const generateEvent: GenerateEvent = {
         type: "generate",
-        conversationId: conversation.id,
-        model: conversation.model,
-        prompt,
-        codingConvention: conversation.codingConvention || undefined,
-        includedFiles,
+        conversation,
       };
 
       chatPanelMessageClient.send("generate", generateEvent);
@@ -134,11 +130,7 @@ export function Chat(props: ChatPageProps) {
 
     const generateEvent: GenerateEvent = {
       type: "generate",
-      conversationId: conversation.id,
-      model: conversation.model,
-      prompt: newMessage,
-      codingConvention: conversation.codingConvention || undefined,
-      includedFiles: [], // No files for subsequent messages
+      conversation,
     };
 
     chatPanelMessageClient.send("generate", generateEvent);

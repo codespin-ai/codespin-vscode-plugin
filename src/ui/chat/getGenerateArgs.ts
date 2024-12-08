@@ -1,9 +1,13 @@
 import { GenerateArgs as CodeSpinGenerateArgs } from "codespin/dist/commands/generate/index.js";
 import { getModel } from "codespin/dist/settings/getModel.js";
 import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
+import {
+  Conversation,
+  UserMessage,
+  UserTextContent,
+} from "../../conversations/types.js";
 import { getCodingConventionPath } from "../../settings/conventions/getCodingConventionPath.js";
 import { getProviderConfigPath } from "../../settings/provider/getProviderConfigPath.js";
-import { GenerateUserInput } from "./types.js";
 import {
   EditConfigPageProps,
   SupportedProviders,
@@ -22,7 +26,7 @@ export type CanGenerateArgs = {
 export type GetGenerateArgs = MissingProviderConfigArgs | CanGenerateArgs;
 
 export async function getGenerateArgs(
-  generateUserInput: GenerateUserInput,
+  conversation: Conversation,
   workspaceRoot: string
 ): Promise<GetGenerateArgs> {
   const modelDescription = await getModelDescription(workspaceRoot);
@@ -33,14 +37,21 @@ export async function getGenerateArgs(
   );
 
   if (configFilePath) {
+    const userMessage = conversation.messages[0] as UserMessage;
+    const prompt = (userMessage.content[0] as UserTextContent).text;
+    const includedFiles =
+      userMessage.content[1]?.type === "files"
+        ? userMessage.content[1].includedFiles.map((file) => file.path)
+        : [];
+
     const codespinGenerateArgs: CodeSpinGenerateArgs = {
-      prompt: generateUserInput.prompt,
-      model: generateUserInput.model,
+      prompt,
+      model: conversation.model,
       write: false,
-      include: generateUserInput.includedFiles.map((f) => f.path),
-      spec: generateUserInput.codingConvention
+      include: includedFiles,
+      spec: conversation.codingConvention
         ? await getCodingConventionPath(
-            generateUserInput.codingConvention,
+            conversation.codingConvention,
             workspaceRoot
           )
         : undefined,
@@ -58,7 +69,7 @@ export async function getGenerateArgs(
       status: "missing_provider_config",
       providerConfigArgs: {
         provider: modelDescription.provider as SupportedProviders,
-        generateUserInput: generateUserInput,
+        conversation,
       },
     };
     return missingConfigResult;

@@ -39,7 +39,7 @@ export async function handleNewConversation(
       title: message.prompt.slice(0, 100) ?? "Untitled",
       timestamp: Date.now(),
       model: message.model,
-      codingConvention: message.codingConvention || null,
+      codingConvention: message.codingConvention || undefined,
       initialMessage: userMessage,
     },
     workspaceRoot

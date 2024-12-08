@@ -10,7 +10,7 @@ export async function getConversation(
     id: string;
   },
   workspaceRoot: string
-): Promise<Conversation | null> {
+): Promise<Conversation | undefined> {
   const conversationsDir = path.join(
     getCodeSpinDir(workspaceRoot),
     "conversations"
@@ -23,7 +23,7 @@ export async function getConversation(
 
     const summary = summaries.conversations.find((c) => c.id === params.id);
     if (!summary) {
-      return null;
+      return undefined;
     }
 
     const conversationDirPath = path.join(conversationsDir, summary.id);
@@ -38,18 +38,18 @@ export async function getConversation(
 
       if (!validateConversation(conversation)) {
         await clearAllData(conversationsDir);
-        return null;
+        return undefined;
       }
 
       return conversation as Conversation;
     } catch (error) {
       // If file doesn't exist, data is corrupted
       await clearAllData(conversationsDir);
-      return null;
+      return undefined;
     }
   } catch (error) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
-      return null;
+      return undefined;
     }
     throw error;
   }

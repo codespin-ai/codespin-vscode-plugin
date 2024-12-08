@@ -19,7 +19,7 @@ export function EditOpenAIConfig(props: EditConfigPageProps) {
     const message: EditOpenAIConfigEvent = {
       type: "editOpenAIConfig",
       apiKey,
-      generateUserInput: props.generateUserInput,
+      conversation: props.conversation,
     };
 
     chatPanelMessageClient.send("editOpenAIConfig", message);

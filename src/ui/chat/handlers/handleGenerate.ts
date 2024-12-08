@@ -14,14 +14,17 @@ export async function handleGenerate(
   message: GenerateEvent,
   workspaceRoot: string
 ): Promise<void> {
-  const generateArgs = await getGenerateArgs(message, workspaceRoot);
+  const generateArgs = await getGenerateArgs(
+    message.conversation,
+    workspaceRoot
+  );
 
   switch (generateArgs.status) {
     case "can_generate":
       try {
         await invokeGenerate(
           chatPanel,
-          message.conversationId,
+          message.conversation.id,
           generateArgs.args,
           workspaceRoot
         );
@@ -31,7 +34,7 @@ export async function handleGenerate(
 
           const configPageState: EditConfigPageProps = {
             provider: modelDescription.provider as SupportedProviders,
-            generateUserInput: message,
+            conversation: message.conversation,
           };
 
           const navigate = createChatNavigator(chatPanel);

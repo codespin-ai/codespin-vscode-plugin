@@ -32,7 +32,7 @@ export type CreateConversationParams = {
   title: string;
   timestamp: number;
   model: string;
-  codingConvention: string | null;
+  codingConvention: string | undefined;
   initialMessage: Message;
 };
 

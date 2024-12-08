@@ -45,13 +45,13 @@ export interface AddDepsEvent {
 export interface EditAnthropicConfigEvent {
   type: "editAnthropicConfig";
   apiKey: string;
-  generateUserInput: GenerateUserInput;
+  conversation: Conversation;
 }
 
 export interface EditOpenAIConfigEvent {
   type: "editOpenAIConfig";
   apiKey: string;
-  generateUserInput: GenerateUserInput;
+  conversation: Conversation;
 }
 
 export interface MarkdownToHtmlEvent {
@@ -75,9 +75,13 @@ export interface SourceCodeToHtmlEvent {
   content: string;
 }
 
-export interface GenerateEvent extends GenerateUserInput {
+export type GenerateArgs = {
+  conversation: Conversation;
+};
+
+export type GenerateEvent = {
   type: "generate";
-}
+} & GenerateArgs;
 
 export interface CancelEvent {
   type: "cancel";
