@@ -1,6 +1,6 @@
 import { Conversation } from "../../conversations/types.js";
 
-export type GenerateUserInput = {
+export type NewConversationArgs = {
   model: string;
   conversationId: string;
   codingConvention: string | undefined;
@@ -13,7 +13,7 @@ export type GenerateUserInput = {
 
 export type NewConversationEvent = {
   type: "newConversation";
-} & Omit<GenerateUserInput, "conversationId">;
+} & Omit<NewConversationArgs, "conversationId">;
 
 export type OpenChatArgs = {
   conversation: Conversation;
