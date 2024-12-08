@@ -1,4 +1,3 @@
-// src/ui/navigation/core.ts
 import { NavigationModule, NavigateOptions } from "./types.js";
 import { NavigateEvent } from "../types.js";
 

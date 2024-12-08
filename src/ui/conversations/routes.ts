@@ -1,4 +1,3 @@
-// src/ui/conversations/routes.ts
 import type { ConversationSummary } from "../../conversations/types.js";
 
 export type ConversationRoutes = {

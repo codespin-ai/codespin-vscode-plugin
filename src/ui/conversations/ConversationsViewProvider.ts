@@ -1,4 +1,3 @@
-// src/ui/conversations/ConversationsViewProvider.ts
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
 import { listConversations } from "../../conversations/listConversations.js";
@@ -7,9 +6,8 @@ import { isInitialized } from "../../settings/isInitialized.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ViewProvider } from "../ViewProvider.js";
 import { MessageTemplate } from "../types.js";
-import { UpdateConversationsEvent } from "./types.js";
 import { createConversationsNavigator } from "./createConversationsNavigator.js";
-import type { ConversationRoutes } from "./routes.js";
+import { UpdateConversationsEvent } from "./types.js";
 
 export class ConversationsViewProvider extends ViewProvider {
   constructor(
