@@ -19,6 +19,7 @@ import { MessageList } from "./components/MessageList.js";
 import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
+import { Resizer } from "./components/Resizer.js";
 
 export type ChatPageProps = {
   conversation: Conversation;
@@ -38,6 +39,19 @@ export function Chat(props: ChatPageProps) {
   const [newMessage, setNewMessage] = React.useState("");
   const chatEndRef = React.useRef<HTMLDivElement>(null!);
   const [fileMap, setFileMap] = React.useState<FileReferenceMap>(new Map());
+  const [messageListHeight, setMessageListHeight] = React.useState(
+    window.innerHeight - 300
+  ); // Default height accounting for header and input
+
+  const handleResize = React.useCallback((delta: number) => {
+    setMessageListHeight((prevHeight) => {
+      const newHeight = prevHeight + delta;
+      // Limit the height between a minimum and maximum
+      const minHeight = 100; // Minimum height in pixels
+      const maxHeight = window.innerHeight - 200; // Maximum height (leaving space for input)
+      return Math.min(Math.max(newHeight, minHeight), maxHeight);
+    });
+  }, []);
 
   // Check if we need to trigger generation automatically
   React.useEffect(() => {
@@ -146,23 +160,45 @@ export function Chat(props: ChatPageProps) {
   // Extract provider from model string (format is "provider:model")
   const provider = conversation.model.split(":")[0];
 
+  // Handle window resize
+  React.useEffect(() => {
+    const handleWindowResize = () => {
+      setMessageListHeight((prevHeight) => {
+        const maxHeight = window.innerHeight - 200;
+        return Math.min(prevHeight, maxHeight);
+      });
+    };
+
+    window.addEventListener("resize", handleWindowResize);
+    return () => window.removeEventListener("resize", handleWindowResize);
+  }, []);
+
   return (
     <div className="h-screen flex flex-col bg-vscode-editor-background">
       <ChatHeader provider={provider} model={conversation.model} />
 
-      <MessageList
-        messages={conversation.messages}
-        currentBlock={currentBlock}
-        chatEndRef={chatEndRef}
-      />
+      <div
+        style={{ height: `${messageListHeight}px` }}
+        className="message-list-container overflow-y-auto relative"
+      >
+        <MessageList
+          messages={conversation.messages}
+          currentBlock={currentBlock}
+          chatEndRef={chatEndRef}
+        />
+      </div>
 
-      <MessageInput
-        newMessage={newMessage}
-        setNewMessage={setNewMessage}
-        sendMessage={sendMessage}
-        isGenerating={isGenerating}
-        fileMap={fileMap}
-      />
+      <Resizer onResize={handleResize} />
+
+      <div className="flex-shrink-0">
+        <MessageInput
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+          sendMessage={sendMessage}
+          isGenerating={isGenerating}
+          fileMap={fileMap}
+        />
+      </div>
     </div>
   );
 }

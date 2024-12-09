@@ -308,3 +308,28 @@
     }
   }
 }
+
+/* Resize handle */
+.message-list-container {
+  transition: height 0.1s ease;
+  will-change: height;
+}
+
+.resize-handle {
+  margin: 0;
+  padding: 0;
+  transition: background-color 0.2s;
+}
+
+.resize-handle:hover {
+  background-color: var(--vscode-panel-border) !important;
+}
+
+.resize-handle.dragging {
+  background-color: var(--vscode-focusBorder) !important;
+}
+
+.resize-handle:hover .resize-handle-line,
+.resize-handle.dragging .resize-handle-line {
+  opacity: 0.8;
+}

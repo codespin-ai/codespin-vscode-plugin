@@ -23,9 +23,9 @@ export function MessageInput({
   fileMap,
 }: MessageInputProps) {
   const [showFilePopup, setShowFilePopup] = React.useState(false);
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const [selectionState, setSelectionState] =
     React.useState<FileSelectionState>(() => {
-      // Try to load saved state from localStorage
       const saved = localStorage.getItem("fileSelectionState");
       if (saved) {
         const parsed = JSON.parse(saved);
@@ -34,7 +34,6 @@ export function MessageInput({
           selectedFiles: new Set(parsed.selectedFiles),
         };
       }
-      // Default state - all files selected, latest mode
       return {
         mode: "latest" as const,
         selectedFiles: new Set(Array.from(fileMap.keys())),
@@ -42,6 +41,15 @@ export function MessageInput({
     });
 
   const fileCount = getFileCount(fileMap);
+
+  // Auto-resize textarea
+  React.useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto'; // Reset height
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 300)}px`; // Set new height with max of 300px
+    }
+  }, [newMessage]);
 
   // Save selection state whenever it changes
   React.useEffect(() => {
@@ -58,11 +66,12 @@ export function MessageInput({
     <div className="p-4 border-t border-vscode-panel-border bg-vscode-editor-background">
       <div className="max-w-6xl grid grid-cols-[1fr,auto] gap-4">
         <textarea
-          className="min-h-[44px] rounded 
+          ref={textareaRef}
+          className="min-h-[44px] max-h-[300px] rounded 
              bg-vscode-input-background text-vscode-input-foreground 
              p-3 border border-vscode-input-border focus:outline-none 
-             focus:ring-2 focus:ring-vscode-focusBorder focus:border-transparent"
-          style={{ maxHeight: "70vh" }}
+             focus:ring-2 focus:ring-vscode-focusBorder focus:border-transparent
+             resize-none overflow-y-auto"
           value={newMessage}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setNewMessage(e.target.value)
