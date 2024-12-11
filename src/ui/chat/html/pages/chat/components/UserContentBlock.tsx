@@ -29,7 +29,6 @@ export function UserContentBlock({ message }: Props) {
                     __html: `${content.html}`,
                   }}
                 />
-                <pre>{content.html}</pre>
               </div>
             );
           case "files":
