@@ -1,21 +1,21 @@
 import { EventEmitter } from "events";
 import * as vscode from "vscode";
-import { listConversations } from "../../conversations/listConversations.js";
-import { initialize } from "../../settings/initialize.js";
-import { isInitialized } from "../../settings/isInitialized.js";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
 import { ViewProvider } from "../ViewProvider.js";
 import { MessageTemplate } from "../types.js";
-import { createConversationsNavigator } from "./createConversationsNavigator.js";
-import { UpdateConversationsEvent } from "./types.js";
+import { getMessageBroker } from "./getMessageBroker.js";
 
 export class ConversationsViewProvider extends ViewProvider {
+  messageBroker: ReturnType<typeof getMessageBroker>;
+
   constructor(
     context: vscode.ExtensionContext,
     globalEventEmitter: EventEmitter
   ) {
     const webviewOptions = {};
     super(webviewOptions, context, globalEventEmitter);
+    const workspaceRoot = getWorkspaceRoot(context);
+    this.messageBroker = getMessageBroker(this, workspaceRoot);
   }
 
   async init() {
@@ -24,38 +24,11 @@ export class ConversationsViewProvider extends ViewProvider {
   }
 
   async onMessage(message: MessageTemplate) {
-    const workspaceRoot = getWorkspaceRoot(this.context);
-    const navigate = createConversationsNavigator(this);
-
-    switch (message.type) {
-      case "webviewReady": {
-        const initialized = await isInitialized(workspaceRoot);
-
-        if (initialized) {
-          const entries = await listConversations(workspaceRoot);
-          await navigate("/conversations", { entries });
-        } else {
-          await navigate("/initialize");
-        }
-        break;
-      }
-      case "newConversation": {
-        const updateConversationsEvent: UpdateConversationsEvent = {
-          type: "updateConversations",
-          entries: await listConversations(workspaceRoot),
-        };
-
-        const webview = this.getWebview();
-        if (webview) {
-          webview.postMessage(updateConversationsEvent);
-        }
-        break;
-      }
-      case "initialize": {
-        await initialize(false, workspaceRoot);
-        const entries = await listConversations(workspaceRoot);
-        await navigate("/conversations", { entries });
-        break;
+    if (this.messageBroker.canHandle(message.type)) {
+      const result = await this.messageBroker.handleRequest(message as any);
+      const webview = this.getWebview();
+      if (webview && result) {
+        webview.postMessage(result);
       }
     }
   }
