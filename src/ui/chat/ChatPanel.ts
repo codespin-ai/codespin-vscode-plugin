@@ -27,7 +27,8 @@ export class ChatPanel extends UIPanel {
 
   async onMessage(message: MessageTemplate) {
     if (this.messageBroker.canHandle(message.type)) {
-      this.messageBroker.handleRequest(message as any);
+      const result = await this.messageBroker.handleRequest(message as any);
+      this.getWebview().postMessage(result);
     }
   }
 

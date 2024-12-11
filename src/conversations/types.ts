@@ -1,6 +1,7 @@
 export type UserTextContent = {
   type: "text";
   text: string;
+  html: string;
 };
 
 export type UserImageContent = {

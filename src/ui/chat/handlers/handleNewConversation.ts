@@ -5,6 +5,7 @@ import {
   UserTextContent,
   UserFileContent,
 } from "../../../conversations/types.js";
+import { markdownToHtml } from "../../../markdown/markdownToHtml.js";
 import { ChatPanel } from "../ChatPanel.js";
 import { createChatNavigator } from "../createChatNavigator.js";
 import { NewConversationEvent } from "../types.js";
@@ -19,6 +20,7 @@ export async function handleNewConversation(
     {
       type: "text",
       text: message.prompt,
+      html: await markdownToHtml(message.prompt),
     },
     {
       type: "files" as const,

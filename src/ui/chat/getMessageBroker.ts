@@ -6,6 +6,7 @@ import { handleCopyToClipboard } from "./handlers/handleCopyToClipboard.js";
 import { handleEditAnthropicConfig } from "./handlers/handleEditAnthropicConfig.js";
 import { handleEditOpenAIConfig } from "./handlers/handleEditOpenAIConfig.js";
 import { handleGenerate } from "./handlers/handleGenerate.js";
+import { handleGetMarkdown } from "./handlers/handleGetMarkdown.js";
 import { handleMarkdownToHtml } from "./handlers/handleMarkdownToHtml.js";
 import { handleModelChange } from "./handlers/handleModelChange.js";
 import { handleNewConversation } from "./handlers/handleNewConversation.js";
@@ -19,13 +20,14 @@ import {
   EditAnthropicConfigEvent,
   EditOpenAIConfigEvent,
   GenerateEvent,
+  GetMarkdownEvent,
   MarkdownToHtmlEvent,
   ModelChangeEvent,
   NewConversationEvent,
   OpenChatEvent,
   OpenFileEvent,
   SourceCodeToHtmlEvent,
-  StartChatEvent
+  StartChatEvent,
 } from "./types.js";
 
 export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
@@ -65,6 +67,9 @@ export function getMessageBroker(chatPanel: ChatPanel, workspaceRoot: string) {
     )
     .attachHandler("openFile", (message: OpenFileEvent) =>
       handleOpenFile(message, workspaceRoot)
+    )
+    .attachHandler("getMarkdown", (message: GetMarkdownEvent) =>
+      handleGetMarkdown(message)
     )
     .attachHandler("cancel", async () => handleCancel(chatPanel));
 }

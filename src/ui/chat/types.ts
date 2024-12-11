@@ -98,3 +98,11 @@ export interface StartChatEvent {
   prompt?: string;
   args: string[]; // file paths
 }
+
+export type GetMarkdownArgs = {
+  text: string;
+};
+
+export type GetMarkdownEvent = {
+  type: "getMarkdown";
+} & GetMarkdownArgs;

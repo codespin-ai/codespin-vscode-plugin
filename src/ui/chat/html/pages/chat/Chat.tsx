@@ -118,12 +118,28 @@ export function Chat(props: ChatPageProps) {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [conversation.messages]);
 
-  const sendMessage = React.useCallback(() => {
+  const sendMessage = React.useCallback(async () => {
     if (!newMessage.trim() || isGenerating) return;
+
+    const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
+      (message: unknown) => {
+        getVSCodeApi().postMessage(message);
+      }
+    );
+
+    function listeners(event: BrowserEvent) {
+      chatPanelMessageClient.onResponse(event.data as any);
+    }
+
+    window.addEventListener("message", listeners);
 
     const userContent: UserTextContent = {
       type: "text",
       text: newMessage,
+      html: await chatPanelMessageClient.wait("getMarkdown", {
+        type: "getMarkdown",
+        text: newMessage,
+      }),
     };
 
     const userMessage: UserMessage = {
@@ -136,12 +152,6 @@ export function Chat(props: ChatPageProps) {
       messages: [...prev.messages, userMessage],
     }));
 
-    const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
-      (message: unknown) => {
-        getVSCodeApi().postMessage(message);
-      }
-    );
-
     const generateEvent: GenerateEvent = {
       type: "generate",
       conversation,
@@ -149,6 +159,8 @@ export function Chat(props: ChatPageProps) {
 
     chatPanelMessageClient.send("generate", generateEvent);
     setNewMessage("");
+
+    return () => window.removeEventListener("message", listeners);
   }, [
     newMessage,
     isGenerating,
