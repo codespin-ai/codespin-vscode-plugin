@@ -23,8 +23,13 @@ export function UserContentBlock({ message }: Props) {
             return <></>; // Keep existing image handling
           case "text":
             return (
-              <div key={index} data-block-type="user-text" className="pre-text">
-                <pre>{content.text}</pre>
+              <div key={index} data-block-type="user-text" className="markdown">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: `${content.html}`,
+                  }}
+                />
+                <pre>{content.html}</pre>
               </div>
             );
           case "files":
