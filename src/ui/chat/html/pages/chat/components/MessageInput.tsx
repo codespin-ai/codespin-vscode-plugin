@@ -23,7 +23,6 @@ export function MessageInput({
   fileMap,
 }: MessageInputProps) {
   const [showFilePopup, setShowFilePopup] = React.useState(false);
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const [selectionState, setSelectionState] =
     React.useState<FileSelectionState>(() => {
       const saved = localStorage.getItem("fileSelectionState");
@@ -42,15 +41,6 @@ export function MessageInput({
 
   const fileCount = getFileCount(fileMap);
 
-  // Auto-resize textarea
-  React.useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = 'auto'; // Reset height
-      textarea.style.height = `${Math.min(textarea.scrollHeight, 300)}px`; // Set new height with max of 300px
-    }
-  }, [newMessage]);
-
   // Save selection state whenever it changes
   React.useEffect(() => {
     localStorage.setItem(
@@ -66,12 +56,11 @@ export function MessageInput({
     <div className="p-4 border-t border-vscode-panel-border bg-vscode-editor-background">
       <div className="max-w-6xl grid grid-cols-[1fr,auto] gap-4">
         <textarea
-          ref={textareaRef}
-          className="min-h-[44px] max-h-[300px] rounded 
+          className="min-h-[44px] max-h-[300px] h-auto rounded 
              bg-vscode-input-background text-vscode-input-foreground 
              p-3 border border-vscode-input-border focus:outline-none 
              focus:ring-2 focus:ring-vscode-focusBorder focus:border-transparent
-             resize-none overflow-y-auto"
+             resize-none overflow-y-auto block w-full"
           value={newMessage}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setNewMessage(e.target.value)

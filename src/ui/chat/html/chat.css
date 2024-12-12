@@ -327,3 +327,14 @@
 .resize-handle.dragging .resize-handle-line {
   opacity: 0.8;
 }
+
+/* Message input */
+
+.message-input-container textarea {
+  height: auto;
+  overflow-y: hidden;
+}
+
+.message-input-container textarea:focus {
+  overflow-y: auto;
+}
