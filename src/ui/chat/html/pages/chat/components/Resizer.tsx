@@ -33,46 +33,41 @@ export function Resizer({ onResize }: ResizerProps) {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
 
-      // Cancel any pending frame
       if (frameRef.current) {
         cancelAnimationFrame(frameRef.current);
       }
 
-      // Schedule new frame
       frameRef.current = requestAnimationFrame(() => {
         const delta = e.clientY - lastY.current;
         accumulatedDelta.current += delta;
 
-        // Directly manipulate DOM during drag
         if (messageListRef.current && inputContainerRef.current) {
           const currentInputHeight = inputContainerRef.current.offsetHeight;
           const newHeight = currentInputHeight - delta;
 
           // Apply constraints
           const minHeight = 80;
-          const maxHeight = window.innerHeight - 200; // Leave space for messages
+          const maxHeight = window.innerHeight - 200;
           const constrainedHeight = Math.min(
             Math.max(newHeight, minHeight),
             maxHeight
           );
 
           inputContainerRef.current.style.height = `${constrainedHeight}px`;
+          lastY.current = e.clientY;
         }
-
-        lastY.current = e.clientY;
       });
     };
 
     const handleMouseUp = () => {
       setIsDragging(false);
 
-      // Clean up GPU layers
       if (messageListRef.current && inputContainerRef.current) {
         messageListRef.current.style.transform = "";
         inputContainerRef.current.style.transform = "";
       }
 
-      // Sync final height back to React only once at end of drag
+      // Sync final height back to React and localStorage
       if (accumulatedDelta.current !== 0) {
         onResize(accumulatedDelta.current);
         accumulatedDelta.current = 0;

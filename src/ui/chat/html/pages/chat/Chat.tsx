@@ -22,6 +22,8 @@ import { buildFileReferenceMap, FileReferenceMap } from "./fileReferences.js";
 import { handleStreamingResult } from "./fileStreamProcessor.js";
 import { getMessageBroker } from "./getMessageBroker.js";
 
+const DEFAULT_INPUT_HEIGHT = 120;
+
 export type ChatPageProps = {
   conversation: Conversation;
   isNew: boolean;
@@ -39,7 +41,14 @@ export function Chat(props: ChatPageProps) {
   const [newMessage, setNewMessage] = React.useState("");
   const chatEndRef = React.useRef<HTMLDivElement>(null!);
   const [fileMap, setFileMap] = React.useState<FileReferenceMap>(new Map());
-  const [inputHeight, setInputHeight] = React.useState(120);
+  const [inputHeight, setInputHeight] = React.useState(() => {
+    const savedHeight = localStorage.getItem("chatInputHeight");
+    const initialHeight = savedHeight
+      ? parseInt(savedHeight, 10)
+      : DEFAULT_INPUT_HEIGHT;
+    const maxHeight = window.innerHeight - 300; // rough initial estimate
+    return Math.min(Math.max(initialHeight, 80), maxHeight);
+  });
   const headerRef = React.useRef<HTMLDivElement>(null);
 
   const calculateMaxHeight = React.useCallback(() => {
@@ -54,7 +63,12 @@ export function Chat(props: ChatPageProps) {
         const newHeight = prevHeight - delta;
         const minHeight = 80;
         const maxHeight = calculateMaxHeight();
-        return Math.min(Math.max(newHeight, minHeight), maxHeight);
+        const constrainedHeight = Math.min(
+          Math.max(newHeight, minHeight),
+          maxHeight
+        );
+        localStorage.setItem("chatInputHeight", constrainedHeight.toString());
+        return constrainedHeight;
       });
     },
     [calculateMaxHeight]
@@ -64,7 +78,9 @@ export function Chat(props: ChatPageProps) {
     const handleWindowResize = () => {
       setInputHeight((prevHeight) => {
         const maxHeight = calculateMaxHeight();
-        return Math.min(prevHeight, maxHeight);
+        const constrainedHeight = Math.min(prevHeight, maxHeight);
+        localStorage.setItem("chatInputHeight", constrainedHeight.toString());
+        return constrainedHeight;
       });
     };
 
