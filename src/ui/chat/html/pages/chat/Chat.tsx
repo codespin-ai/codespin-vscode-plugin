@@ -1,3 +1,4 @@
+// ./src/ui/chat/html/pages/chat/Chat.tsx
 import * as React from "react";
 import {
   CodeContent,
@@ -38,29 +39,38 @@ export function Chat(props: ChatPageProps) {
   const [newMessage, setNewMessage] = React.useState("");
   const chatEndRef = React.useRef<HTMLDivElement>(null!);
   const [fileMap, setFileMap] = React.useState<FileReferenceMap>(new Map());
-  const [inputHeight, setInputHeight] = React.useState(120); // Starting height in pixels
+  const [inputHeight, setInputHeight] = React.useState(120);
+  const headerRef = React.useRef<HTMLDivElement>(null);
 
-  const handleResize = React.useCallback((delta: number) => {
-    setInputHeight((prevHeight) => {
-      const newHeight = prevHeight - delta; // Inverse delta since we're resizing input
-      const minHeight = 80; // Minimum input height
-      const maxHeight = Math.max(600, window.innerHeight * 0.7); // Maximum height is either 300px or 70% of window height
-      return Math.min(Math.max(newHeight, minHeight), maxHeight);
-    });
+  const calculateMaxHeight = React.useCallback(() => {
+    const headerHeight = headerRef.current?.offsetHeight || 0;
+    const minMessageListHeight = 100; // Minimum space to keep for messages
+    return window.innerHeight - headerHeight - minMessageListHeight;
   }, []);
 
-  // Handle window resize
+  const handleResize = React.useCallback(
+    (delta: number) => {
+      setInputHeight((prevHeight) => {
+        const newHeight = prevHeight - delta;
+        const minHeight = 80;
+        const maxHeight = calculateMaxHeight();
+        return Math.min(Math.max(newHeight, minHeight), maxHeight);
+      });
+    },
+    [calculateMaxHeight]
+  );
+
   React.useEffect(() => {
     const handleWindowResize = () => {
       setInputHeight((prevHeight) => {
-        const maxHeight = Math.max(600, window.innerHeight * 0.7);
+        const maxHeight = calculateMaxHeight();
         return Math.min(prevHeight, maxHeight);
       });
     };
 
     window.addEventListener("resize", handleWindowResize);
     return () => window.removeEventListener("resize", handleWindowResize);
-  }, []);
+  }, [calculateMaxHeight]);
 
   React.useEffect(() => {
     const shouldGenerate =
@@ -181,9 +191,16 @@ export function Chat(props: ChatPageProps) {
 
   return (
     <div className="chat-layout">
-      <ChatHeader provider={provider} model={conversation.model} />
+      <div ref={headerRef}>
+        <ChatHeader provider={provider} model={conversation.model} />
+      </div>
 
-      <div className="message-list-container">
+      <div
+        className="message-list-container"
+        style={{
+          minHeight: "100px",
+        }}
+      >
         <MessageList
           messages={conversation.messages}
           currentBlock={currentBlock}

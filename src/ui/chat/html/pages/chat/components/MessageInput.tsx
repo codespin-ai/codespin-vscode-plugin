@@ -1,3 +1,4 @@
+// ./src/ui/chat/html/pages/chat/components/MessageInput.tsx
 import * as React from "react";
 import { FileReferencePopup } from "./FileReferencePopup.js";
 import { FileReferenceMap, getFileCount } from "../fileReferences.js";
@@ -41,7 +42,6 @@ export function MessageInput({
 
   const fileCount = getFileCount(fileMap);
 
-  // Save selection state whenever it changes
   React.useEffect(() => {
     localStorage.setItem(
       "fileSelectionState",
@@ -53,14 +53,14 @@ export function MessageInput({
   }, [selectionState]);
 
   return (
-    <div className="p-4 border-t border-vscode-panel-border bg-vscode-editor-background">
-      <div className="max-w-6xl grid grid-cols-[1fr,auto] gap-4">
+    <div className="p-4 border-t border-vscode-panel-border bg-vscode-editor-background h-full">
+      <div className="max-w-6xl grid grid-cols-[1fr,auto] gap-4 h-full">
         <textarea
-          className="min-h-[44px] max-h-[300px] h-auto rounded 
+          className="w-full h-full min-h-[44px] rounded 
              bg-vscode-input-background text-vscode-input-foreground 
              p-3 border border-vscode-input-border focus:outline-none 
              focus:ring-2 focus:ring-vscode-focusBorder focus:border-transparent
-             resize-none overflow-y-auto block w-full"
+             resize-none overflow-y-auto"
           value={newMessage}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setNewMessage(e.target.value)
