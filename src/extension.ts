@@ -3,11 +3,12 @@
 import * as vscode from "vscode";
 
 import { EventEmitter } from "events";
-import { getStartChatCommand } from "./commands/codegen/startChat.js";
+import { getStartChatCommand } from "./commands/codegen/getStartChatCommand.js";
 import { getIncludeFilesCommand } from "./commands/codegen/includeFiles.js";
-import { getInitCommand } from "./commands/init/command.js";
+import { getInitCommand } from "./commands/init/getInitCommand.js";
 import { ConversationsViewProvider } from "./ui/conversations/ConversationsViewProvider.js";
-import { getOpenConversationCommand } from "./commands/openConversation/index.js";
+import { getOpenConversationCommand } from "./commands/openConversation/getOpenConversationCommand.js";
+import { getCommitCommand } from "./commands/commit/getCommitCommand.js";
 
 const globalEventEmitter = new EventEmitter();
 
@@ -64,6 +65,12 @@ export async function activate(context: vscode.ExtensionContext) {
       "codespin-ai.openConversation",
       openConversationCommand
     )
+  );
+
+  const commitCommand = getCommitCommand(context);
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand("codespin-ai.commit", commitCommand)
   );
 }
 

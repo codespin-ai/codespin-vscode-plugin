@@ -42,22 +42,30 @@
         "command": "codespin-ai.openConversation",
         "title": "Open Conversation",
         "category": "CodeSpin"
+      },
+      {
+        "command": "codespin-ai.commit",
+        "title": "CodeSpin.AI: Create Commit"
       }
     ],
     "menus": {
       "explorer/context": [
         {
           "command": "codespin-ai.startChat",
-          "group": "codespin-ai"
+          "group": "codespin-ai@1"
         },
         {
           "command": "codespin-ai.includeFiles",
-          "group": "codespin-ai",
+          "group": "codespin-ai@2",
           "when": "codespin-ai.enableIncludeFiles"
         },
         {
+          "command": "codespin-ai.commit",
+          "group": "codespin-ai@3"
+        },
+        {
           "submenu": "codespin-ai.more",
-          "group": "codespin-ai"
+          "group": "codespin-ai@4"
         }
       ],
       "editor/context": [
@@ -74,6 +82,10 @@
         },
         {
           "command": "codespin-ai.init",
+          "group": "codespin-ai"
+        },
+        {
+          "command": "codespin-ai.commit",
           "group": "codespin-ai"
         }
       ]
@@ -135,7 +147,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@types/ws": "^8.5.13",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "codespin": "^0.0.258",
+    "codespin": "^0.0.259",
     "diff2html": "^3.4.48",
     "gray-matter": "^4.0.3",
     "ignore": "^6.0.2",
