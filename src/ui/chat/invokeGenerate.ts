@@ -2,7 +2,6 @@ import {
   GenerateArgs as CodeSpinGenerateArgs,
   generate as codespinGenerate,
 } from "codespin/dist/commands/generate/index.js";
-import { StreamingFileParseResult } from "codespin/dist/responseParsing/streamingFileParser.js";
 import { addMessage } from "../../conversations/addMessage.js";
 import { AssistantMessage } from "../../conversations/types.js";
 import { createMessageClient } from "../../ipc/messageClient.js";
@@ -11,6 +10,7 @@ import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
+import { StreamingFileParseResult } from "libllm";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,
