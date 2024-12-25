@@ -1,12 +1,11 @@
-import { SourceFile } from "codespin/dist/sourceCode/SourceFile.js";
+import { FileContent } from "libllm";
 import {
   AssistantMessage,
   CodeContent,
   Conversation,
   FileHeadingContent,
   MarkdownContent,
-  Message,
-  TextContent,
+  TextContent
 } from "../../../../../conversations/types.js";
 
 export type ResponseStreamArgs = {
@@ -24,7 +23,7 @@ export type ProcessedStreamingFileParseResult =
     }
   | {
       type: "end-file-block";
-      file: SourceFile;
+      file: FileContent;
       html: string;
     }
   | {
