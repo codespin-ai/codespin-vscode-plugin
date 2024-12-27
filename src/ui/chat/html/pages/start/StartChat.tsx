@@ -11,8 +11,8 @@ import { PromptInput } from "./components/PromptInput.js";
 import { ActionButtons } from "./components/ActionButtons.js";
 import { FileList } from "./components/FileList.js";
 import { CodingConventionsSelector } from "./components/CodingConventionsSelector.js";
-import { ModelDescription } from "codespin/dist/settings/CodeSpinConfig.js";
 import { CodingConvention } from "../../../../../settings/conventions/CodingConvention.js";
+import { ModelDescription } from "libllm";
 
 interface MessageFile {
   path: string;
