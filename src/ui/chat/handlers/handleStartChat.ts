@@ -1,5 +1,4 @@
-import { getModel } from "codespin/dist/settings/getModel.js";
-import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
+import * as codespin from "codespin";
 import { promises as fs } from "fs";
 import * as path from "path";
 import { getFilesRecursive } from "../../../fs/getFilesRecursive.js";
@@ -9,6 +8,7 @@ import { ChatPanel } from "../ChatPanel.js";
 import { StartChatEvent as StartChatEvent } from "../types.js";
 import { StartChatPageProps } from "../html/pages/start/StartChat.js";
 import { createChatNavigator } from "../createChatNavigator.js";
+import { getProviders } from "libllm";
 
 export async function handleNewChat(
   chatPanel: ChatPanel,
@@ -17,9 +17,30 @@ export async function handleNewChat(
   const workspaceRoot = getWorkspaceRoot(chatPanel.context);
   const conventions = await getConventions(workspaceRoot);
 
-  const codespinConfig = await readCodeSpinConfig(undefined, workspaceRoot);
-  const selectedModel = await getModel([codespinConfig.model], codespinConfig);
+  const codespinConfig = await codespin.settings.readCodeSpinConfig(
+    undefined,
+    workspaceRoot
+  );
   const allPaths = await getFilesRecursive(message.args, workspaceRoot);
+
+  const configDirs = await codespin.settings.getConfigDirs(
+    undefined,
+    workspaceRoot
+  );
+
+  const models = (
+    await Promise.all(
+      getProviders()
+        .map((provider) =>
+          provider.getAPI(
+            configDirs.configDir,
+            configDirs.globalConfigDir,
+            codespin.console.getLoggers()
+          )
+        )
+        .map((api) => api.getModels())
+    )
+  ).flat();
 
   const fileDetails = (
     await Promise.all(
@@ -35,10 +56,10 @@ export async function handleNewChat(
   ).sort((a, b) => a.path.localeCompare(b.path));
 
   const pageProps: StartChatPageProps = {
+    models,
     includedFiles: fileDetails,
     codingConventions: conventions,
-    models: codespinConfig.models ?? [],
-    selectedModel: selectedModel.alias ?? selectedModel.name,
+    selectedModel: codespinConfig.model,
     prompt: message.prompt ?? "",
     codingConvention: undefined,
   };

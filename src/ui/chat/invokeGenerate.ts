@@ -1,7 +1,5 @@
-import {
-  GenerateArgs as CodeSpinGenerateArgs,
-  generate as codespinGenerate,
-} from "codespin/dist/commands/generate/index.js";
+import * as codespin from "codespin";
+import * as libllm from "libllm";
 import { addMessage } from "../../conversations/addMessage.js";
 import { AssistantMessage } from "../../conversations/types.js";
 import { createMessageClient } from "../../ipc/messageClient.js";
@@ -10,12 +8,11 @@ import { getHtmlForCode } from "../../sourceAnalysis/getHtmlForCode.js";
 import { getLangFromFilename } from "../../sourceAnalysis/getLangFromFilename.js";
 import { ChatPanel } from "./ChatPanel.js";
 import { ChatPageBrokerType } from "./html/pages/chat/getMessageBroker.js";
-import { StreamingFileParseResult } from "libllm";
 
 export async function invokeGenerate(
   chatPanel: ChatPanel,
   conversationId: string,
-  generateArgs: CodeSpinGenerateArgs,
+  generateArgs: codespin.commands.GenerateArgs,
   workspaceRoot: string
 ): Promise<void> {
   // Send initial user message to chat page
@@ -33,7 +30,7 @@ export async function invokeGenerate(
 
   // Rest of the streaming callback remains the same
   generateArgs.fileResultStreamCallback = async (
-    streamedBlock: StreamingFileParseResult
+    streamedBlock: libllm.types.StreamingFileParseResult
   ) => {
     if (streamedBlock.type === "start-file-block") {
       if (currentTextBlock !== "") {
@@ -92,7 +89,7 @@ export async function invokeGenerate(
     }
   };
 
-  await codespinGenerate(generateArgs, {
+  await codespin.commands.generate(generateArgs, {
     workingDir: workspaceRoot,
   });
 

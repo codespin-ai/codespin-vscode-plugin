@@ -12,7 +12,7 @@ import { ActionButtons } from "./components/ActionButtons.js";
 import { FileList } from "./components/FileList.js";
 import { CodingConventionsSelector } from "./components/CodingConventionsSelector.js";
 import { CodingConvention } from "../../../../../settings/conventions/CodingConvention.js";
-import { ModelDescription } from "libllm";
+import * as libllm from "libllm";
 
 interface MessageFile {
   path: string;
@@ -20,7 +20,7 @@ interface MessageFile {
 }
 
 export type StartChatPageProps = {
-  models: ModelDescription[];
+  models: libllm.types.ModelDescription[];
   codingConventions: Array<CodingConvention>;
   selectedModel: string;
   codingConvention: string | undefined;

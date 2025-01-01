@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { getWorkspaceRoot } from "../../vscode/getWorkspaceRoot.js";
-import { hasUncommittedChanges } from "codespin/dist/git/hasUncommittedChanges.js";
+import * as codespin from "codespin";
 
 export function getCommitCommand(context: vscode.ExtensionContext) {
   return async function commitCommand(_: unknown): Promise<void> {
@@ -8,7 +8,9 @@ export function getCommitCommand(context: vscode.ExtensionContext) {
       const workspaceRoot = await getWorkspaceRoot(context);
 
       // We'll check changes in the root directory
-      const hasChanges = await hasUncommittedChanges(workspaceRoot);
+      const hasChanges = await codespin.git.hasUncommittedChanges(
+        workspaceRoot
+      );
 
       if (!hasChanges) {
         vscode.window.showInformationMessage("No uncommitted changes found.");

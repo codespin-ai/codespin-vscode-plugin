@@ -1,4 +1,4 @@
-import { dependencies as codespinDependencies } from "codespin/dist/commands/dependencies.js";
+import * as codespin from "codespin";
 
 export async function addDeps(
   file: string,
@@ -11,7 +11,7 @@ export async function addDeps(
     model,
     maxTokens: undefined,
   };
-  return await codespinDependencies(dependenciesArgs, {
+  return await codespin.commands.dependencies(dependenciesArgs, {
     workingDir: workspaceRoot,
   });
 }

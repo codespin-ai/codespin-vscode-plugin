@@ -1,5 +1,4 @@
-import { readCodeSpinConfig } from "codespin/dist/settings/readCodeSpinConfig.js";
-import { UnsupportedConfigVersionError } from "codespin/dist/errors.js";
+import * as codespin from "codespin";
 import * as vscode from "vscode";
 import { initialize } from "../settings/initialize.js";
 import { isInitialized } from "../settings/isInitialized.js";
@@ -7,10 +6,10 @@ import { isInitialized } from "../settings/isInitialized.js";
 export async function validateConfig(workspaceRoot: string): Promise<boolean> {
   if (await isInitialized(workspaceRoot)) {
     try {
-      await readCodeSpinConfig(undefined, workspaceRoot);
+      await codespin.settings.readCodeSpinConfig(undefined, workspaceRoot);
       return true;
     } catch (ex: any) {
-      if (ex instanceof UnsupportedConfigVersionError) {
+      if (ex instanceof codespin.errors.UnsupportedConfigVersionError) {
         // Ask the user if they want to force initialize
         const userChoice = await vscode.window.showWarningMessage(
           "CodeSpin configuration (.codespin/codespin.json) is outdated. Reset?",

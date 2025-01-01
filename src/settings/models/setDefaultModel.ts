@@ -1,7 +1,7 @@
-import { CodeSpinConfig } from "codespin/dist/settings/CodeSpinConfig.js";
 import { readFile, writeFile } from "fs/promises";
 import * as path from "path";
 import { getCodeSpinDir } from "../codespinDirs.js";
+import * as codespin from "codespin";
 
 export async function setDefaultModel(
   model: string,
@@ -12,7 +12,7 @@ export async function setDefaultModel(
 
   // Read the existing configuration
   const configContent = await readFile(configFilePath, { encoding: "utf-8" });
-  const config = JSON.parse(configContent) as CodeSpinConfig;
+  const config = JSON.parse(configContent) as codespin.settings.CodeSpinConfig;
 
   // Update the api and model properties
   config.model = model;

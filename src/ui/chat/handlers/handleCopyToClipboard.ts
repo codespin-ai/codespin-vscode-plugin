@@ -1,4 +1,4 @@
-import { formatPrompt, FormatPromptArgs } from "codespin/dist/commands/formatPrompt/index.js";
+import * as codespin from "codespin";
 import * as vscode from "vscode";
 import { getCodingConventionPath } from "../../../settings/conventions/getCodingConventionPath.js";
 import { CopyToClipboardEvent } from "../types.js";
@@ -7,7 +7,7 @@ export async function handleCopyToClipboard(
   userInput: CopyToClipboardEvent,
   workspaceRoot: string
 ): Promise<void> {
-  const templateArgs: FormatPromptArgs = {
+  const templateArgs: codespin.commands.FormatPromptArgs = {
     include: userInput.includedFiles.map((inc) => inc.path),
     prompt: userInput.prompt,
     spec: userInput.codingConvention
@@ -16,7 +16,7 @@ export async function handleCopyToClipboard(
     template: "files",
   };
 
-  const result = await formatPrompt(templateArgs, {
+  const result = await codespin.commands.formatPrompt(templateArgs, {
     workingDir: workspaceRoot,
   });
 

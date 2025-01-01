@@ -1,12 +1,12 @@
-import { FileContent } from "libllm";
 import {
   AssistantMessage,
   CodeContent,
   Conversation,
   FileHeadingContent,
   MarkdownContent,
-  TextContent
+  TextContent,
 } from "../../../../../conversations/types.js";
+import * as libllm from "libllm";
 
 export type ResponseStreamArgs = {
   data: string;
@@ -23,7 +23,7 @@ export type ProcessedStreamingFileParseResult =
     }
   | {
       type: "end-file-block";
-      file: FileContent;
+      file: libllm.types.FileContent;
       html: string;
     }
   | {

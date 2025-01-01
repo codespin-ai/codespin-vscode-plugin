@@ -3,10 +3,8 @@ import { Conversation } from "../../../../../conversations/types.js";
 import { EditAnthropicConfig } from "./EditAnthropicConfig.js";
 import { EditOpenAIConfig } from "./EditOpenAIConfig.js";
 
-export type SupportedProviders = "openai" | "anthropic" | "google";
-
 export type EditConfigPageProps = {
-  provider: SupportedProviders;
+  provider: string;
   conversation: Conversation;
 };
 
