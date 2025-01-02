@@ -1,3 +1,4 @@
+import { BloomComponent } from "bloom-router";
 import { NavigateEvent } from "../types.js";
 import { UIContainer } from "../UIContainer.js";
 
@@ -6,7 +7,12 @@ export type NavigateOptions = {
 };
 
 export function createNavigator<
-  Routes extends Record<string, React.ComponentType<any>>
+  Routes extends Record<
+    string,
+    (
+      component: HTMLElement & BloomComponent & any
+    ) => AsyncGenerator<JSX.Element, unknown, unknown>
+  >
 >(container: UIContainer) {
   return async function navigateTo<Path extends keyof Routes>(
     url: Path,

@@ -14,7 +14,7 @@ export type MessageListProps = {
     | TextContent
     | CodeContent
     | MarkdownContent;
-  chatEndRef: React.RefObject<HTMLDivElement>;
+  chatEndRef: { current: HTMLDivElement | null };
 };
 
 export async function* MessageList(
@@ -64,5 +64,5 @@ export async function* MessageList(
 component("message-list", MessageList, {
   messages: [],
   currentBlock: undefined,
-  chatEndRef: null,
+  chatEndRef: { current: null },
 });

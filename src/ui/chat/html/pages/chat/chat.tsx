@@ -1,6 +1,7 @@
 import { BloomComponent, component } from "bloom-router";
 import {
   CodeContent,
+  ContentItem,
   Conversation,
   FileHeadingContent,
   MarkdownContent,
@@ -22,6 +23,8 @@ const DEFAULT_INPUT_HEIGHT = 120;
 type ChatProps = {
   conversation: Conversation;
   isNew: boolean;
+  handleMessage?: (event: BrowserEvent) => void;
+  handleWindowResize?: () => void;
 };
 
 export async function* Chat(
@@ -30,12 +33,14 @@ export async function* Chat(
   const conversationInState = component.conversation;
 
   let conversation = conversationInState;
+
   let currentBlock:
     | FileHeadingContent
     | TextContent
     | CodeContent
     | MarkdownContent
     | undefined = undefined;
+
   let isGenerating = false;
   let newMessage = "";
   const chatEndRef = { current: null as HTMLDivElement | null };
@@ -69,50 +74,83 @@ export async function* Chat(
   };
 
   // Handle window resize
-  const handleWindowResize = () => {
+  component.handleWindowResize = () => {
     const maxHeight = calculateMaxHeight();
     inputHeight = Math.min(inputHeight, maxHeight);
     localStorage.setItem("chatInputHeight", inputHeight.toString());
     component.render();
   };
 
-  window.addEventListener("resize", handleWindowResize);
-  component.cleanup = () =>
-    window.removeEventListener("resize", handleWindowResize);
-
   // Set up initial message broker and event handling
   const pageMessageBroker = getMessageBroker({
-    setIsGenerating: (value) => {
+    setIsGenerating: (value: boolean) => {
       isGenerating = value;
       component.render();
     },
-    setCurrentConversation: (newConv) => {
-      conversation = newConv;
+    setCurrentConversation: (updater: (prev: Conversation) => Conversation) => {
+      conversation = updater(conversation);
       component.render();
     },
     onFileResult: (result) =>
       handleStreamingResult(result, {
         currentBlock,
-        setCurrentBlock: (block) => {
-          currentBlock = block;
+        getCurrentBlock: () => currentBlock,
+        setCurrentBlock: (value: ContentItem | undefined) => {
+          currentBlock = value;
           component.render();
         },
-        setCurrentConversation: (newConv) => {
-          conversation = newConv;
+        getCurrentConversation: () => conversation,
+        setCurrentConversation: (value: Conversation) => {
+          conversation = value;
           component.render();
         },
       }),
   });
 
-  function listeners(event: BrowserEvent) {
+  component.handleMessage = (event: BrowserEvent) => {
     const message = event.data;
     if (pageMessageBroker.canHandle(message.type)) {
       pageMessageBroker.handleRequest(message as any);
     }
-  }
+  };
 
-  window.addEventListener("message", listeners);
-  getVSCodeApi().postMessage({ type: "webviewReady" });
+  const sendMessage = async (text: string) => {
+    if (!text.trim() || isGenerating) return;
+
+    const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
+      (message: unknown) => {
+        getVSCodeApi().postMessage(message);
+      }
+    );
+
+    const userContent: UserTextContent = {
+      type: "text",
+      text,
+      html: await chatPanelMessageClient.wait("getMarkdown", {
+        type: "getMarkdown",
+        text,
+      }),
+    };
+
+    const userMessage: UserMessage = {
+      role: "user",
+      content: [userContent],
+    };
+
+    conversation = {
+      ...conversation,
+      messages: [...conversation.messages, userMessage],
+    };
+
+    const generateEvent: GenerateEvent = {
+      type: "generate",
+      conversation,
+    };
+
+    chatPanelMessageClient.send("generate", generateEvent);
+    newMessage = "";
+    component.render();
+  };
 
   // Handle initial generation if needed
   const shouldGenerate =
@@ -147,44 +185,6 @@ export async function* Chat(
   // Update fileMap whenever messages change
   fileMap = buildFileReferenceMap(conversation.messages);
 
-  const sendMessage = async () => {
-    if (!newMessage.trim() || isGenerating) return;
-
-    const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
-      (message: unknown) => {
-        getVSCodeApi().postMessage(message);
-      }
-    );
-
-    const userContent: UserTextContent = {
-      type: "text",
-      text: newMessage,
-      html: await chatPanelMessageClient.wait("getMarkdown", {
-        type: "getMarkdown",
-        text: newMessage,
-      }),
-    };
-
-    const userMessage: UserMessage = {
-      role: "user",
-      content: [userContent],
-    };
-
-    conversation = {
-      ...conversation,
-      messages: [...conversation.messages, userMessage],
-    };
-
-    const generateEvent: GenerateEvent = {
-      type: "generate",
-      conversation,
-    };
-
-    chatPanelMessageClient.send("generate", generateEvent);
-    newMessage = "";
-    component.render();
-  };
-
   while (true) {
     const provider = conversation.model.split(":")[0];
 
@@ -215,12 +215,12 @@ export async function* Chat(
         >
           <message-input
             newMessage={newMessage}
-            setNewMessage={(msg) => {
+            setNewMessage={(msg: string) => {
               newMessage = msg;
               component.render();
             }}
-            sendMessage={sendMessage}
-            isGenerating={isGenerrating}
+            sendMessage={() => sendMessage(newMessage)}
+            isGenerating={isGenerating}
             fileMap={fileMap}
           />
         </div>
@@ -229,7 +229,23 @@ export async function* Chat(
   }
 }
 
-component("chat", Chat, {
-  conversation: null,
-  isNew: false,
-});
+component(
+  "chat",
+  Chat,
+  {
+    conversation: undefined as unknown as Conversation,
+    isNew: false,
+    handleMessage: undefined,
+    handleWindowResize: undefined,
+  },
+  {
+    onConnected: (component) => {
+      window.addEventListener("resize", component.handleWindowResize!);
+      window.addEventListener("message", component.handleMessage!);
+    },
+    onDisconnected: (component) => {
+      window.removeEventListener("resize", component.handleWindowResize!);
+      window.removeEventListener("message", component.handleMessage!);
+    },
+  }
+);

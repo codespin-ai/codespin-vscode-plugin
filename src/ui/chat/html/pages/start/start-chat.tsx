@@ -23,6 +23,7 @@ export type StartChatProps = {
     path: string;
     size: number;
   }[];
+  messageListener?: (event: BrowserEvent) => void;
 };
 
 export async function* StartChat(
@@ -48,15 +49,13 @@ export async function* StartChat(
     component.render();
   });
 
-  function listener(event: BrowserEvent) {
+  // Create message listener and attach to component for cleanup
+  component.messageListener = (event: BrowserEvent) => {
     const message = event.data;
     if (startChatPageMessageBroker.canHandle(message.type)) {
       startChatPageMessageBroker.handleRequest(message as any);
     }
-  }
-
-  window.addEventListener("message", listener);
-  component.cleanup = () => window.removeEventListener("message", listener);
+  };
 
   const openChat = () => {
     chatPanelMessageClient.send("newConversation", {
@@ -87,7 +86,7 @@ export async function* StartChat(
             model={model}
             models={component.models}
             messageClient={chatPanelMessageClient}
-            onModelChange={(newModel) => {
+            onModelChange={(newModel: string) => {
               model = newModel;
               component.render();
             }}
@@ -96,7 +95,7 @@ export async function* StartChat(
           <prompt-input
             prompt={prompt}
             promptRef={promptRef}
-            setPrompt={(newPrompt) => {
+            setPrompt={(newPrompt: string) => {
               prompt = newPrompt;
               component.render();
             }}
@@ -123,7 +122,7 @@ export async function* StartChat(
           <coding-conventions-selector
             codingConvention={codingConvention}
             conventions={component.codingConventions}
-            onChange={(newConvention) => {
+            onChange={(newConvention: string | undefined) => {
               codingConvention = newConvention;
               component.render();
             }}
@@ -146,11 +145,24 @@ export async function* StartChat(
   }
 }
 
-component("start-chat", StartChat, {
-  models: [],
-  codingConventions: [],
-  selectedModel: "",
-  codingConvention: undefined,
-  prompt: "",
-  includedFiles: [],
-});
+component(
+  "start-chat",
+  StartChat,
+  {
+    models: [],
+    codingConventions: [],
+    selectedModel: "",
+    codingConvention: undefined,
+    prompt: "",
+    includedFiles: [],
+    messageListener: undefined,
+  },
+  {
+    onConnected: (component) => {
+      window.addEventListener("message", component.messageListener!);
+    },
+    onDisconnected: (component) => {
+      window.removeEventListener("message", component.messageListener!);
+    },
+  }
+);

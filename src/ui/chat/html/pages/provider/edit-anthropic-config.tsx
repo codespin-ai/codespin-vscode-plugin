@@ -3,14 +3,21 @@ import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { EditAnthropicConfigEvent } from "../../../types.js";
-import { EditConfigPageProps } from "./edit-config.js";
+import { EditConfigProps } from "./edit-config.js";
+import { Conversation } from "../../../../../conversations/types.js";
 
 export async function* EditAnthropicConfig(
-  component: HTMLElement & BloomComponent & EditConfigPageProps
+  component: HTMLElement & BloomComponent & EditConfigProps
 ) {
   let apiKey = "";
 
   const onSave = () => {
+    // Guard against null conversation
+    if (!component.conversation) {
+      console.error("Cannot save config without a conversation");
+      return;
+    }
+
     const chatPanelMessageClient = createMessageClient<ChatPanelBrokerType>(
       (message: unknown) => {
         getVSCodeApi().postMessage(message);
@@ -20,7 +27,7 @@ export async function* EditAnthropicConfig(
     const event: EditAnthropicConfigEvent = {
       type: "editAnthropicConfig",
       apiKey,
-      conversation: component.conversation,
+      conversation: component.conversation, // Now TypeScript knows this is not null
     };
 
     chatPanelMessageClient.send("editAnthropicConfig", event);
@@ -69,7 +76,8 @@ export async function* EditAnthropicConfig(
             <div class="pt-4">
               <button
                 onclick={onSave}
-                class="min-w-[120px] px-4 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200"
+                disabled={!component.conversation}
+                class="min-w-[120px] px-4 py-2 bg-vscode-button-background text-vscode-button-foreground rounded font-medium hover:bg-vscode-button-hover-background focus:outline-none focus:ring-2 focus:ring-vscode-focusBorder transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Save Settings
               </button>
@@ -81,6 +89,12 @@ export async function* EditAnthropicConfig(
   }
 }
 
+// The component props should require a non-null conversation
+type RequiredEditConfigProps = Omit<EditConfigProps, "conversation"> & {
+  conversation: Conversation;
+};
+
 component("edit-anthropic-config", EditAnthropicConfig, {
-  conversation: null,
+  provider: "",
+  conversation: undefined as any as Conversation, // We have to cast this since we can't provide a real conversation as default
 });

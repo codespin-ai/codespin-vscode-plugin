@@ -140,24 +140,18 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
-    "@types/react": "^19.0.2",
-    "@types/react-dom": "^19.0.2",
-    "@types/react-router-dom": "^5.3.3",
     "@types/vscode": "^1.96.0",
     "@types/vscode-webview": "^1.57.5",
     "@types/ws": "^8.5.13",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "bloom-router": "^0.0.18",
+    "bloom-router": "^0.0.21",
     "codespin": "^0.0.275",
     "diff2html": "^3.4.51",
     "gray-matter": "^4.0.3",
     "ignore": "^7.0.0",
     "libllm": "^0.0.41",
     "marked": "^15.0.4",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-router-dom": "^7.1.1",
-    "shiki": "^1.24.4",
-    "webjsx": "^0.0.42"
+    "shiki": "^1.25.1",
+    "webjsx": "^0.0.43"
   }
 }

@@ -4,9 +4,15 @@ import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { EditOpenAIConfigEvent } from "../../../types.js";
 import { EditConfigProps } from "./edit-config.js";
+import { Conversation } from "../../../../../conversations/types.js";
+
+type EditOpenAIConfigProps = {
+  conversation: Conversation;
+  provider: string;
+};
 
 export async function* EditOpenAIConfig(
-  component: HTMLElement & BloomComponent & EditConfigProps
+  component: HTMLElement & BloomComponent & EditOpenAIConfigProps
 ) {
   let apiKey = "";
 
@@ -82,5 +88,6 @@ export async function* EditOpenAIConfig(
 }
 
 component("edit-openai-config", EditOpenAIConfig, {
-  conversation: null,
+  conversation: null as unknown as Conversation, // This is a required prop that must be provided when using the component
+  provider: "openai", // Default provider value
 });

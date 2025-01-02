@@ -2,6 +2,9 @@ import { BloomComponent, component } from "bloom-router";
 
 type ResizerProps = {
   onResize: (delta: number) => void;
+  handleMouseMove?: (e: MouseEvent) => void;
+  handleMouseUp?: (e: MouseEvent) => void;
+  frameId?: number;
 };
 
 export async function* Resizer(
@@ -28,7 +31,8 @@ export async function* Resizer(
     component.render();
   };
 
-  const handleMouseMove = (e: MouseEvent) => {
+  // Attach handlers to component so they can be referenced in onConnected/onDisconnected
+  component.handleMouseMove = (e: MouseEvent) => {
     if (!isDragging) return;
 
     if (frameId) {
@@ -55,9 +59,10 @@ export async function* Resizer(
       }
       component.render();
     });
+    component.frameId = frameId;
   };
 
-  const handleMouseUp = () => {
+  component.handleMouseUp = () => {
     isDragging = false;
 
     if (messageListRef && inputContainerRef) {
@@ -74,19 +79,6 @@ export async function* Resizer(
       cancelAnimationFrame(frameId);
     }
     component.render();
-  };
-
-  // Add event listeners
-  document.addEventListener("mousemove", handleMouseMove);
-  document.addEventListener("mouseup", handleMouseUp);
-
-  // Cleanup on component destroy
-  component.cleanup = () => {
-    document.removeEventListener("mousemove", handleMouseMove);
-    document.removeEventListener("mouseup", handleMouseUp);
-    if (frameId) {
-      cancelAnimationFrame(frameId);
-    }
   };
 
   while (true) {
@@ -123,6 +115,26 @@ export async function* Resizer(
   }
 }
 
-component("resizer", Resizer, {
-  onResize: () => {},
-});
+component(
+  "resizer",
+  Resizer,
+  {
+    onResize: () => {},
+    handleMouseMove: undefined,
+    handleMouseUp: undefined,
+    frameId: undefined,
+  },
+  {
+    onConnected: (component) => {
+      document.addEventListener("mousemove", component.handleMouseMove!);
+      document.addEventListener("mouseup", component.handleMouseUp!);
+    },
+    onDisconnected: (component) => {
+      document.removeEventListener("mousemove", component.handleMouseMove!);
+      document.removeEventListener("mouseup", component.handleMouseUp!);
+      if (component.frameId) {
+        cancelAnimationFrame(component.frameId);
+      }
+    },
+  }
+);

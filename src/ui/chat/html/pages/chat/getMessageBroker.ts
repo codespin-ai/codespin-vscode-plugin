@@ -15,7 +15,9 @@ export function getMessageBroker({
 }: {
   setIsGenerating: (value: boolean) => void;
   onFileResult: (result: ProcessedStreamingFileParseResult) => void;
-  setCurrentConversation: React.Dispatch<React.SetStateAction<Conversation>>;
+  setCurrentConversation: (
+    setter: (prev: Conversation) => Conversation
+  ) => void;
 }) {
   return createMessageBroker()
     .attachHandler(

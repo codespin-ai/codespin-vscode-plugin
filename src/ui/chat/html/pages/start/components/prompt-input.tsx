@@ -1,36 +1,25 @@
 import { BloomComponent, component } from "bloom-router";
+import { Ref } from "webjsx";
 
 type PromptInputProps = {
   prompt: string;
-  promptRef: React.RefObject<HTMLTextAreaElement>;
+  promptRef: { current: HTMLTextAreaElement | null };
   setPrompt: (value: string) => void;
   onGenerate: () => void;
+  handleKeyDown?: (e: KeyboardEvent) => void;
 };
 
 export async function* PromptInput(
   component: HTMLElement & BloomComponent & PromptInputProps
 ) {
-  // Set up event handlers for Ctrl/Cmd+Enter
-  if (component.promptRef.current) {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-        e.preventDefault();
-        e.stopPropagation();
-        component.onGenerate();
-      }
-    };
-
-    component.promptRef.current.focus();
-    component.promptRef.current.addEventListener("keydown", handleKeyDown);
-
-    // Cleanup
-    component.cleanup = () => {
-      component.promptRef.current?.removeEventListener(
-        "keydown",
-        handleKeyDown
-      );
-    };
-  }
+  // Set up event handler
+  component.handleKeyDown = (e: KeyboardEvent) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      e.stopPropagation();
+      component.onGenerate();
+    }
+  };
 
   while (true) {
     yield (
@@ -39,7 +28,13 @@ export async function* PromptInput(
           Prompt:
         </label>
         <textarea
-          ref={component.promptRef}
+          ref={(el: HTMLTextAreaElement) => {
+            if (el instanceof HTMLTextAreaElement) {
+              component.promptRef.current = el;
+              // Only add event listener when element is first mounted
+              el.addEventListener("keydown", component.handleKeyDown!);
+            }
+          }}
           rows={10}
           value={component.prompt}
           onchange={(e: Event) =>
@@ -52,9 +47,33 @@ export async function* PromptInput(
   }
 }
 
-component("prompt-input", PromptInput, {
-  prompt: "",
-  promptRef: null,
-  setPrompt: () => {},
-  onGenerate: () => {},
-});
+const promptRef: Ref<HTMLTextAreaElement> = { current: null };
+
+component(
+  "prompt-input",
+  PromptInput,
+  {
+    prompt: "",
+    promptRef,
+    setPrompt: () => {},
+    onGenerate: () => {},
+    handleKeyDown: undefined,
+  },
+  {
+    onConnected: (component) => {
+      // Focus on mount
+      if (component.promptRef.current) {
+        component.promptRef.current.focus();
+      }
+    },
+    onDisconnected: (component) => {
+      // Clean up event listener
+      if (component.promptRef.current && component.handleKeyDown) {
+        component.promptRef.current.removeEventListener(
+          "keydown",
+          component.handleKeyDown
+        );
+      }
+    },
+  }
+);

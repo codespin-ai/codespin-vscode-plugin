@@ -1,12 +1,12 @@
+import * as libllm from "libllm";
 import {
   AssistantMessage,
   CodeContent,
+  ContentItem,
   Conversation,
-  FileHeadingContent,
   MarkdownContent,
   TextContent,
 } from "../../../../../conversations/types.js";
-import * as libllm from "libllm";
 
 export type ResponseStreamArgs = {
   data: string;
@@ -45,22 +45,11 @@ export type FileResultStreamEvent = {
 } & FileResultStreamArgs;
 
 type FileBlockProcessorArgs = {
-  currentBlock:
-    | FileHeadingContent
-    | TextContent
-    | CodeContent
-    | MarkdownContent
-    | undefined;
-  setCurrentBlock: React.Dispatch<
-    React.SetStateAction<
-      | FileHeadingContent
-      | TextContent
-      | CodeContent
-      | MarkdownContent
-      | undefined
-    >
-  >;
-  setCurrentConversation: React.Dispatch<React.SetStateAction<Conversation>>;
+  currentBlock: ContentItem | undefined;
+  getCurrentBlock: () => ContentItem | undefined;
+  setCurrentBlock: (value: ContentItem | undefined) => void;
+  getCurrentConversation: () => Conversation;
+  setCurrentConversation: (value: Conversation) => void;
 };
 
 function generateBlockId() {
@@ -68,18 +57,20 @@ function generateBlockId() {
 }
 
 export function appendText(content: string, args: FileBlockProcessorArgs) {
-  const { setCurrentBlock } = args;
+  const { getCurrentBlock, setCurrentBlock } = args;
 
-  setCurrentBlock((prev) => {
-    if (prev && prev.type === "text") {
-      return { ...prev, content: prev.content + content };
-    }
-    return {
-      id: generateBlockId(),
-      type: "text",
-      content,
-    };
-  });
+  const prev = getCurrentBlock();
+
+  const newBlock: TextContent =
+    prev && prev.type === "text"
+      ? { ...prev, content: prev.content + content }
+      : {
+          id: generateBlockId(),
+          type: "text",
+          content,
+        };
+
+  setCurrentBlock(newBlock);
 }
 
 export function startFileBlock(path: string, args: FileBlockProcessorArgs) {
@@ -98,7 +89,7 @@ export function endFileBlock(
   html: string,
   args: FileBlockProcessorArgs
 ) {
-  const { setCurrentConversation, setCurrentBlock } = args;
+  const { setCurrentConversation, getCurrentConversation } = args;
 
   const codeBlock: CodeContent = {
     id: generateBlockId(),
@@ -108,30 +99,36 @@ export function endFileBlock(
     html,
   };
 
-  setCurrentConversation((prevConversation) => {
-    const prevMessages = prevConversation.messages;
-    let lastAssistantMessage = prevMessages[prevMessages.length - 1];
+  const prevConversation = getCurrentConversation();
 
-    if (!lastAssistantMessage || lastAssistantMessage.role !== "assistant") {
-      const newAssistantMessage: AssistantMessage = {
-        role: "assistant",
-        content: [codeBlock],
-      };
-      return {
-        ...prevConversation,
-        messages: [...prevMessages, newAssistantMessage],
-      };
-    }
+  const prevMessages = prevConversation.messages;
+  let lastAssistantMessage = prevMessages[prevMessages.length - 1];
 
-    const newMessages = [...prevMessages];
-    const lastMessage = { ...lastAssistantMessage };
-    lastMessage.content = [...lastMessage.content, codeBlock];
-    newMessages[newMessages.length - 1] = lastMessage;
-    return {
-      ...prevConversation,
-      messages: newMessages,
-    };
-  });
+  const newConversation =
+    !lastAssistantMessage || lastAssistantMessage.role !== "assistant"
+      ? (() => {
+          const newAssistantMessage: AssistantMessage = {
+            role: "assistant",
+            content: [codeBlock],
+          };
+          return {
+            ...prevConversation,
+            messages: [...prevMessages, newAssistantMessage],
+          };
+        })()
+      : (() => {
+          const newMessages = [...prevMessages];
+          const lastMessage = { ...lastAssistantMessage };
+          lastMessage.content = [...lastMessage.content, codeBlock];
+          newMessages[newMessages.length - 1] = lastMessage;
+
+          return {
+            ...prevConversation,
+            messages: newMessages,
+          };
+        })();
+
+  setCurrentConversation(newConversation);
 }
 
 export function handleMarkdownBlock(
@@ -139,7 +136,8 @@ export function handleMarkdownBlock(
   html: string,
   args: FileBlockProcessorArgs
 ) {
-  const { setCurrentConversation, setCurrentBlock } = args;
+  const { getCurrentConversation, setCurrentConversation, setCurrentBlock } =
+    args;
 
   const markdownBlock: MarkdownContent = {
     id: generateBlockId(),
@@ -148,31 +146,35 @@ export function handleMarkdownBlock(
     html,
   };
 
-  setCurrentConversation((prevConversation) => {
-    const prevMessages = prevConversation.messages;
-    let lastAssistantMessage = prevMessages[prevMessages.length - 1];
+  const prevConversation = getCurrentConversation();
 
-    if (!lastAssistantMessage || lastAssistantMessage.role !== "assistant") {
-      const newAssistantMessage: AssistantMessage = {
-        role: "assistant",
-        content: [markdownBlock],
-      };
-      return {
-        ...prevConversation,
-        messages: [...prevMessages, newAssistantMessage],
-      };
-    }
+  const prevMessages = prevConversation.messages;
+  let lastAssistantMessage = prevMessages[prevMessages.length - 1];
 
-    const newMessages = [...prevMessages];
-    const lastMessage = { ...lastAssistantMessage };
-    lastMessage.content = [...lastMessage.content, markdownBlock];
-    newMessages[newMessages.length - 1] = lastMessage;
-    return {
-      ...prevConversation,
-      messages: newMessages,
-    };
-  });
+  const newConversation =
+    !lastAssistantMessage || lastAssistantMessage.role !== "assistant"
+      ? (() => {
+          const newAssistantMessage: AssistantMessage = {
+            role: "assistant",
+            content: [markdownBlock],
+          };
+          return {
+            ...prevConversation,
+            messages: [...prevMessages, newAssistantMessage],
+          };
+        })()
+      : (() => {
+          const newMessages = [...prevMessages];
+          const lastMessage = { ...lastAssistantMessage };
+          lastMessage.content = [...lastMessage.content, markdownBlock];
+          newMessages[newMessages.length - 1] = lastMessage;
+          return {
+            ...prevConversation,
+            messages: newMessages,
+          };
+        })();
 
+  setCurrentConversation(newConversation);
   setCurrentBlock(undefined);
 }
 

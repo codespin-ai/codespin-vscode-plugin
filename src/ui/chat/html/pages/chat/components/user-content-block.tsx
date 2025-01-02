@@ -9,19 +9,21 @@ export async function* UserContentBlock(
   component: HTMLElement & BloomComponent & UserContentBlockProps
 ) {
   while (true) {
+    const { message } = component;
+    if (!message) {
+      yield <div>No message to display</div>;
+      continue;
+    }
+
     yield (
       <div class="user-messages-list">
-        {component.message.content.map((content, index) => {
+        {message.content.map((content, index) => {
           switch (content.type) {
             case "image":
               return <></>;
             case "text":
               return (
-                <div
-                  key={index}
-                  data-block-type="user-text"
-                  class="markdown"
-                >
+                <div key={index} data-block-type="user-text" class="markdown">
                   <div
                     dangerouslySetInnerHTML={{
                       __html: `${content.html}`,
@@ -47,5 +49,9 @@ export async function* UserContentBlock(
 }
 
 component("user-content-block", UserContentBlock, {
-  message: null,
+  // Initialize with an empty but valid UserMessage structure
+  message: {
+    role: "user",
+    content: [],
+  },
 });

@@ -125,7 +125,7 @@ component("file-reference-popup", FileReferencePopup, {
   fileMap: new Map(),
   selectionState: {
     mode: "latest",
-    selectedFiles: new Set(),
+    selectedFiles: new Set<string>(),
   },
   setSelectionState: () => {},
   onClose: () => {},
