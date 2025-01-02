@@ -1,16 +1,16 @@
-import { NavigateOptions } from "./types.js";
 import { NavigateEvent } from "../types.js";
 import { UIContainer } from "../UIContainer.js";
 
-// Helper type to extract props from components
-type ComponentProps<T> = T extends React.ComponentType<infer P> ? P : never;
+export type NavigateOptions = {
+  replace?: boolean;
+};
 
 export function createNavigator<
   Routes extends Record<string, React.ComponentType<any>>
 >(container: UIContainer) {
   return async function navigateTo<Path extends keyof Routes>(
     url: Path,
-    args?: ComponentProps<Routes[Path]>,
+    args?: any,
     options?: NavigateOptions
   ): Promise<void> {
     return new Promise<void>((resolve) => {
@@ -18,7 +18,6 @@ export function createNavigator<
       const navigateEvent: NavigateEvent = {
         type: "navigate",
         url: url as string,
-        state: args,
       };
 
       const webview = container.getWebview();

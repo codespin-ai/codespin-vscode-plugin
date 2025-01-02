@@ -1,6 +1,6 @@
-import { Chat } from "./html/pages/chat/Chat.js";
-import { StartChat } from "./html/pages/start/StartChat.js";
-import { EditConfig } from "./html/pages/provider/EditConfig.js";
+import { Chat } from "./html/pages/chat/chat.js";
+import { StartChat } from "./html/pages/start/start-chat.js";
+import { EditConfig } from "./html/pages/provider/edit-config.js";
 
 export const chatRoutes = {
   "/chat": Chat,

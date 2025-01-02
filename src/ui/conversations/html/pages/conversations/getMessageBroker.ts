@@ -1,9 +1,12 @@
 import { ConversationSummary } from "../../../../../conversations/types.js";
-import { BrokerType, createMessageBroker } from "../../../../../ipc/messageBroker.js";
+import {
+  BrokerType,
+  createMessageBroker,
+} from "../../../../../ipc/messageBroker.js";
 import { UpdateConversationsEvent } from "../../../types.js";
 
 export function getMessageBroker(
-  setEntries: (value: React.SetStateAction<ConversationSummary[]>) => void
+  setEntries: (value: ConversationSummary[]) => void
 ) {
   return createMessageBroker().attachHandler(
     "updateConversations",

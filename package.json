@@ -147,6 +147,7 @@
     "@types/vscode-webview": "^1.57.5",
     "@types/ws": "^8.5.13",
     "@vscode/webview-ui-toolkit": "^1.4.0",
+    "bloom-router": "^0.0.18",
     "codespin": "^0.0.275",
     "diff2html": "^3.4.51",
     "gray-matter": "^4.0.3",
@@ -156,6 +157,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.1",
-    "shiki": "^1.24.4"
+    "shiki": "^1.24.4",
+    "webjsx": "^0.0.42"
   }
 }

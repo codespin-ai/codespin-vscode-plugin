@@ -2,9 +2,7 @@ import * as libllm from "libllm";
 import { ChatPanel } from "../ChatPanel.js";
 import { createChatNavigator } from "../createChatNavigator.js";
 import { getGenerateArgs } from "../getGenerateArgs.js";
-import {
-  EditConfigPageProps
-} from "../html/pages/provider/EditConfig.js";
+import { EditConfigProps } from "../html/pages/provider/edit-config.js";
 import { invokeGenerate } from "../invokeGenerate.js";
 import { GenerateEvent } from "../types.js";
 
@@ -32,7 +30,7 @@ export async function handleGenerate(
         workspaceRoot
       );
 
-      const configPageState: EditConfigPageProps = {
+      const configPageState: EditConfigProps = {
         provider: api.getProviderName(),
         conversation: message.conversation,
       };

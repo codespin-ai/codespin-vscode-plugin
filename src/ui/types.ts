@@ -8,7 +8,6 @@ export type BrowserEvent = {
 
 export type NavigateArgs = {
   url: string;
-  state: unknown;
 };
 
 export type NavigateEvent = {

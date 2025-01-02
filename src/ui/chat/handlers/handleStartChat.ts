@@ -6,7 +6,7 @@ import { getConventions } from "../../../settings/conventions/getCodingConventio
 import { getWorkspaceRoot } from "../../../vscode/getWorkspaceRoot.js";
 import { ChatPanel } from "../ChatPanel.js";
 import { StartChatEvent as StartChatEvent } from "../types.js";
-import { StartChatPageProps } from "../html/pages/start/StartChat.js";
+import { StartChatProps } from "../html/pages/start/start-chat.js";
 import { createChatNavigator } from "../createChatNavigator.js";
 import { getProviders } from "libllm";
 
@@ -55,7 +55,7 @@ export async function handleNewChat(
     )
   ).sort((a, b) => a.path.localeCompare(b.path));
 
-  const pageProps: StartChatPageProps = {
+  const pageProps: StartChatProps = {
     models,
     includedFiles: fileDetails,
     codingConventions: conventions,
