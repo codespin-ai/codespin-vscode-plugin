@@ -1,13 +1,13 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
+import { Conversation } from "../../../../../conversations/types.js";
 import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { EditAnthropicConfigEvent } from "../../../types.js";
 import { EditConfigProps } from "./edit-config.js";
-import { Conversation } from "../../../../../conversations/types.js";
 
 export async function* EditAnthropicConfig(
-  component: HTMLElement & BloomComponent & EditConfigProps
+  component: HTMLElement & Component & EditConfigProps
 ) {
   let apiKey = "";
 

@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 import { Conversation } from "../../../../../conversations/types.js";
 
 export type EditConfigProps = {
@@ -7,7 +7,7 @@ export type EditConfigProps = {
 };
 
 export async function* EditConfig(
-  component: HTMLElement & BloomComponent & EditConfigProps
+  component: HTMLElement & Component & EditConfigProps
 ) {
   while (true) {
     const provider = component.provider;

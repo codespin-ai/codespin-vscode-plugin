@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";import { Router } from "magic-loop-router";
 import { formatFileSize } from "../../../../../../fs/formatFileSize.js";
 import { ChatPanelBrokerType } from "../../../../getMessageBroker.js";
 import { MessageClient } from "../../../../../../ipc/messageClient.js";
@@ -16,7 +16,7 @@ type FileListProps = {
 };
 
 export async function* FileList(
-  component: HTMLElement & BloomComponent & FileListProps
+  component: HTMLElement & Component & FileListProps
 ) {
   const handleFileClick = (filePath: string) => {
     component.messageClient.send("openFile", {

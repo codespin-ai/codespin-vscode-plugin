@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 import { FileReferenceMap } from "../fileReferences.js";
 
 export type FileSelectionState = {
@@ -14,7 +14,7 @@ export type FileReferencePopupProps = {
 };
 
 export async function* FileReferencePopup(
-  component: HTMLElement & BloomComponent & FileReferencePopupProps
+  component: HTMLElement & Component & FileReferencePopupProps
 ) {
   const toggleMode = (mode: "latest" | "inline") => {
     component.setSelectionState({

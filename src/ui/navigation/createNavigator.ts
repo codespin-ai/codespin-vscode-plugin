@@ -10,7 +10,7 @@ export function createNavigator<
   Routes extends Record<
     string,
     (
-      component: HTMLElement & BloomComponent & any
+      component: HTMLElement & Component & any
     ) => AsyncGenerator<JSX.Element, unknown, unknown>
   >
 >(container: UIContainer) {

@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 
 type ResizerProps = {
   onResize: (delta: number) => void;
@@ -8,7 +8,7 @@ type ResizerProps = {
 };
 
 export async function* Resizer(
-  component: HTMLElement & BloomComponent & ResizerProps
+  component: HTMLElement & Component & ResizerProps
 ) {
   let isDragging = false;
   let lastY = 0;
@@ -86,29 +86,13 @@ export async function* Resizer(
       <div
         onmousedown={handleMouseDown}
         className={`resize-handle ${isDragging ? "dragging" : ""}`}
-        style={{
-          height: "8px",
-          cursor: "row-resize",
-          backgroundColor: isDragging
-            ? "var(--vscode-focusBorder)"
-            : "transparent",
-          position: "relative",
-          userSelect: "none",
-          touchAction: "none",
-        }}
+        style={`height: 8px; cursor: row-resize, background-color: ${
+          isDragging ? "var(--vscode-focusBorder)" : "transparent"
+        }, position: relative, user-select: none, touch-action: none`}
       >
         <div
           class="resize-handle-line"
-          style={{
-            position: "absolute",
-            left: "50%",
-            top: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "32px",
-            height: "4px",
-            backgroundColor: "var(--vscode-panel-border)",
-            borderRadius: "2px",
-          }}
+          style={`position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 32px; height: 4px; background-color: var(--vscode-panel-border); border-radius: 2px;`}
         />
       </div>
     );

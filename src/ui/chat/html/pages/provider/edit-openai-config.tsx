@@ -1,10 +1,9 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
+import { Conversation } from "../../../../../conversations/types.js";
 import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { ChatPanelBrokerType } from "../../../getMessageBroker.js";
 import { EditOpenAIConfigEvent } from "../../../types.js";
-import { EditConfigProps } from "./edit-config.js";
-import { Conversation } from "../../../../../conversations/types.js";
 
 type EditOpenAIConfigProps = {
   conversation: Conversation;
@@ -12,7 +11,7 @@ type EditOpenAIConfigProps = {
 };
 
 export async function* EditOpenAIConfig(
-  component: HTMLElement & BloomComponent & EditOpenAIConfigProps
+  component: HTMLElement & Component & EditOpenAIConfigProps
 ) {
   let apiKey = "";
 

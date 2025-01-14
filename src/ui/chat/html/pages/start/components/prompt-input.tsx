@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";import { Router } from "magic-loop-router";
 import { Ref } from "webjsx";
 
 type PromptInputProps = {
@@ -10,7 +10,7 @@ type PromptInputProps = {
 };
 
 export async function* PromptInput(
-  component: HTMLElement & BloomComponent & PromptInputProps
+  component: HTMLElement & Component & PromptInputProps
 ) {
   // Set up event handler
   component.handleKeyDown = (e: KeyboardEvent) => {

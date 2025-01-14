@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";import { Router } from "magic-loop-router";
 import { formatFileSize } from "../../../../../fs/formatFileSize.js";
 import { createMessageClient } from "../../../../../ipc/messageClient.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
@@ -27,7 +27,7 @@ export type StartChatProps = {
 };
 
 export async function* StartChat(
-  component: HTMLElement & BloomComponent & StartChatProps
+  component: HTMLElement & Component & StartChatProps
 ) {
   const vsCodeApi = getVSCodeApi();
   const promptRef = { current: null as HTMLTextAreaElement | null };

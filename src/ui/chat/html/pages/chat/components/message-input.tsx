@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 import { FileReferenceMap, getFileCount } from "../fileReferences.js";
 
 export type FileSelectionState = {
@@ -15,7 +15,7 @@ export type MessageInputProps = {
 };
 
 export async function* MessageInput(
-  component: HTMLElement & BloomComponent & MessageInputProps
+  component: HTMLElement & Component & MessageInputProps
 ) {
   let showFilePopup = false;
   let selectionState: FileSelectionState = {

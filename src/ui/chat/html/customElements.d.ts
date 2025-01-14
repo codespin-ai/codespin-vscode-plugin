@@ -1,7 +1,7 @@
 import { BloomComponent } from "bloom-router";
 
 type PropType<T> = T extends (
-  component: HTMLElement & BloomComponent & infer P
+  component: HTMLElement & Component & infer P
 ) => any
   ? P
   : never;

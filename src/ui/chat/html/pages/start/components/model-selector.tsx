@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";import { Router } from "magic-loop-router";
 import { ChatPanelBrokerType } from "../../../../getMessageBroker.js";
 import { MessageClient } from "../../../../../../ipc/messageClient.js";
 
@@ -15,7 +15,7 @@ type ModelSelectorProps = {
 };
 
 export async function* ModelSelector(
-  component: HTMLElement & BloomComponent & ModelSelectorProps
+  component: HTMLElement & Component & ModelSelectorProps
 ) {
   const handleModelChange = (e: Event) => {
     const newModel = (e.target as HTMLSelectElement).value;

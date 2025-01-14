@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 import {
   CodeContent,
   ContentItem,
@@ -28,7 +28,7 @@ type ChatProps = {
 };
 
 export async function* Chat(
-  component: HTMLElement & BloomComponent & ChatProps
+  component: HTMLElement & Component & ChatProps
 ) {
   const conversationInState = component.conversation;
 

@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 
 export type ChatHeaderProps = {
   provider: string;
@@ -6,7 +6,7 @@ export type ChatHeaderProps = {
 };
 
 export async function* ChatHeader(
-  component: HTMLElement & BloomComponent & ChatHeaderProps
+  component: HTMLElement & Component & ChatHeaderProps
 ) {
   return (
     <div class="p-4 border-b border-vscode-panel-border">

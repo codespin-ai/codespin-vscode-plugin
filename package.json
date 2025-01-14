@@ -128,30 +128,31 @@
   },
   "devDependencies": {
     "@types/mocha": "^10.0.10",
-    "@types/node": "^22.10.3",
+    "@types/node": "^22.10.6",
     "@types/tailwindcss": "^3.1.0",
     "@vscode/test-electron": "^2.4.1",
     "autoprefixer": "^10.4.20",
     "esbuild": "^0.24.2",
-    "glob": "^11.0.0",
+    "glob": "^11.0.1",
     "mocha": "^11.0.1",
-    "postcss": "^8.4.49",
+    "postcss": "^8.5.1",
     "tailwindcss": "^3.4.17",
-    "typescript": "^5.7.2"
+    "typescript": "^5.7.3"
   },
   "dependencies": {
     "@types/vscode": "^1.96.0",
     "@types/vscode-webview": "^1.57.5",
     "@types/ws": "^8.5.13",
     "@vscode/webview-ui-toolkit": "^1.4.0",
-    "bloom-router": "^0.0.21",
     "codespin": "^0.0.275",
     "diff2html": "^3.4.51",
     "gray-matter": "^4.0.3",
-    "ignore": "^7.0.0",
+    "ignore": "^7.0.3",
     "libllm": "^0.0.41",
-    "marked": "^15.0.4",
-    "shiki": "^1.25.1",
-    "webjsx": "^0.0.43"
+    "magic-loop": "^0.0.19",
+    "magic-loop-router": "^0.0.22",
+    "marked": "^15.0.6",
+    "shiki": "^1.27.0",
+    "webjsx": "^0.0.71"
   }
 }

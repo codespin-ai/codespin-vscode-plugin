@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 import { Message } from "../../../../../../conversations/types.js";
 import {
   FileHeadingContent,
@@ -18,7 +18,7 @@ export type MessageListProps = {
 };
 
 export async function* MessageList(
-  component: HTMLElement & BloomComponent & MessageListProps
+  component: HTMLElement & Component & MessageListProps
 ) {
   const renderMessage = (message: Message) => {
     if (message.role === "user") {

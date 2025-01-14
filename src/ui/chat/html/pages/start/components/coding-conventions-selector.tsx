@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";import { Router } from "magic-loop-router";
 import { CodingConvention } from "../../../../../../settings/conventions/CodingConvention.js";
 
 type CodingConventionsSelectorProps = {
@@ -8,7 +8,7 @@ type CodingConventionsSelectorProps = {
 };
 
 export async function* CodingConventionsSelector(
-  component: HTMLElement & BloomComponent & CodingConventionsSelectorProps
+  component: HTMLElement & Component & CodingConventionsSelectorProps
 ) {
   const handleChange = (e: Event) => {
     const value = (e.target as HTMLSelectElement).value;

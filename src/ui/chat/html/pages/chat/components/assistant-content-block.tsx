@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 import { ContentItem } from "../../../../../../conversations/types.js";
 
 type AssistantContentBlockProps = {
@@ -6,7 +6,7 @@ type AssistantContentBlockProps = {
 };
 
 export async function* AssistantContentBlock(
-  component: HTMLElement & BloomComponent & AssistantContentBlockProps
+  component: HTMLElement & Component & AssistantContentBlockProps
 ) {
   const block = component.block;
 

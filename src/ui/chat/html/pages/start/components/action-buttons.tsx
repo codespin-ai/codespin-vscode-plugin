@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";import { Router } from "magic-loop-router";
 import { ChatPanelBrokerType } from "../../../../getMessageBroker.js";
 import { MessageClient } from "../../../../../../ipc/messageClient.js";
 
@@ -11,7 +11,7 @@ type ActionButtonsProps = {
 };
 
 export async function* ActionButtons(
-  component: HTMLElement & BloomComponent & ActionButtonsProps
+  component: HTMLElement & Component & ActionButtonsProps
 ) {
   let showCopied = false;
 

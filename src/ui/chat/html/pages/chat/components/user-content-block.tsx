@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";
 import { UserMessage } from "../../../../../../conversations/types.js";
 
 type UserContentBlockProps = {
@@ -6,7 +6,7 @@ type UserContentBlockProps = {
 };
 
 export async function* UserContentBlock(
-  component: HTMLElement & BloomComponent & UserContentBlockProps
+  component: HTMLElement & Component & UserContentBlockProps
 ) {
   while (true) {
     const { message } = component;

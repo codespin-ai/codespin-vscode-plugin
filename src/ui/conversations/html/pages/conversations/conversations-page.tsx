@@ -1,4 +1,4 @@
-import { BloomComponent, component } from "bloom-router";
+import { component, Component } from "magic-loop";import { Router } from "magic-loop-router";
 import { ConversationSummary } from "../../../../../conversations/types.js";
 import { getVSCodeApi } from "../../../../../vscode/getVSCodeApi.js";
 import { BrowserEvent } from "../../../../types.js";
@@ -19,7 +19,7 @@ const truncatePrompt = (text: string): string => {
 };
 
 export async function* ConversationsPage(
-  component: HTMLElement & BloomComponent & { entries?: ConversationSummary[] }
+  component: HTMLElement & Component & { entries?: ConversationSummary[] }
 ) {
   let entries = component.entries || [];
   let hoveredItemId: string | null = null;
